@@ -1,0 +1,47 @@
+// 亮色模式下的主题色
+:root {
+  --mao-background-color: aliceblue;
+  // 留言板说明背景
+  --mao-bg-message: #f5f5f5;
+  // 分类列表背景
+  --mao-bg-category: linear-gradient(135deg, #f54ea2, #ff7676);
+  // 首页波浪
+  --mao-bg-wave01: rgba(240, 248, 255,0.7);
+  --mao-bg-wave02: rgba(240, 248, 255,0.5);
+  --mao-bg-wave03: rgba(240, 248, 255,0.3);
+  --mao-bg-wave04: rgba(240, 248, 255,1);
+  // footer
+  --mao-bg-footer: linear-gradient(135deg,#f6ceec,#d939cd);
+  // chatgpt模块
+  --mao-bg-right: #dbe4ff;
+  --mao-bg-left: #eebefa;
+  --mao-bg-left-card: #eebefa;
+  // 评论框背景
+  --mao-bg-comment: #F2F2F3;
+  // 回复用户名
+  --mao-bg-reply: rgba(245, 108, 108, 0.7);
+}
+
+// 暗色模式下的主题色
+html.dark {
+  --mao-background-color: #424242;
+  --mao-bg-message: #212121;
+  --mao-bg-category: linear-gradient(135deg,#000c40,#607d8b);
+  --mao-bg-wave01: rgba(70, 70, 70, 0.7);
+  --mao-bg-wave02: rgba(70, 70, 70, 0.5);
+  --mao-bg-wave03: rgba(70, 70, 70, 0.3);
+  --mao-bg-wave04: rgba(70, 70, 70, 1);
+  --mao-bg-footer: linear-gradient(135deg,#000c40,#607d8b);
+  --mao-bg-right: #292D3DFF;
+  --mao-bg-left: #52305e;
+  --mao-bg-left-card: #714e79;
+  --mao-bg-comment: #a8a8b7;
+  --mao-bg-reply: rgba(0, 0, 0, 0.7);
+}
+
+// 全局字体
+body {
+  /* 将 body 元素或者任何其他你想要应用该字体的元素设置为 '阿里妈妈方圆体 VF Regular' */
+  font-family: "阿里妈妈方圆体 VF Regular", sans-serif;
+  /* 当自定义字体尚未加载时提供一个备选字体（在这个例子中是无衬线字体） */
+}

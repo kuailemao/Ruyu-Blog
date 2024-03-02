@@ -1,0 +1,59 @@
+.ant-btn {
+    &.orange {
+        &, &:active, &.active {
+            color: #fff!important;
+            background-color: #ff9900!important;
+            border-color: #ff9900!important;
+        }
+        &:hover, &:focus {
+            background-color: #ffad33!important;
+            border-color: #ffad33!important;
+        }
+        &[disabled] {
+            .color-disabled
+        }
+    }
+    &.green {
+        &, &:active, &.active {
+            color: #fff!important;
+            background-color: #19be6b!important;
+            border-color: #19be6b!important;
+        }
+        &:hover, &:focus {
+            background-color: #47cb89!important;
+            border-color: #47cb89!important;
+        }
+        &[disabled] {
+            .color-disabled
+        }
+    }
+    &.light-blue {
+        &, &:active, &.active {
+            color: #fff;
+            background-color: #2db7f5;
+            border-color: #2db7f5;
+        }
+        &:hover, &:focus {
+            color: #fff;
+            background-color: #57c5f7;
+            border-color: #57c5f7;
+        }
+        &[disabled] {
+            .color-disabled
+        }
+    }
+    &.red {
+        &, &:active, &.active {
+            color: #fff;
+            background-color: #ed4014;
+            border-color: #ed4014;
+        }
+        &:hover, &:focus {
+            background-color: #f16643;
+            border-color: #f16643;
+        }
+        &[disabled] {
+            .color-disabled
+        }
+    }
+}

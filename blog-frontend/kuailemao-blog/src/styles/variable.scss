@@ -1,0 +1,18 @@
+@import "element_style";
+@import "cursor";
+@import "woff";
+
+// 全局样式设置文件
+// 侧边栏卡片的宽度
+$card-width: 80%;
+// 侧边栏卡片的外边距
+$card-margin: 0 10%;
+// 圆角
+$border-radius: 0.6em;
+// 自定义主题颜色(黑/白)
+$menuActiveText: var(--themeColor);
+
+body{
+  transition: all 1s ease !important;
+  background-color: var(--mao-background-color);
+}

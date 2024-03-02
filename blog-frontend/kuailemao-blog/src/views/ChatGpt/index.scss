@@ -1,0 +1,276 @@
+.parent_container {
+  width: 100%;
+  height: 100vh;
+  @media screen and (max-width: 1000px) {
+    padding: .2rem;
+    transition: padding 0.3s;
+  }
+  @media screen and (min-width: 1000px) {
+    padding: 2rem;
+    transition: padding 0.5s;
+  }
+  //border: 1px solid red;
+
+  .container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+
+    .left_card {
+      width: 20%;
+      height: 100%;
+      background: var(--mao-bg-left);
+      box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+
+      @media screen and (max-width: 1000px) {
+        width: 0;
+        // 过渡动画
+        transition: width 0.3s;
+      }
+
+      .left_header {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 15rem;
+
+
+        .title {
+          font-size: 1.2rem;
+          font-weight: bold;
+          margin: 1rem 0;
+        }
+
+        .desc {
+          font-size: 0.8rem;
+          color: #999;
+          margin: 0 0.5rem;
+        }
+      }
+
+      .cards {
+        height: 77%;
+
+        .history_card {
+          background: var(--mao-bg-left-card);
+          border-radius: $border-radius;
+          margin: 0.5rem;
+
+          .history_title {
+            font-size: 1rem;
+            font-weight: bold;
+            // 防止文字换行
+            white-space: nowrap;
+            // 超出部分隐藏
+            overflow: hidden;
+            // 显示省略号
+            text-overflow: ellipsis;
+          }
+
+          div:last-child {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.2rem;
+
+            div div:first-child {
+              font-size: 0.8rem;
+              color: #999;
+            }
+
+            .el-button {
+              height: 1.5rem;
+              font-size: 0.7rem;
+            }
+          }
+        }
+      }
+    }
+
+    .right_card {
+      width: 80%;
+      height: 100%;
+      background: var(--mao-bg-right);
+      margin-left: 2rem;
+      padding-bottom: 5rem;
+      padding-top: 2rem;
+      box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+      position: relative;
+
+      @media screen and (max-width: 1000px) {
+        width: 100%;
+        margin-left: 0rem;
+      }
+
+      .right_tail {
+        .btn {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          .el-input {
+            height: 2.5rem;
+          }
+
+          :deep(.el-input__wrapper) {
+            border-radius: $border-radius;
+          }
+
+          .el-button {
+            height: 2.2rem;
+          }
+        }
+
+        padding: 0.5rem;
+        border-radius: $border-radius;
+        //background: #e5dbff;
+        position: absolute;
+        width: 88%;
+        bottom: 1rem;
+        left: 3rem;
+      }
+
+      .questions_container {
+        display: flex;
+        flex-direction: column;
+
+        .right_questions {
+          display: flex;
+          margin: 1.5rem;
+          flex-direction: row-reverse;
+
+          .el-avatar {
+            // 上对齐
+            margin-top: 1rem;
+          }
+
+          .questions_content {
+            max-width: 50%;
+
+            .name {
+              text-align: right;
+              font-size: 0.75rem;
+              font-weight: bold;
+              margin-right: 0.5rem;
+            }
+
+            .text {
+
+              display: flex;
+              justify-content: flex-end;
+              align-items: center;
+              margin-right: 0.5rem;
+              margin-top: 0.5rem;
+              padding: 0.3rem;
+              border-radius: 0.3rem;
+              border-top-right-radius: 0;
+              min-height: 2rem;
+              background: white;
+              font-size: 0.9rem;
+            }
+          }
+        }
+
+        .left_questions {
+          display: flex;
+          margin: 1.5rem;
+          align-items: center;
+
+          .questions_content {
+            max-width: 50%;
+
+            .name {
+              font-size: 1rem;
+              font-weight: bold;
+              margin-left: 0.5rem;
+            }
+
+            .text {
+              // 文字自动换行
+              word-break: break-all;
+              display: flex;
+              justify-content: flex-start;
+              align-items: center;
+              margin-left: 0.5rem;
+              margin-top: 0.5rem;
+              padding: 0.5rem;
+              border-radius: 0.3rem;
+              border-top-left-radius: 0;
+              min-height: 2rem;
+              background: white;
+              font-size: 0.9rem;
+            }
+          }
+        }
+      }
+
+      .right_content {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        div {
+          margin: 0.5rem 1.5rem;
+          display: flex;
+          flex-direction: column;
+          justify-items: center;
+          align-items: center;
+          width: 13rem;
+          @media screen and (max-width: 750px) {
+            width: 100%;
+            transition: width 0.3s;
+          }
+
+
+          div:nth-child(n+2) {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 4rem;
+            padding: 1rem;
+            border-radius: $border-radius;
+            color: gray;
+            font-size: 0.85rem;
+            background: var(--el-bg-color);
+          }
+        }
+
+        .header {
+          font-size: 1.2rem;
+          font-weight: bold;
+        }
+      }
+
+      .right_header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin-top: 1rem;
+
+        div:first-child {
+          font-size: 1.5rem;
+          font-weight: bold;
+        }
+
+        div:last-child {
+          margin-top: 0.5rem;
+          font-size: 0.82rem;
+          color: #999;
+          display: flex;
+          align-items: center;
+
+          // 模型选择框
+          :deep(.el-input__wrapper) {
+            margin-bottom: 0.5rem;
+            background: transparent;
+            height: 2em;
+            border: gray solid 1px;
+          }
+        }
+      }
+    }
+  }
+}
