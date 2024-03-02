@@ -28,17 +28,17 @@
 
 ## 在线体验地址
 
-** 前台博客：** kuailemao.xyz
+**前台博客：** kuailemao.xyz
 
-** 后台管理：** blog.kuailemao.xyz
+**后台管理：** blog.kuailemao.xyz
 
-** 测试账号：** Test，**密码：** 123456
+**测试账号：** Test，**密码：** 123456
 
-** Gitee地址：** https://gitee.com/kuailemao/ruyu-blog
+**Gitee地址：** https://gitee.com/kuailemao/ruyu-blog
 
-** 接口文档：** [API文档 (kuailemao.xyz)](http://kuailemao.xyz:8088/doc.html#/home)
+**接口文档：** [API文档 (kuailemao.xyz)](http://kuailemao.xyz:8088/doc.html#/home)
 
-** 欢迎各位提交 PR ，一起改进项目**
+**欢迎各位提交 PR ，一起改进项目**
 
 ## 运行环境
 
@@ -81,13 +81,13 @@
 
 ## 技术介绍
 
-** 前台前端（博客）：**Vue3 + Pinia +  Vue Router + TypeScript + Axios + Element Plus + Echarts……
+**前台前端（博客）：** Vue3 + Pinia +  Vue Router + TypeScript + Axios + Element Plus + Echarts……
 
-** 后台启动（管理）：**Vue3 + Pinia +  Vue Router + TypeScript + Axios + Antdv Pro + Ant Design Vue……
+**后台启动（管理）：** Vue3 + Pinia +  Vue Router + TypeScript + Axios + Antdv Pro + Ant Design Vue……
 
-** 后端：**JDK17 + SpringBoot3 + SpringSecurity + Mysql + Redis + Quartz  + RabbitMQ + Minio + Mybatis-Plus + Nginx + Docker……
+**后端：** JDK17 + SpringBoot3 + SpringSecurity + Mysql + Redis + Quartz  + RabbitMQ + Minio + Mybatis-Plus + Nginx + Docker……
 
-** 其他：**Gitee、Github 第三方登录
+**其他：** Gitee、Github 第三方登录
 
 ## 运行环境
 
@@ -133,13 +133,13 @@
 
 ## 最后
 
-** 该文档初次编写可能存在一些问题，如果发现，后面会进行修改提交**
+**该文档初次编写可能存在一些问题，如果发现，后面会进行修改提交**
 
-** 该项目交流群：** （有什么不懂的可以提问）
+**该项目交流群：** （有什么不懂的可以提问）
 
-** QQ：**635887836
+**QQ：** 635887836
 
-** 二维码：**
+**二维码：**
 
 ![博客开源群二维码](https://gitee.com/kuailemao/ruyu-blog/blob/master/img/Ruyu%E5%BC%80%E6%BA%90%E5%8D%9A%E5%AE%A2%E4%BA%A4%E6%B5%81%E7%BE%A4%E7%BE%A4%E8%81%8A%E4%BA%8C%E7%BB%B4%E7%A0%81.png)
 
