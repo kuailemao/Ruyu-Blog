@@ -10,7 +10,7 @@
 
 ### 前台
 
-![前台首页](D:/Tools/%E9%A1%B9%E7%9B%AE/blog%E7%9B%B8%E5%85%B3/%E5%BC%80%E6%BA%90/%E6%BA%90%E7%A0%81/blog/img/%E5%89%8D%E5%8F%B0%E9%A6%96%E9%A1%B5.jpg)
+![前台首页](https://gitee.com/kuailemao/ruyu-blog/tree/master/img/%E5%89%8D%E5%8F%B0%E9%A6%96%E9%A1%B5.jpg)
 
 ![前台中心](D:/Tools/%E9%A1%B9%E7%9B%AE/blog%E7%9B%B8%E5%85%B3/%E5%BC%80%E6%BA%90/%E6%BA%90%E7%A0%81/blog/img/%E5%89%8D%E5%8F%B0%E4%B8%AD%E5%BF%83.jpg)
 
