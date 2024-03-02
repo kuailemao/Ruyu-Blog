@@ -141,5 +141,5 @@
 
 **二维码：**
 
-<img src="https://gitee.com/kuailemao/ruyu-blog/blob/master/img/Ruyu开源博客交流群群聊二维码.png" />
+<img src="https://gitee.com/kuailemao/ruyu-blog/raw/master/img/Ruyu开源博客交流群群聊二维码.png" />
 
