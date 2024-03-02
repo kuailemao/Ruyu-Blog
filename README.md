@@ -14,17 +14,17 @@
 
 ### 前台
 
-![前台首页](https://gitee.com/kuailemao/ruyu-blog/blob/master/img/%E5%89%8D%E5%8F%B0%E9%A6%96%E9%A1%B5.jpg)
+![前台首页](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%89%8D%E5%8F%B0%E9%A6%96%E9%A1%B5.jpg)
 
-![前台中心](https://gitee.com/kuailemao/ruyu-blog/blob/master/img/%E5%89%8D%E5%8F%B0%E4%B8%AD%E5%BF%83.jpg)
+![前台中心](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%89%8D%E5%8F%B0%E4%B8%AD%E5%BF%83.jpg)
 
-![前台文章](https://gitee.com/kuailemao/ruyu-blog/blob/master/img/%E5%89%8D%E5%8F%B0%E6%96%87%E7%AB%A0.jpg)
+![前台文章](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%89%8D%E5%8F%B0%E6%96%87%E7%AB%A0.jpg)
 
 ### 后台
 
-![后台发布文章](https://gitee.com/kuailemao/ruyu-blog/blob/master/img/%E5%90%8E%E5%8F%B0%E5%8F%91%E5%B8%83%E6%96%87%E7%AB%A0.jpg)
+![后台发布文章](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%90%8E%E5%8F%B0%E5%8F%91%E5%B8%83%E6%96%87%E7%AB%A0.jpg)
 
-![后台文章列表](https://gitee.com/kuailemao/ruyu-blog/blob/master/img/%E5%90%8E%E5%8F%B0%E6%96%87%E7%AB%A0%E5%88%97%E8%A1%A8.jpg)
+![后台文章列表](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%90%8E%E5%8F%B0%E6%96%87%E7%AB%A0%E5%88%97%E8%A1%A8.jpg)
 
 ## 在线体验地址
 
