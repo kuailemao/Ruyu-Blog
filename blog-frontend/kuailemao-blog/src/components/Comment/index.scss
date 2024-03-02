@@ -1,0 +1,293 @@
+// 用户评论
+.comments {
+  .comments_title {
+    display: flex;
+    align-items: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 2rem 0;
+
+    span {
+      margin-left: 0.5rem;
+    }
+  }
+
+  .form_container {
+    padding: 0.5rem 1rem;
+
+    .textarea {
+      // 禁止拉长宽度
+      resize: none;
+      padding: 0.5rem;
+      width: 100%;
+      height: 7em;
+      border-radius: 0.5em;
+      line-height: 1.5em;
+      border: 1px solid var(--el-border-color);
+    }
+
+    // 预览
+    .preview {
+      margin-top: 1rem;
+      padding: 0.2rem;
+      width: 100%;
+      min-height: 4em;
+      height: 100%;
+      border-radius: 0.5em;
+      line-height: 1.5em;
+      border: 1px solid var(--el-border-color);
+    }
+
+    // 预览框markdown 默认内边距
+    :deep(.md-editor-preview-wrapper) {
+      padding: 0;
+    }
+
+    // 图片默认样式
+    :deep(.default-theme img) {
+      border: none;
+      width: 40px;
+      height: 40px;
+      // 图片不可放大
+      pointer-events: none;
+      // 跟文字对齐
+      vertical-align: middle;
+    }
+
+    .btn {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+
+      .emojis_container {
+        z-index: 2;
+        position: absolute;
+        top: 2em;
+        width: 25em;
+        height: 20em;
+        background-color: white;
+        border: 1px solid var(--el-border-color);
+
+        .OvO_heo {
+          display: flex;
+          flex-wrap: wrap;
+
+          div {
+            width: 100%;
+            height: 100%;
+            margin: 0.2rem;
+            cursor: pointer;
+
+            img {
+              width: 3em;
+              height: 3em;
+
+              &:hover {
+                background-color: #F1F1F2FF;
+              }
+            }
+          }
+        }
+
+        .OvO_emojis {
+          display: flex;
+          flex-wrap: wrap;
+
+          div {
+            font-size: 1.8rem;
+            width: 1.5em;
+            height: 1.8em;
+            color: #4A4A4A;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+
+            &:hover {
+              background-color: #F1F1F2FF;
+            }
+          }
+        }
+
+        .OvO_options {
+          // 选项卡固定到底部
+          position: relative;
+          background-color: white;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-start;
+          width: 100%;
+          border: 1px solid var(--el-border-color);
+
+
+          .item_emoji {
+            width: 3em;
+            height: 2em;
+            color: #4A4A4A;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 0.26rem;
+            cursor: pointer;
+
+            &:first-child {
+              background-color: #7B5F69;
+              color: white;
+            }
+
+            &:hover {
+              background-color: #F1F1F2FF;
+            }
+
+          }
+        }
+      }
+    }
+
+  }
+}
+
+// 评论内容
+.comment_content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  .comment_content_header {
+    display: flex;
+    justify-content: space-between;
+
+    div {
+      display: flex;
+      margin: 0 0.2rem;
+      align-items: center;
+
+      & div:nth-child(1) {
+        font-weight: bold;
+
+        &:hover {
+          color: #cb829d;
+          cursor: pointer;
+          transition: color 0.5s;
+        }
+      }
+
+      & div:last-child {
+        margin-left: 2rem;
+        font-size: 0.5em;
+        color: grey;
+      }
+    }
+  }
+
+  .comment_content_body {
+    font-size: 0.9rem;
+    margin: 0.5rem 0.2rem;
+    padding: 0.5rem 0.7rem;
+    border-radius: 0.5em;
+    background-color: var(--mao-bg-comment);
+    line-height: 0.8em;
+  }
+
+  .comment_content_footer {
+    display: flex;
+    font-size: 0.7rem;
+    color: grey;
+    margin-top: 0.2rem;
+    margin-right: 1rem;
+    justify-content: flex-end;
+
+    div {
+      display: flex;
+      align-items: center;
+    }
+
+    div:last-child {
+      margin-left: 0.5rem;
+    }
+
+    div:first-child {
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+// 修改
+.comment_content_body {
+  // h1 - h6
+  :deep(.default-theme h1) {
+    font-size: 1.5em;
+  }
+
+  :deep(.default-theme h2) {
+    font-size: 1.3em;
+  }
+
+  :deep(.default-theme h3) {
+    font-size: 1.1em;
+  }
+
+  :deep(.default-theme h4) {
+    font-size: 1em;
+  }
+
+  :deep(.default-theme h5) {
+    font-size: 0.9em;
+  }
+
+  :deep(.default-theme h6) {
+    font-size: 0.8em;
+  }
+
+  :deep(.default-theme h1),
+  :deep(.default-theme h2),
+  :deep(.default-theme h3),
+  :deep(.default-theme h4),
+  :deep(.default-theme h5),
+  :deep(.default-theme h6) {
+    margin: 0;
+    line-height: 1.2em;
+  }
+
+  :deep(.default-theme pre) {
+    margin: 0;
+    background-color: #f6f8fa;
+    border-radius: 0.3em;
+    padding: 0.4em;
+    overflow: auto;
+  }
+
+  // 表情包
+  :deep(.default-theme img) {
+    max-width: 100%;
+    height: auto;
+    vertical-align: middle;
+    border-style: none;
+    padding: 0;
+    margin: 0 0.3rem;
+  }
+
+  // 列表
+  :deep(.default-theme ol),
+  :deep(.default-theme ul) {
+    margin: 0;
+  }
+
+  :deep(.md-editor-preview-wrapper) {
+    padding: 0;
+    margin: 0;
+    background: var(--mao-bg-comment);
+  }
+
+  // 普通文字
+  :deep(.default-theme p) {
+    padding: 0;
+    font-size: 0.9rem;
+  }
+}
+
+// 表情包图片
+:deep(.medium-zoom-image) {
+  pointer-events: none;
+}

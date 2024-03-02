@@ -1,0 +1,123 @@
+.ant-pro-sider{
+  .ant-layout-sider-children{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  &-fixed{
+    position: fixed!important;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 100;
+    box-shadow: 2px 0 8px 0 rgba(29,35,41,.05);
+  }
+
+  &-menu{
+    position: relative;
+    z-index: 10;
+    min-height: 100%;
+    border-inline-end: none !important;
+  }
+
+  &-collapsed-button{
+    border-top: 1px solid rgba(0,0,0,.06);
+  }
+
+  &-collapsed-button-inverted{
+    border-top: 1px solid rgba(143, 132, 117, 0.06);
+  }
+
+  &-light{
+    .ant-menu-light{
+      border-right-color:  transparent;
+    }
+  }
+
+  &-logo{
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 16px 24px;
+    cursor: pointer;
+    transition: padding .3s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+    >a{
+      display:flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+    }
+
+    img{
+      display: inline-block;
+      height: 32px;
+      vertical-align: middle;
+    }
+
+    h1{
+      display: inline-block;
+      height: 32px;
+      margin: 0 0 0 12px;
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 32px;
+      vertical-align: middle;
+      animation: pro-layout-title-hide .3s;
+    }
+  }
+
+  &-collapsed{
+    padding: 16px 8px;
+  }
+}
+
+
+[data-theme='dark'] .ant-pro-sider {
+  &-collapsed-button{
+    border-top: 1px solid rgba(143, 132, 117, 0.06);
+  }
+
+  &-fixed {
+    box-shadow: rgba(13, 13, 13, 0.65) 0 2px 8px 0;
+  }
+}
+
+
+
+@keyframes pro-layout-title-hide {
+  0% {
+      display: none;
+      opacity: 0
+  }
+
+  80% {
+      display: none;
+      opacity: 0
+  }
+
+  to {
+      display: unset;
+      opacity: 1
+  }
+}
+
+.scrollbar {
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background: rgba(190, 190, 190, 0.2);
+  }
+
+  &::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 5px rgba(227, 227, 227, 0.2);
+    border-radius: 0;
+    background: rgba(0, 0, 0, 0.1);
+  }
+}
