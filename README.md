@@ -1,10 +1,14 @@
 ## 博客介绍
 
-![头像](https://foruda.gitee.com/avatar/1667975309022664009/11937114_kuailemao_1667975308.png)
+<p align="center">
+  <a href="http://www.kuailemao.xyz">
+    <img src="https://foruda.gitee.com/avatar/1667975309022664009/11937114_kuailemao_1667975308.png" alt="Ruyu的个人博客" style="border-radius: 50%;">
+  </a>
+</p>
 
-```html
-<b style="text-align: center;">基于 SpringBoot3 + Vue3 开发前后端分离个人博客系统</b>
-```
+<p align="center">
+  基于 SpringBoot3 + Vue3 开发前后端分离个人博客系统
+</p>
 
 ## 项目部分截图
 
@@ -91,11 +95,11 @@
 
 > 最低 2 核 4 G
 
-** 我的：** 腾讯云 2 核 2 G  4 M * 2  （穷）
+**我的：** 腾讯云 2 核 2 G  4 M * 2  （穷）
 
-** 系统：** **OpenCloudOS**	
+**系统：** **OpenCloudOS**	
 
-** 前端：** Docker   **后端：** jenkins
+**前端：** Docker   **后端：** jenkins
 
 ## 后续计划（有空）
 
