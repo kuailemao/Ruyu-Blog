@@ -1,36 +1,41 @@
 ## 博客介绍
 
-![头像](https://foruda.gitee.com/avatar/1667975309022664009/11937114_kuailemao_1667975308.png)
+<p align="center">
+  <a href="http://www.kuailemao.xyz">
+    <img src="https://foruda.gitee.com/avatar/1667975309022664009/11937114_kuailemao_1667975308.png" alt="Ruyu的个人博客" style="border-radius: 50%;">
+  </a>
+</p>
 
-```html
-<b style="text-align: center;">基于 SpringBoot3 + Vue3 开发前后端分离个人博客系统</b>
-```
+<p align="center">
+  基于 SpringBoot3 + Vue3 开发前后端分离个人博客系统
+</p>
 
 ## 项目部分截图
 
 ### 前台
 
-![前台首页](D:/Tools/%E9%A1%B9%E7%9B%AE/blog%E7%9B%B8%E5%85%B3/%E5%BC%80%E6%BA%90/%E6%BA%90%E7%A0%81/blog/img/%E5%89%8D%E5%8F%B0%E9%A6%96%E9%A1%B5.jpg)
+![前台首页](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%89%8D%E5%8F%B0%E9%A6%96%E9%A1%B5.jpg)
 
-![前台中心](D:/Tools/%E9%A1%B9%E7%9B%AE/blog%E7%9B%B8%E5%85%B3/%E5%BC%80%E6%BA%90/%E6%BA%90%E7%A0%81/blog/img/%E5%89%8D%E5%8F%B0%E4%B8%AD%E5%BF%83.jpg)
+![前台中心](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%89%8D%E5%8F%B0%E4%B8%AD%E5%BF%83.jpg)
 
-![前台文章](D:/Tools/%E9%A1%B9%E7%9B%AE/blog%E7%9B%B8%E5%85%B3/%E5%BC%80%E6%BA%90/%E6%BA%90%E7%A0%81/blog/img/%E5%89%8D%E5%8F%B0%E6%96%87%E7%AB%A0.jpg)
+![前台文章](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%89%8D%E5%8F%B0%E6%96%87%E7%AB%A0.jpg)
 
 ### 后台
 
-![后台发布文章](D:/Tools/%E9%A1%B9%E7%9B%AE/blog%E7%9B%B8%E5%85%B3/%E5%BC%80%E6%BA%90/%E6%BA%90%E7%A0%81/blog/img/%E5%90%8E%E5%8F%B0%E5%8F%91%E5%B8%83%E6%96%87%E7%AB%A0.jpg)
+![后台发布文章](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%90%8E%E5%8F%B0%E5%8F%91%E5%B8%83%E6%96%87%E7%AB%A0.jpg)
 
-![后台文章列表](D:/Tools/%E9%A1%B9%E7%9B%AE/blog%E7%9B%B8%E5%85%B3/%E5%BC%80%E6%BA%90/%E6%BA%90%E7%A0%81/blog/img/%E5%90%8E%E5%8F%B0%E6%96%87%E7%AB%A0%E5%88%97%E8%A1%A8.jpg)
+![后台文章列表](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%90%8E%E5%8F%B0%E6%96%87%E7%AB%A0%E5%88%97%E8%A1%A8.jpg)
 
 ## 在线体验地址
+> 服务器比较垃圾，随机可能崩掉，发现了会进行维护，且看且珍惜
 
-**前台博客：**kuailemao.xyz
+**前台博客：** kuailemao.xyz
 
-**后台管理：**blog.kuailemao.xyz
+**后台管理：** blog.kuailemao.xyz
 
 **测试账号：** Test，**密码：** 123456
 
-**Gitee地址：**https://gitee.com/kuailemao/ruyu-blog
+**Gitee地址：** https://gitee.com/kuailemao/ruyu-blog
 
 **接口文档：** [API文档 (kuailemao.xyz)](http://kuailemao.xyz:8088/doc.html#/home)
 
@@ -77,13 +82,13 @@
 
 ## 技术介绍
 
-**前台前端（博客）：**Vue3 + Pinia +  Vue Router + TypeScript + Axios + Element Plus + Echarts……
+**前台前端（博客）：** Vue3 + Pinia +  Vue Router + TypeScript + Axios + Element Plus + Echarts……
 
-**后台启动（管理）：**Vue3 + Pinia +  Vue Router + TypeScript + Axios + Antdv Pro + Ant Design Vue……
+**后台启动（管理）：** Vue3 + Pinia +  Vue Router + TypeScript + Axios + Antdv Pro + Ant Design Vue……
 
-**后端：**JDK17 + SpringBoot3 + SpringSecurity + Mysql + Redis + Quartz  + RabbitMQ + Minio + Mybatis-Plus + Nginx + Docker……
+**后端：** JDK17 + SpringBoot3 + SpringSecurity + Mysql + Redis + Quartz  + RabbitMQ + Minio + Mybatis-Plus + Nginx + Docker……
 
-**其他：**Gitee、Github 第三方登录
+**其他：** Gitee、Github 第三方登录
 
 ## 运行环境
 
@@ -93,7 +98,7 @@
 
 **我的：** 腾讯云 2 核 2 G  4 M * 2  （穷）
 
-**系统：** **OpenCloudOS**	
+**系统：** **OpenCloudOS**
 
 **前端：** Docker   **后端：** jenkins
 
@@ -133,9 +138,9 @@
 
 **该项目交流群：** （有什么不懂的可以提问）
 
-**QQ：**635887836
+**QQ：** 635887836
 
 **二维码：**
 
-![博客开源群二维码](D:/Tools/%E9%A1%B9%E7%9B%AE/blog%E7%9B%B8%E5%85%B3/%E5%BC%80%E6%BA%90/%E6%BA%90%E7%A0%81/blog/img/Ruyu%E5%BC%80%E6%BA%90%E5%8D%9A%E5%AE%A2%E4%BA%A4%E6%B5%81%E7%BE%A4%E7%BE%A4%E8%81%8A%E4%BA%8C%E7%BB%B4%E7%A0%81.png)
+<img src="https://gitee.com/kuailemao/ruyu-blog/raw/master/img/Ruyu开源博客交流群群聊二维码.png" />
 
