@@ -30,7 +30,7 @@ defineProps({
     </div>
     <div class="is_banner_container">
       <!-- 内容区 -->
-      <div class="content_container">
+      <div class="content_container" style="width: 100%">
         <slot name="content"/>
       </div>
       <!-- 侧边栏 -->
