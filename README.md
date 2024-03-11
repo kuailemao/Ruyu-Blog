@@ -37,6 +37,8 @@
 
 **Gitee地址：** https://gitee.com/kuailemao/ruyu-blog
 
+**Github地址：** https://github.com/kuailemao/Ruyu-Blog
+
 **接口文档：** [API文档 (kuailemao.xyz)](http://kuailemao.xyz:8088/doc.html#/home)
 
 **欢迎各位提交 PR ，一起改进项目**
