@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref} from 'vue'
-import {MdCatalog, MdPreview} from 'md-editor-v3';
+import {MdPreview} from 'md-editor-v3';
 import 'md-editor-v3/lib/preview.css';
 import {
   addArticleVisit,
@@ -10,10 +10,10 @@ import {cancelFavorite, userFavorite, isFavorite} from '@/apis/favorite'
 import {cancelLike, isLike, userLike} from '@/apis/like';
 import DirectoryCard from "./DirectoryCard/index.vue";
 import {ElMessage} from "element-plus";
-import {Close} from "@element-plus/icons-vue";
 import router from "@/router";
 import useWebsiteStore from "@/store/modules/website.ts";
 import {useColorMode} from "@vueuse/core";
+import MobileDirectoryCard from "./MobileDirectoryCard/index.vue";
 
 // .env
 const env = import.meta.env;
@@ -22,6 +22,7 @@ const websiteStore = useWebsiteStore()
 const mode = useColorMode()
 const id = 'preview-only';
 const scrollElement = document.documentElement;
+const isShowMoveCatalog = ref(false)
 
 const articleDetail = ref({
   articleCover: '',
@@ -61,7 +62,7 @@ onMounted(async () => {
 
 async function getArticleDetailById() {
   getArticleDetail(route.params.id).then(res => {
-    if(!res.data){
+    if (!res.data) {
       ElMessage.warning({
         message: '文章不存在',
       })
@@ -69,8 +70,8 @@ async function getArticleDetailById() {
       router.push({path: '/'})
       return
     }
-    if (route.params.id){
-       addArticleVisit(route.params.id)
+    if (route.params.id) {
+      addArticleVisit(route.params.id)
     }
     // 时间去掉时分秒
     res.data.createTime = res.data.createTime.split(' ')[0]
@@ -185,8 +186,6 @@ function isLikeFunc() {
   })
 }
 
-const isShowMoveCatalog = ref(false)
-
 </script>
 
 <template>
@@ -235,7 +234,8 @@ const isShowMoveCatalog = ref(false)
             <strong>本文作者： {{ websiteStore.webInfo?.webmasterName }}</strong>
           </div>
           <div class="link">
-            <svg-icon name="author_link"></svg-icon>x`
+            <svg-icon name="author_link"></svg-icon>
+            x`
             <strong>本文链接： </strong>
             <a :href="env.VITE_FRONTEND_URL + $route.path">{{ env.VITE_FRONTEND_URL + $route.path }}</a>
           </div>
@@ -289,7 +289,8 @@ const isShowMoveCatalog = ref(false)
             <div class="qrCode">
               <div>
                 微信
-                <el-image src="http://blog.kuailemao.xyz:9000/blog/pay/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98%E4%BA%8C%E7%BB%B4%E7%A0%81.jpg"/>
+                <el-image
+                    src="http://blog.kuailemao.xyz:9000/blog/pay/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98%E4%BA%8C%E7%BB%B4%E7%A0%81.jpg"/>
               </div>
             </div>
           </template>
@@ -349,26 +350,14 @@ const isShowMoveCatalog = ref(false)
           content="显示目录"
           placement="right"
       >
-      <div class="move_catalog_btn" @click="isShowMoveCatalog = true" >
-        <svg-icon name="directory" class="move_catalog_svg" width="30" height="30"/>
-      </div>
+        <div class="move_catalog_btn" @click="isShowMoveCatalog = true">
+          <svg-icon name="directory" class="move_catalog_svg" width="30" height="30"/>
+        </div>
       </el-tooltip>
     </el-affix>
   </div>
-  <div>
-    <el-drawer v-model="isShowMoveCatalog" :with-header="true" size="60%" direction="rtl" :show-close="false">
-      <template #header>
-        <span style="font-size: 1.2rem">目录</span>
-        <el-button :icon="Close" style="background: none;font-size: 1.5rem;width: 30px;border: none"
-                   @click="isShowMoveCatalog = false"/>
-      </template>
-      <template #default>
-        <div class="move_catalog">
-          <MdCatalog :editorId="id" :scrollElement="scrollElement"/>
-        </div>
-      </template>
-    </el-drawer>
-  </div>
+  <MobileDirectoryCard :id="id" :scroll-element="scrollElement" :is-show-move-catalog="isShowMoveCatalog"
+                       @update:isShowMoveCatalog="(value) =>  isShowMoveCatalog = value"/>
 </template>
 
 <style scoped lang="scss">
@@ -395,39 +384,36 @@ const isShowMoveCatalog = ref(false)
     visibility: visible;
   }
 
-  .move_catalog_svg{
+  .move_catalog_svg {
     @media screen and (max-width: 768px) {
-        width: 25px !important;
-        height: 25px !important;
+      width: 25px !important;
+      height: 25px !important;
     }
-  }
-}
-// 移动端目录
-.move_catalog{
-  :deep(.md-editor-catalog-link){
-    span{
-      font-size: 1.05em;
-    }
-    padding: 1rem;
   }
 }
 
-:deep(.el-drawer__header){
+:deep(.el-drawer__header) {
   margin-bottom: 0;
 }
 
 // 目录
 :deep(.md-editor-catalog-link .md-editor-catalog-link:hover) {
   background: #eeeeee;
-  border-left: 2px solid #eeeeee;
+  border-left: 2px solid grey;
   transition: all 0.3s;
 }
-:deep(.md-editor-catalog-wrapper .md-editor-catalog-link){
+
+// 选中的
+:deep(.md-editor-catalog-link .md-editor-catalog-active){
+  background: gainsboro;
+}
+
+:deep(.md-editor-catalog-wrapper .md-editor-catalog-link) {
   border-left: 2px solid saddlebrown;
   transition: all 0.3s;
 }
 
-:deep(.md-editor-catalog-link){
+:deep(.md-editor-catalog-link) {
   @media screen and (max-width: 768px) {
     font-size: 0.5em;
   }
@@ -601,13 +587,13 @@ const isShowMoveCatalog = ref(false)
   }
 }
 
-:deep(.md-editor-preview-wrapper){
+:deep(.md-editor-preview-wrapper) {
   @media screen and (max-width: 910px) {
     padding: 0.2rem;
   }
 }
 
-:deep(.md-editor){
+:deep(.md-editor) {
   // 主题切换配置
 }
 </style>

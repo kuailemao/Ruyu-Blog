@@ -63,8 +63,10 @@ defineProps({
   }
   // 过渡效果
   transition: margin 0.5s;
-  margin: 0 10%;
+  margin: 0 0;
+  //border: red 1px solid;
   display: flex;
+  justify-content: center;
   padding-bottom: 2rem;
   width: 100%;
 }
@@ -75,6 +77,7 @@ defineProps({
   transition: padding 0.5s;
   //border: red 1px solid;
   @media screen and (max-width: 910px) {
+    width: 100%;
     padding: 0.2rem;
   }
   padding: 1rem;
@@ -86,8 +89,12 @@ defineProps({
 .information_container {
   width: 23%;
   height: 100%;
+  transition: width 0.5s;
   @media screen and (max-width: 910px) {
     display: none;
+  }
+  @media screen and (max-width: 1200px) {
+    width: 30%;
   }
   //border: yellow 1px solid;
 }

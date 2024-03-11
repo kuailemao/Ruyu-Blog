@@ -19,7 +19,6 @@ const useWebsiteStore = defineStore('website', () => {
             const differenceInDays = Math.floor((now - lastUpdatedTimestamp) / (1000 * 60 * 60 * 24));
             res.data.lastUpdateTime = differenceInDays + '天前'
             webInfo.value = res.data
-            console.log('网站信息', res.data)
         })
     }
 
