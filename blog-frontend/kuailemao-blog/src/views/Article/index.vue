@@ -15,6 +15,9 @@ import router from "@/router";
 import useWebsiteStore from "@/store/modules/website.ts";
 import {useColorMode} from "@vueuse/core";
 
+// .env
+const env = import.meta.env;
+
 const websiteStore = useWebsiteStore()
 const mode = useColorMode()
 const id = 'preview-only';
@@ -229,12 +232,12 @@ const isShowMoveCatalog = ref(false)
         <div class="copyright">
           <div class="author">
             <svg-icon name="article_author"></svg-icon>
-            <strong>本文作者： 猫</strong>
+            <strong>本文作者： {{ websiteStore.webInfo?.webmasterName }}</strong>
           </div>
           <div class="link">
-            <svg-icon name="author_link"></svg-icon>
-            <strong>本文链接：</strong>
-            <a href="http://kuailemao.xyz/blog{{ $route.path }}">kuailemao.xyz/blog{{ $route.path }}</a>
+            <svg-icon name="author_link"></svg-icon>x`
+            <strong>本文链接： </strong>
+            <a :href="env.VITE_FRONTEND_URL + $route.path">{{ env.VITE_FRONTEND_URL + $route.path }}</a>
           </div>
           <div class="license">
             <svg-icon name="author_copyright"></svg-icon>
