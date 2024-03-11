@@ -1,5 +1,5 @@
 <template>
-  <Main :only-father-container="false" is-side-bar>
+  <Main is-side-bar>
     <!-- 内容区 -->
     <template #content>
       <div class="announcement">
