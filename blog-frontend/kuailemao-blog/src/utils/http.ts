@@ -21,7 +21,6 @@ let pendingRequestCount = 0; // 初始化请求计数器
 
 // request拦截器
 http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-    console.log(config?.url)
     let url = config?.url;
     if (!(url?.startsWith("https://v1.hitokoto.cn"))){
         // 判断请求前缀
