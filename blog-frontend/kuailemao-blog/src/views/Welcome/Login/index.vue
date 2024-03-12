@@ -9,6 +9,7 @@ import useUserStore from "@/store/modules/user.ts";
 
 
 const formRef = ref();
+const env = import.meta.env;
 
 const form = reactive({
   username: '',
@@ -96,12 +97,12 @@ function userLogin() {
     <div>
       <div class="other_login">
         <div>
-          <el-link href="http://127.0.0.1:8088/oauth/gitee/render">
+          <el-link :href="env.VITE_SERVE + '/oauth/gitee/render'">
             <svg-icon name="gitee" width="20px" height="20px" color="#4E86F1"/>
           </el-link>
         </div>
         <div style="margin-left: 1rem">
-          <el-link href="http://127.0.0.1:8088/oauth/github/render">
+          <el-link :href="env.VITE_SERVE + '/oauth/github/render'">
           <svg-icon name="github" width="20px" height="20px" color="#4E86F1"/>
           </el-link>
         </div>
