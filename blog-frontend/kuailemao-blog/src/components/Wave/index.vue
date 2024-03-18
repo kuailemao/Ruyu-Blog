@@ -141,16 +141,13 @@ p {
 @media (max-width: 768px) {
   .waves {
     margin-bottom: -115px;
-    height: 40px;
-    min-height: 40px;
+    height: 60px;
+    min-height: 50px;
   }
 
-  .content {
-    height: 30vh;
+  .header{
+    bottom: -55px;
   }
 
-  h1 {
-    font-size: 24px;
-  }
 }
 </style>

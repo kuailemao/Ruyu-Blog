@@ -7,9 +7,9 @@
 import MusicList from "./list/index.vue";
 import MusicControl from "./controls/index.vue";
 import { defineComponent, ref, watch } from "vue";
-import blogAvatar from "@/assets/img/blogAvatar.png";
+import blogAvatar from "@/assets/images/blogAvatar.svg";
 
-import { music } from "@/store/index";
+import { music } from "@/store/modules/music";
 import { storeToRefs } from "pinia";
 
 const { getIsShow, getShowLyricBoard, getIsPaused, getIsToggleImg, getMusicDescription } =
@@ -38,9 +38,9 @@ watch(
   () => getIsShow.value,
   (newV) => {
     if (newV) {
-      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflowY = "hidden";
     } else {
-      document.body.style.overflow = "visible";
+      document.documentElement.style.overflowY = "visible";
     }
   },
   {
@@ -57,7 +57,7 @@ watch(
       <div class="music-box flex flex-col justify-center items-center">
         <i
           v-if="!getShowLyricBoard"
-          class="iconfont icon-off-search change-color"
+          class="iconfont icon-off-search dark-close change-color"
           @click="toggleDisc"
         ></i>
         <!-- 播放器列表 -->
@@ -98,7 +98,7 @@ watch(
   left: 0;
   bottom: 0;
   right: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--shadow-mask-bg);
   z-index: 2002;
   opacity: 0;
   display: none;
@@ -106,20 +106,20 @@ watch(
   &-box {
     position: relative;
     width: 100%;
-    max-width: 1080px;
-    background-color: #fff;
+    max-width: 1024px;
+    background-color: var(--global-white);
     overflow: hidden;
   }
 
   .list {
-    max-width: 1080px;
+    max-width: 1024px;
     height: 100%;
     padding-top: 30px;
     overflow: hidden;
   }
 
   .control {
-    max-width: 1080px;
+    max-width: 1024px;
   }
 }
 .icon-off-search {
@@ -128,7 +128,7 @@ watch(
   right: 8px;
   font-size: 1.4rem;
   z-index: 2001;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: var(--shadow-button-bg);
   padding: 10px;
   border-radius: 20px;
 }
@@ -142,7 +142,7 @@ watch(
   z-index: 2001;
   padding: 10px;
   border-radius: 20px;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: var(--shadow-button-bg);
 }
 
 .show-music {
@@ -158,7 +158,7 @@ watch(
   position: fixed;
   left: 0;
   box-sizing: border-box;
-  background-color: #fafafa;
+  background-color: var(--global-shadow-white);
   display: flex;
   align-items: center;
   z-index: 2002;
@@ -185,7 +185,7 @@ watch(
 
 .change-color:hover {
   cursor: pointer;
-  color: #62c28a;
+  color: var(--music-main-active);
 }
 
 .disc-rotate {
@@ -195,7 +195,6 @@ watch(
 .paused {
   animation-play-state: paused;
 }
-
 // pc
 @media screen and (min-width: 768px) {
   .music-disc {
@@ -223,9 +222,11 @@ watch(
   }
 
   .music-box {
+    height: 100%;
+    max-height: 580px;
     position: relative;
     padding: 0;
-    border-radius: 20px;
+    border-radius: 12px;
   }
 
   .music-left {

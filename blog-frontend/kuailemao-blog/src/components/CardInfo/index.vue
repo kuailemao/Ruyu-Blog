@@ -78,14 +78,14 @@ const useWebsite = useWebsiteStore()
     display: flex;
     justify-content: space-around;
     width: 100%;
-    margin-top: 1.2rem;
+    margin-top: 0.7rem;
     div {
       display: flex;
       flex-direction: column;
 
       span {
         font-size: 15px;
-        margin-top: 10px;
+        margin-top: 5px;
       }
 
       span:last-child {

@@ -6,6 +6,7 @@ import 'nprogress/nprogress.css';
 import {Jwt_Prefix} from "@/const/Jwt";
 import {GET_TOKEN} from "@/utils/auth.ts";
 import useLoadingStore from "@/store/modules/loading.ts";
+import {loadEnv} from "vite";
 
 
 // 创建axios实例
@@ -22,6 +23,10 @@ let pendingRequestCount = 0; // 初始化请求计数器
 // request拦截器
 http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     let url = config?.url;
+    if (url?.startsWith(import.meta.env.VITE_MUSIC_BASE_API)){
+        config.baseURL = "";
+    }
+
     if (!(url?.startsWith("https://v1.hitokoto.cn"))){
         // 判断请求前缀
         if (pendingRequestCount === 0) {

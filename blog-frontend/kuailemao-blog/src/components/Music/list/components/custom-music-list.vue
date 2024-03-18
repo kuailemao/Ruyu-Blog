@@ -1,7 +1,7 @@
 <script setup>
 import { defineComponent, h, watch } from "vue";
 
-import { music } from "@/store/index";
+import { music } from "@/store/modules/music";
 import { PLAYTYPE } from "../../musicTool";
 import { storeToRefs } from "pinia";
 import { ElNotification } from "element-plus";
@@ -124,7 +124,7 @@ watch(
     cursor: pointer;
 
     &:hover {
-      color: #62c28a;
+      color: var(--music-main-active);
     }
   }
 

@@ -4,6 +4,7 @@
   </div>
   <!-- 全局loading -->
   <loading></loading>
+  <Music />
 </template>
 
 <script setup lang="ts">

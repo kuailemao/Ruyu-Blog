@@ -1,11 +1,7 @@
 <script setup>
 import { defineComponent } from "vue";
-import { music } from "@/store/index";
+import { music } from "@/store/modules/music";
 import { storeToRefs } from "pinia";
-
-import ProgressLine from "./components/progress-line";
-import Information from "./components/information";
-import AudioControls from "./components/audio-controls";
 
 const { getIsPaused, getCurrentSchedule, getMusicDescription, getIsToggleImg } = storeToRefs(
   music()
@@ -75,7 +71,7 @@ defineComponent({
 
 .change-color:hover {
   cursor: pointer;
-  color: #62c28a;
+  color: var(--music-main-active);
 }
 
 // mobile

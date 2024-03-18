@@ -8,7 +8,7 @@ import {
   Bowl,
   Link,
   UserFilled,
-  Collection,
+  Headset,
   Setting, ChatLineSquare, Promotion, Clock, DocumentCopy, PriceTag, Fries, Close
 } from '@element-plus/icons-vue'
 import SvgIcon from '@/components/SvgIcon/index.vue'
@@ -69,7 +69,7 @@ const logoutSub = () => {
 // 菜单默认值
 const activeIndex = ref('1')
 const handleSelect = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
+  // console.log(key, keyPath)
 }
 
 const isHeader = ref(true)
@@ -204,6 +204,12 @@ function changeToggle({detail}) {
               <Link/>
             </el-icon>
             友链
+          </el-menu-item>
+          <el-menu-item index="/music">
+            <el-icon>
+              <Headset/>
+            </el-icon>
+            音乐
           </el-menu-item>
           <el-menu-item index="/about">
             <el-icon>

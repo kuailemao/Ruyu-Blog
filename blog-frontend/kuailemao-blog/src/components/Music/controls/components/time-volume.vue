@@ -6,11 +6,9 @@
 <script setup>
 import { defineComponent, ref, watch } from "vue";
 
-import { music } from "@/store/index";
+import { music } from "@/store/modules/music";
 import { storeToRefs } from "pinia";
 import { MODELLIST } from "@/utils/enum";
-
-import CustomMusicList from "../../list/components/custom-music-list.vue";
 
 const { getPlayModel, getVolume } = storeToRefs(music());
 
@@ -138,7 +136,7 @@ watch(
 
 .change-color:hover {
   cursor: pointer;
-  color: #62c28a;
+  color: var(--music-main-active);
 }
 
 .pop {
@@ -167,13 +165,13 @@ watch(
 }
 
 :deep(.el-slider__bar) {
-  background-color: #62bf82;
+  background-color: var(--music-main-active);
 }
 
 :deep(.el-slider__button) {
   width: 8px;
   height: 8px;
-  border: solid 2px #62bf82;
+  border: solid 2px var(--music-main-active);
 }
 :deep(.el-slider__runway) {
   margin: 6px 16px 4px 16px !important;

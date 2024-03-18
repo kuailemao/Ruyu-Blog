@@ -1,6 +1,6 @@
 <script setup>
 import { watch, onMounted, onBeforeUnmount, nextTick, ref } from "vue";
-import { music } from "@/store";
+import { music } from "@/store/modules/music";
 import { storeToRefs } from "pinia";
 import { gsapTransLyric } from "@/utils/transform";
 
@@ -399,7 +399,7 @@ onBeforeUnmount(() => {
   bottom: 0;
   z-index: 2000;
   padding: 35px 0;
-  background-color: #fff;
+  background-color: var(--global-white);
   overflow: hidden;
   display: none;
   background-position: center center;
@@ -440,7 +440,7 @@ onBeforeUnmount(() => {
 }
 .special {
   &-title {
-    color: #fff;
+    color: var(--global-white);
     cursor: pointer;
     z-index: 2;
     height: 180px;
@@ -448,8 +448,8 @@ onBeforeUnmount(() => {
 
   .author {
     line-height: 2.8;
-    color: #fff;
-    text-shadow: 0px 0px 5px #ffffff;
+    color: var(--global-white);
+    text-shadow: 0px 0px 5px var(--global-white);
     cursor: pointer;
     text-align: center;
   }
@@ -462,13 +462,13 @@ onBeforeUnmount(() => {
   }
 
   .special-lyric {
-    color: #fff;
+    color: var(--global-white);
     text-align: center;
     z-index: 2;
     font-smooth: never;
     height: 60px;
     line-height: 60px;
-    text-shadow: 0px 0px 5px #ffffff;
+    text-shadow: 0px 0px 5px var(--global-white);
   }
 }
 
@@ -482,7 +482,7 @@ onBeforeUnmount(() => {
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  height: 120px;
+  height: 80px;
   z-index: 9999;
   display: flex;
   justify-content: center;
@@ -490,16 +490,16 @@ onBeforeUnmount(() => {
 
   .control {
     width: 100%;
-    margin: 0 20px;
+    margin: 0 10px;
     padding: 10px 20px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--shadow-mask-bg);
     border-radius: 60px;
 
     &-group {
-      width: 12%;
+      width: 15%;
       display: flex;
       justify-content: space-around;
       align-items: center;
@@ -522,17 +522,17 @@ onBeforeUnmount(() => {
     align-items: center;
     .type-btn {
       cursor: pointer;
-      color: #fff;
+      color: var(--global-white);
 
       &:hover {
-        color: #62c28a;
+        color: var(--music-main-active);
       }
     }
   }
 
   .iconfont {
     font-size: 1.8rem;
-    color: #fff;
+    color: var(--global-white);
   }
 
   .icon-zanting,
@@ -541,7 +541,7 @@ onBeforeUnmount(() => {
   }
   .change-color:hover {
     cursor: pointer;
-    color: #62c28a;
+    color: var(--music-main-active);
   }
 }
 
@@ -671,7 +671,7 @@ onBeforeUnmount(() => {
   }
 
   .control-group {
-    width: 30%;
+    width: 30% !important;
   }
 
   .close-board {

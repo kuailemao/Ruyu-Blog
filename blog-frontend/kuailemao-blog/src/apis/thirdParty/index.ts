@@ -3,7 +3,7 @@ import http from "@/utils/http.ts";
 // 每日鸡汤
 export const getSoup = () => {
     return http({
-        url: 'https://v1.hitokoto.cn/?c=f&encode=json',
+        url: 'https://v1.hitokoto.cn/?c=a&encode=json',
         method: 'get'
     })
 }
