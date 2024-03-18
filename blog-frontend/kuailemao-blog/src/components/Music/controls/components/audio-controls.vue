@@ -7,10 +7,9 @@
 import { defineComponent, onMounted } from "vue";
 
 import { storeToRefs } from "pinia";
-import { music } from "@/store/index";
+import { music } from "@/store/modules/music";
 
 import { ElNotification } from "element-plus";
-import TimeVolume from "./time-volume";
 import { calcMusicTime } from "../../musicTool";
 
 defineComponent({
@@ -35,9 +34,13 @@ const next = async () => {
 };
 
 onMounted(() => {
-  music().init();
   ElNotification({
     offset: 60,
+    title: "欢迎访问我的个人博客~",
+  });
+  music().init();
+  ElNotification({
+    offset: 120,
     title: "左下角听听歌吧～",
   });
 });
@@ -94,7 +97,7 @@ onMounted(() => {
 }
 .change-color:hover {
   cursor: pointer;
-  color: #62c28a;
+  color: var(--music-main-active);
 }
 
 @media screen and (max-width: 768px) {

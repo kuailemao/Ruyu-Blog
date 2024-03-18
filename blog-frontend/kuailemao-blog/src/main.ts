@@ -8,6 +8,8 @@ import 'element-plus/dist/index.css'
 import router from '@/router'
 // 引入模板的全局的样式
 import '@/styles/index.scss'
+// tailwind.css  https://www.tailwindcss.cn/docs
+import "@/styles/tailwind.css";
 // 黑暗模式
 import 'element-plus/theme-chalk/dark/css-vars.css'
 // pinia

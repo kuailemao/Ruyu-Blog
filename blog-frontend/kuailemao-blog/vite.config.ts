@@ -6,6 +6,8 @@ import vue from '@vitejs/plugin-vue'
 // 引入svg需要用到插件
 import {createSvgIconsPlugin} from 'vite-plugin-svg-icons'
 import path from 'path'
+import tailwindcss from 'tailwindcss'
+import autoprefixer from 'autoprefixer'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv) => {
@@ -40,6 +42,12 @@ export default defineConfig(({ mode }: ConfigEnv) => {
                     additionalData: '@import "./src/styles/variable.scss";',
                 },
             },
+            postcss: {
+                plugins: [
+                    tailwindcss,
+                    autoprefixer,
+                ]
+            }
         },
         server: {
             port: 99,
@@ -49,6 +57,11 @@ export default defineConfig(({ mode }: ConfigEnv) => {
                     target: `${loadEnv(mode, process.cwd()).VITE_SERVE}`,
                     changeOrigin: true,
                     rewrite: (path) => path.replace(/^\/api/, '')
+                },
+                '/wapi': {
+                    target: `${loadEnv(mode, process.cwd()).VITE_MUSIC_SERVE}`,
+                    changeOrigin: true,
+                    rewrite: (path) => path.replace(/^\/wapi/, '')
                 }
             }
         }

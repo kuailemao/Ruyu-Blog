@@ -6,7 +6,7 @@
 <script setup>
 import { ref, watch, defineComponent } from "vue";
 
-import { music } from "@/store/index";
+import { music } from "@/store/modules/music";
 
 defineComponent({
   name: "ProgressLine",
@@ -61,14 +61,14 @@ watch(
 }
 
 :deep(.el-slider__bar) {
-  background-color: #62bf82;
+  background-color: var(--music-main-active);
   border-radius: 0px !important;
 }
 
 :deep(.el-slider__button) {
   width: 6px;
   height: 6px;
-  border: solid 3px #62bf82;
+  border: solid 3px var(--music-main-active);
 }
 
 :deep(.el-slider.is-vertical .el-slider__runway) {

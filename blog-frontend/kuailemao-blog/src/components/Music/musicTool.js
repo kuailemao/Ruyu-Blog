@@ -1,4 +1,4 @@
-import { reqMusicDetail, reqMusicDescription, reqMusicLyricById } from "@/api/music";
+import { reqMusicDetail, reqMusicDescription, reqMusicLyricById } from "@/apis/music/index";
 
 export const MODELLIST = [
   "RANDOM", // 随机

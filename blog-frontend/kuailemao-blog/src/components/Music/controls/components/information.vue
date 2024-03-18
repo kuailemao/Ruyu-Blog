@@ -6,7 +6,7 @@
 
 <script setup>
 import { defineComponent } from "vue";
-import { music } from "@/store/index";
+import { music } from "@/store/modules/music";
 import { storeToRefs } from "pinia";
 
 defineComponent({

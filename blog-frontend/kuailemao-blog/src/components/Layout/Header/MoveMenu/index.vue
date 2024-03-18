@@ -4,7 +4,7 @@ import {
   Bowl, Clock,
   DocumentCopy,
   Files,
-  Fries,
+  Fries, Headset,
   HomeFilled,
   IceCreamRound,
   Link,
@@ -87,6 +87,12 @@ function isClose(){
         <Link/>
       </el-icon>
       友链
+    </el-menu-item>
+    <el-menu-item index="/music">
+      <el-icon>
+        <Headset/>
+      </el-icon>
+      音乐
     </el-menu-item>
     <el-menu-item index="/about" @click="isClose">
       <el-icon>

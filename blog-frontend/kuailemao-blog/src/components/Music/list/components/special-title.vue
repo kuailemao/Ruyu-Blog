@@ -18,7 +18,7 @@ defineProps({
   position: relative;
   margin: 0 auto;
   z-index: 2000;
-  text-shadow: 0px 0px 5px #ffffff;
+  text-shadow: 0px 0px 5px var(--global-white);
 }
 // @keyframes noise-anim {
 //   $steps: 20;

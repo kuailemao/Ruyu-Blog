@@ -235,7 +235,6 @@ function isLikeFunc() {
           </div>
           <div class="link">
             <svg-icon name="author_link"></svg-icon>
-            x`
             <strong>本文链接： </strong>
             <a :href="env.VITE_FRONTEND_URL + $route.path">{{ env.VITE_FRONTEND_URL + $route.path }}</a>
           </div>

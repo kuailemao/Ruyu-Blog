@@ -1,10 +1,10 @@
 <script setup>
 import { defineComponent, h, ref, reactive } from "vue";
 
-import { music } from "@/store/index";
+import { music } from "@/store/modules/music";
 import { PLAYTYPE } from "../../musicTool";
 import { ElNotification } from "element-plus";
-import { reqSearch, reqSearchSingerHot } from "@/api/music";
+import { reqSearch, reqSearchSingerHot } from "@/apis/music/index";
 import { storeToRefs } from "pinia";
 
 defineComponent({
@@ -21,6 +21,7 @@ const params = reactive({
   offset: 0,
   id: "",
   loadMore: true,
+  loading: false,
 });
 
 const playMusic = (item) => {
@@ -101,6 +102,7 @@ const search = async () => {
 
 const searchSingerSongs = async (type) => {
   if (!params.loadMore || !singer.value) return;
+  params.loading = true;
   params.id = singer.value.id;
   if (type == "init") {
     params.offset = 0;
@@ -126,6 +128,7 @@ const searchSingerSongs = async (type) => {
       song.active = isActive(song.id);
     });
     searchList.value = params.offset == 0 ? list : searchList.value.concat(list);
+    params.loading = false;
   }
 };
 </script>
@@ -208,7 +211,10 @@ const searchSingerSongs = async (type) => {
             </div>
           </el-col>
           <div class="observe" @click="searchSingerSongs('loadMore')">
-            {{ params.loadMore ? "加载更多" : "已经到底了" }}
+            <Loading :size="24" v-if="params.loading" />
+            <template v-else>
+              {{ params.loadMore ? "点击加载更多～" : "已经到底了" }}
+            </template>
           </div>
         </el-row>
         <div v-else class="empty">空空如也</div>
@@ -243,7 +249,7 @@ const searchSingerSongs = async (type) => {
     .big-title {
       font-weight: 600;
       font-size: 1.2rem;
-      color: #62c28a;
+      color: var(--music-main-active);
     }
 
     .header {
@@ -271,7 +277,7 @@ const searchSingerSongs = async (type) => {
     cursor: pointer;
 
     &:hover {
-      color: #62c28a;
+      color: var(--music-main-active);
     }
   }
 
@@ -283,12 +289,12 @@ const searchSingerSongs = async (type) => {
     text-align: center;
     width: 10%;
     &:hover {
-      color: #62c28a;
+      color: var(--music-main-active);
     }
   }
 
   .active {
-    color: #62c28a;
+    color: var(--music-main-active);
   }
 
   .text-overflow {
@@ -310,7 +316,9 @@ const searchSingerSongs = async (type) => {
   }
 }
 .observe {
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   height: 30px;
   line-height: 30px;

@@ -143,7 +143,7 @@ const card = ref()
     .title {
       font-size: 22px;
       font-weight: bold;
-      margin: 1rem 0;
+      margin: 0.7rem 0 0.5rem 0;
       cursor: pointer;
 
       &:hover {
@@ -157,7 +157,6 @@ const card = ref()
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      margin-top: 1rem;
 
       div {
         display: flex;
@@ -177,7 +176,7 @@ const card = ref()
 
     .description {
       font-size: 15px;
-      padding: 1rem 0;
+      padding: 0.2rem 0;
     }
 
     .tag {

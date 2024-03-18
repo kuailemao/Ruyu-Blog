@@ -63,6 +63,12 @@ export const constantRouter = [
                 component: () => import('@/views/Link/index.vue'),
                 name: 'link',
             },
+            // 音乐
+            {
+                path: '/music',
+                component: () => import('@/views/Music/index.vue'),
+                name: 'music',
+            },
             // 关于
             {
                 path: '/about',
