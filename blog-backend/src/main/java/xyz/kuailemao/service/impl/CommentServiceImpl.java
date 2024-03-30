@@ -163,6 +163,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         // 递归获取父评论的子评论数
         return comments.stream()
                 .filter(comment -> Objects.nonNull(comment.getParentId()) && Objects.equals(comment.getParentId(), parentId))
+                .peek(comment -> {
+                    // 回复子评论的数量
+                    Long count = commentMapper.selectCount(new LambdaQueryWrapper<Comment>().eq(Comment::getReplyId, comment.getId()));
+                    comment.setChildCommentCount(count);
+                })
                 .mapToLong(comment -> {
                     if (!comment.getChildComment().isEmpty()) {
                         return (1 + getChildCommentCount(comment.getChildComment(), comment.getId()));

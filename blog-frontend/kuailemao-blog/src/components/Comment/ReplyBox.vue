@@ -194,13 +194,12 @@ function addChildComment(comment: any) {
   width: 100%;
 
   .OvO_heo {
-    display: flex;
-    flex-wrap: wrap;
 
     div {
+      display: flex;
+      flex-wrap: wrap;
       width: 100%;
       height: 100%;
-      margin: 0.2rem;
       cursor: pointer;
 
       img {
