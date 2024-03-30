@@ -16,10 +16,12 @@ import 'element-plus/theme-chalk/dark/css-vars.css'
 import pinia from '@/store'
 // 全局指令
 import vSlideIn from '@/directives/vSlideIn.ts'
+import vLazy from '@/directives/vLazy.ts'
 
 // 获取应用实例对象
 const app = createApp(App)
 app.directive('slide-in',vSlideIn)
+app.directive('lazy',vLazy)
 // 安装自定义插件
 app.use(gloablComponent)
 // 安装路由

@@ -12,11 +12,11 @@
 <script setup lang="ts">
 
 const imageList = [
-  "http://blog.kuailemao.xyz:9000/blog/background/抖音1.png",
-  "http://blog.kuailemao.xyz:9000/blog/background/抖音2.png",
-  "http://blog.kuailemao.xyz:9000/blog/background/抖音3.png",
-  "http://blog.kuailemao.xyz:9000/blog/background/抖音4.png",
-  "http://blog.kuailemao.xyz:9000/blog/background/抖音5.png",
+  "http://cdn.kuailemao.xyz/blog/background/抖音1.png",
+  "http://cdn.kuailemao.xyz/blog/background/抖音2.png",
+  "http://cdn.kuailemao.xyz/blog/background/抖音3.png",
+  "http://cdn.kuailemao.xyz/blog/background/抖音4.png",
+  "http://cdn.kuailemao.xyz/blog/background/抖音5.png",
 ]
 </script>
 

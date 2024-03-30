@@ -64,7 +64,7 @@ const card = ref()
         <div class="classify" style="left: 0">
           {{ article.categoryName }}
         </div>
-        <img :src="article.articleCover" alt="预览图" @click="$router.push('/article/'+article.id)"
+        <img :data-src="article.articleCover" v-lazy="true" alt="预览图" @click="$router.push('/article/'+article.id)"
              style="cursor: pointer"/>
       </div>
       <div class="character">
@@ -113,7 +113,7 @@ const card = ref()
         <div class="classify" style="right: 0">
           {{ article.categoryName }}
         </div>
-        <img :src="article.articleCover" alt="预览图" @click="$router.push('/article/'+article.id)"
+        <img :data-src="article.articleCover" v-lazy="true" alt="预览图" @click="$router.push('/article/'+article.id)"
              style="cursor: pointer"/>
       </div>
     </div>
@@ -180,7 +180,7 @@ const card = ref()
     }
 
     .tag {
-      span{
+      span {
         font-size: 1em;
       }
     }
