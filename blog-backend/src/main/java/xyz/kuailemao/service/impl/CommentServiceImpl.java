@@ -165,7 +165,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                 .filter(comment -> Objects.nonNull(comment.getParentId()) && Objects.equals(comment.getParentId(), parentId))
                 .peek(comment -> {
                     // 回复子评论的数量
-                    Long count = commentMapper.selectCount(new LambdaQueryWrapper<Comment>().eq(Comment::getReplyId, comment.getId()));
+                    Long count = commentMapper.selectCount(new LambdaQueryWrapper<Comment>().eq(Comment::getReplyId, comment.getId()).eq(Comment::getIsCheck, SQLConst.COMMENT_IS_CHECK));
                     comment.setChildCommentCount(count);
                 })
                 .mapToLong(comment -> {
