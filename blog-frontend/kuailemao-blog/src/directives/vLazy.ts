@@ -1,4 +1,6 @@
 import {loadingImg} from "@/utils/base64-img/loading-img.ts";
+
+// 图片懒加载自定义只狼
 const lazyBinding = (el: any, binding: any) => {
     const placehold = loadingImg;
 
@@ -19,7 +21,6 @@ const lazyBinding = (el: any, binding: any) => {
 
 export default {
     beforeMount(el: HTMLElement, binding: any) { // Vue 2中的`bind`在Vue 3中变为`beforeMount`
-        console.log("初始化")
         lazyBinding(el, binding);
     },
     updated(el: HTMLElement, binding: any) { // Vue 2中的`componentUpdated`在Vue 3中变为`updated`

@@ -91,6 +91,22 @@ const fetchData = () => {
     font-family: "Fredericka the Great", Mulish, -apple-system, "PingFang SC", "Microsoft YaHei",
     sans-serif;
     font-size: 3.5em;
+
+    @media (max-width: 500px) {
+      font-size: 2em;
+      // 字体大小过渡效果
+      @keyframes titleScale {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+    }
     line-height: 1.5;
     animation: titleScale 1s;
     color: white;

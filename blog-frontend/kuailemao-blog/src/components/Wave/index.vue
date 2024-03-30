@@ -142,7 +142,7 @@ p {
   .waves {
     margin-bottom: -115px;
     height: 60px;
-    min-height: 50px;
+    min-height: 70px;
   }
 
   .header{
