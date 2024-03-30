@@ -295,7 +295,7 @@ function isLikeFunc() {
           </template>
           <div>
             <svg-icon name="gift"/>
-            <span>ヾ(≧▽≦*)o！</span>
+            <span class="max-[540px]:hidden">ヾ(≧▽≦*)o！</span>
           </div>
         </el-tooltip>
       </div>
@@ -491,6 +491,10 @@ function isLikeFunc() {
     border-radius: 5px;
     background-color: var(--el-background-color);
 
+    @media screen and (max-width: 450px) {
+      padding: 0.25rem;
+    }
+
     &:hover {
       background-color: var(--el-border-color);
       cursor: pointer;
@@ -509,6 +513,12 @@ function isLikeFunc() {
     padding: 0.5rem 0.9rem;
     border-radius: 5px;
     background-color: var(--el-background-color);
+
+    @media screen and (max-width: 450px) {
+      height: 3em;
+      padding: 0.1rem 0.2rem;
+      margin: 0 0.1rem;
+    }
 
     span {
       margin-left: 0.5em;
