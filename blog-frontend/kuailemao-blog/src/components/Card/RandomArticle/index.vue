@@ -76,7 +76,7 @@ function formatDate(date: []) {
         :isScale="true" @invoke="randomArticleBtn">
     <div class="random_container" v-for="randomArticle in randomArticles">
       <div class="random_image" @click="$router.push('/article/'+randomArticle.id)">
-        <el-image :src="randomArticle.articleCover"/>
+        <img :data-src="randomArticle.articleCover" v-lazy="true" />
       </div>
       <div class="random_text" :key="randomArticle.id">
         <div>{{ randomArticle.articleTitle }}</div>
@@ -98,7 +98,7 @@ function formatDate(date: []) {
     overflow: hidden;
     cursor: pointer;
 
-    .el-image {
+    img {
       width: 100%;
       height: 100%;
       transition: transform 0.3s linear;

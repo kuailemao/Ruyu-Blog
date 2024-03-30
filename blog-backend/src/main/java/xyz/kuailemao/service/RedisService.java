@@ -10,4 +10,6 @@ public interface RedisService {
     void articleCountClear();
 
     void articleVisitCount();
+
+    void clearLimitCache();
 }
