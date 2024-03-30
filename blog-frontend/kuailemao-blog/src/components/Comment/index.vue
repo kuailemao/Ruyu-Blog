@@ -103,7 +103,7 @@ watch(() => textarea.value, (value) => {
     // 判断name是否在value中
     if (value.indexOf(name) === -1) {
       // 不在，拼接
-      return `<span><img src="${heo[key]}" width="24" height="24" O.o="${key}" /></span>`
+      return `<emoji><img src="${heo[key]}" width="24" height="24" O.o="${key}" /></emoji>`
     } else {
       // 在，返回原本的
       return key
@@ -151,7 +151,7 @@ function parsingComments(value: string) {
         return emojis[key]
       }
       // 不在，拼接
-      return `<span><img src="${heo[key]}" width="24" height="24" O.o="${key}" /></span>`
+      return `<emoji><img src="${heo[key]}" width="24" height="24" O.o="${key}" /></emoji>`
     }
   })
 

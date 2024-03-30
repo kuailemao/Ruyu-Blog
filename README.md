@@ -27,6 +27,7 @@
 ![后台文章列表](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%90%8E%E5%8F%B0%E6%96%87%E7%AB%A0%E5%88%97%E8%A1%A8.jpg)
 
 ## 在线体验地址
+**注意：在线预览地址可能与仓库代码不同步，以仓库为主**
 > 服务器比较垃圾，随机可能崩掉，发现了会进行维护，且看且珍惜
 
 **前台博客：** kuailemao.xyz
