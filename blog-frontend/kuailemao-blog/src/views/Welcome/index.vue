@@ -8,7 +8,7 @@
     <!-- 左边区域 -->
     <div class="left-card">
       <el-image style="width: 100%;height: 100%" fit="cover"
-                src="http://cdn.kuailemao.xyz/blog/background/压缩水狗.png"/>
+                src="http://blog.kuailemao.xyz:9000/blog/background/压缩水狗.png"/>
     </div>
     <div class="welcome-title">
       <div>欢迎来到我的个人博客</div>
