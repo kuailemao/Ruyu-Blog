@@ -261,7 +261,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Article article = articleDTO.asViewObject(Article.class, v -> v.setUserId(SecurityUtils.getUserId()));
         if (this.saveOrUpdate(article)) {
             // 新增标签关系
-            List<ArticleTag> articleTags = articleDTO.getTagId().stream().map(articleTag -> ArticleTag.builder().articleId(article.getId()).tagId(articleTag).build()).toList();
+            List<ArticleTag> articleTags = articleDTO.getTagId().stream().filter(tagId -> {
+                        Long count = articleTagMapper.selectCount(new LambdaQueryWrapper<ArticleTag>().eq(ArticleTag::getArticleId, article.getId()).eq(ArticleTag::getTagId, tagId));
+                        return count > 0;
+                    })
+                    .map(articleTag -> ArticleTag.builder().articleId(article.getId()).tagId(articleTag).build()).toList();
             articleTagService.saveBatch(articleTags);
             return ResponseResult.success();
         }
