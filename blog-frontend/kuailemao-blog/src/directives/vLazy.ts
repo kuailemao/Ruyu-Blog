@@ -24,7 +24,6 @@ export default {
         lazyBinding(el, binding);
     },
     updated(el: HTMLElement, binding: any) { // Vue 2中的`componentUpdated`在Vue 3中变为`updated`
-        console.log("修改")
         lazyBinding(el, binding);
     },
 };
