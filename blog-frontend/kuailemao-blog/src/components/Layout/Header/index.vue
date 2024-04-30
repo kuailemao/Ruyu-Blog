@@ -438,7 +438,7 @@ function changeToggle({detail}) {
   }
 
   // 更改element-ui默认样式
-  .menu ::v-deep .el-menu-item:hover {
+  .menu :deep(.el-menu-item:hover)  {
     //background-color: rgba(248, 249, 250, 0.2);
     color: #409EFF;
   }
@@ -480,7 +480,7 @@ function changeToggle({detail}) {
 }
 
 // 组件穿透更改elementui-plue菜单的鼠标悬浮样式
-.el-menu-item:hover::v-deep {
+:deep(.el-menu-item:hover) {
   background-color: rgba(222, 222, 64, 0.2);
 }
 

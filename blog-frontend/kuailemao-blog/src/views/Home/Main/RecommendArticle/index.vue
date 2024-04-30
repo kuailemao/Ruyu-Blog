@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import {getRecommendArticleList} from "@/apis/home";
+import { getRecommendArticleList } from "@/apis/home";
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 const recommendArticles = ref([])
 
@@ -13,21 +19,31 @@ getRecommendArticleList().then(res => {
   });
   recommendArticles.value = res.data
 })
+
+const modules = ref([Navigation,Pagination,Autoplay]);
+
 </script>
 
 <template>
-  <div class="essay_title">
+  <div>
     <el-divider border-style="dashed" content-position="left">
-      <div>
+      <div class="flex items-center">
         <SvgIcon name="recommend" color="#409EFF" class="icon"/>
-        <span>推荐</span>
+        <span class="ml-[5px]">推荐</span>
       </div>
     </el-divider>
   </div>
   <div>
-    <el-carousel trigger="click" height="200px" class="recommend" v-slide-in>
-      <el-carousel-item v-for="recommendArticle in recommendArticles" :key="recommendArticle.id"
-                        @click="$router.push(`/article/${recommendArticle.id}`)" style="cursor: pointer">
+    <swiper class="h-[200px] recommend"
+            loop
+            navigation
+            :pagination="{ clickable: true }"
+            :autoplay="{ delay: 2500 }"
+            :modules="modules"
+            v-if="recommendArticles.length > 0"
+    >
+      <swiper-slide v-for="recommendArticle in recommendArticles" :key="recommendArticle.id"
+                    @click="$router.push(`/article/${recommendArticle.id}`)">
         <div class="item_text">
           <div style="font-size: 30px">
             {{ recommendArticle.articleTitle }}
@@ -40,8 +56,9 @@ getRecommendArticleList().then(res => {
           </div>
         </div>
         <el-image :src="recommendArticle.articleCover"/>
-      </el-carousel-item>
-    </el-carousel>
+      </swiper-slide>
+      <div class="swiper-pagination"></div>
+    </swiper>
   </div>
 </template>
 
@@ -72,21 +89,6 @@ getRecommendArticleList().then(res => {
   // 图片
   .el-image {
     transform: translate(0, -20%);
-  }
-}
-
-.essay_title {
-
-  div {
-    display: flex;
-
-    span {
-      margin-left: 5px;
-    }
-  }
-
-  .icon {
-    color: #409EFF;
   }
 }
 </style>
