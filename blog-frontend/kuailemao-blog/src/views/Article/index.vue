@@ -397,14 +397,13 @@ function isLikeFunc() {
 
 // 目录
 :deep(.md-editor-catalog-link .md-editor-catalog-link:hover) {
-  background: #eeeeee;
   border-left: 2px solid grey;
   transition: all 0.3s;
 }
 
 // 选中的
 :deep(.md-editor-catalog-link .md-editor-catalog-active){
-  background: gainsboro;
+  font-weight: bold;
 }
 
 :deep(.md-editor-catalog-wrapper .md-editor-catalog-link) {
@@ -420,7 +419,7 @@ function isLikeFunc() {
 
 .head_title {
   border-radius: $border-radius;
-  height: 40vh;
+  height: 20rem;
   width: 100%;
   // 调整大小以覆盖整个背景区域
   background-size: cover;

@@ -13,7 +13,7 @@ const useWebsite = useWebsiteStore()
     <div style="font-size: 18px;margin: 10px 0;color: white">
       {{ useWebsite.webInfo?.webmasterName }}
     </div>
-    <div style="color: #bbbbbb;font-size: 15px;line-height: 25px">
+    <div style="color: #bbbbbb;font-size: 15px;line-height: 25px" class="truncate ">
       {{ useWebsite.webInfo?.webmasterCopy }}
     </div>
     <div class="quantity_container">

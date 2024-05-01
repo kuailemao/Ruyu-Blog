@@ -23,7 +23,6 @@ watch(isPad, (val) => {
 })
 
 const flag = JSON.parse(import.meta.env.VITE_APP_PROD)
-console.log(flag)
 const layoutProps = computed(() =>
   pick(appStore.layoutSetting, [
     'fixedHeader',

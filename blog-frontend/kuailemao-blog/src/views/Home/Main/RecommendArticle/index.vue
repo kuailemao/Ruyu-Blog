@@ -88,7 +88,10 @@ const modules = ref([Navigation,Pagination,Autoplay]);
 
   // 图片
   .el-image {
-    transform: translate(0, -20%);
+    // 屏幕大于768时
+    @media screen and (min-width: 768px) {
+      transform: translate(0, -20%);
+    }
   }
 }
 </style>

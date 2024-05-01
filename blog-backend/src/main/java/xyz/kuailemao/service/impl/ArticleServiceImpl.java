@@ -27,10 +27,7 @@ import xyz.kuailemao.utils.RedisCache;
 import xyz.kuailemao.utils.SecurityUtils;
 import xyz.kuailemao.utils.StringUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -147,7 +144,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     public List<RandomArticleVO> listRandomArticle() {
         List<Article> articles = this.query().eq(SQLConst.STATUS, SQLConst.PUBLIC_ARTICLE).list();
-        List<Long> ids = new java.util.ArrayList<>(articles.stream().map(Article::getId).toList());
+        List<Long> ids = new ArrayList<>(articles.stream().map(Article::getId).toList());
         // 打乱集合的顺序
         Collections.shuffle(ids);
         // 取前5个id
@@ -216,10 +213,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             articles = articleMapper.selectList(new LambdaQueryWrapper<Article>().eq(Article::getCategoryId, typeId));
         else if (type == 2) {
             List<Long> articleIds = articleTagMapper.selectList(new LambdaQueryWrapper<ArticleTag>().eq(ArticleTag::getTagId, typeId)).stream().map(ArticleTag::getArticleId).toList();
-            articles = articleMapper.selectBatchIds(articleIds);
-        } else {
-            articles = null;
-        }
+            if (!articleIds.isEmpty()) articles = articleMapper.selectBatchIds(articleIds);
+            else articles = List.of();
+        } else articles = List.of();
 
         if (Objects.isNull(articles) || articles.isEmpty()) return null;
         List<ArticleTag> articleTags = articleTagMapper.selectBatchIds(articles.stream().map(Article::getId).toList());
