@@ -193,6 +193,8 @@ async function onDelete(id: string) {
     }
   })
 }
+// 前台域名
+const domain = import.meta.env.VITE_APP_DOMAIN_NAME_FRONT
 </script>
 
 <template>
@@ -264,7 +266,7 @@ async function onDelete(id: string) {
         >
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'operation'">
-              <a :href="`http://blog.kuailemao.xyz/article/${record.id}`" target="_blank">
+              <a :href="`${domain}article/${record.id}`" target="_blank">
                 <a-button type="link" style="padding: 0;">
                   <template #icon>
                     <LinkOutlined />

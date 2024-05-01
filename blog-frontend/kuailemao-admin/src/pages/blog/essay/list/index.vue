@@ -216,6 +216,9 @@ function onDelete(ids?: string[]) {
     })
   }
 }
+
+// 前台域名
+const domain = import.meta.env.VITE_APP_DOMAIN_NAME_FRONT
 </script>
 
 <template>
@@ -371,7 +374,7 @@ function onDelete(ids?: string[]) {
             {{ record.visitCount }}
           </template>
           <template v-if="column.dataIndex === 'operation'">
-            <a href="http://www.baidu.com" target="_blank">
+            <a :href="`${domain}article/${record.id}`" target="_blank">
               <a-button type="link" style="padding: 0">
                 <template #icon>
                   <LinkOutlined />
