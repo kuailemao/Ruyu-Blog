@@ -244,7 +244,6 @@ const toolbars = [
 function getFormData() {
   if (route.query.id) {
     getArticle(route.query.id as string).then((res) => {
-      console.log(res.data)
       if (res.data)
         formData.value = res.data
     })

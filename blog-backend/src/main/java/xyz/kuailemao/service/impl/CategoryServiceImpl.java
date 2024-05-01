@@ -45,6 +45,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
 
     @Override
     public ResponseResult<Void> addCategory(CategoryDTO categoryDTO) {
+        categoryDTO.setId(null);
         if (this.save(categoryDTO.asViewObject(Category.class))) return ResponseResult.success();
         return ResponseResult.failure();
     }

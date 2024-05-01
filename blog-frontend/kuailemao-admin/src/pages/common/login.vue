@@ -62,7 +62,6 @@ async function submit() {
     }
     const { data } = await loginApi(params)
     token.value = JSON.stringify({ token: data?.token, expires: data?.expire })
-    console.log(data)
     notification.success({
       message: '登录成功',
       description: '欢迎回来！',
