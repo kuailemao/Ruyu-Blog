@@ -73,7 +73,7 @@ function getTreeHole() {
   background-image: url('http://blog.kuailemao.xyz:9000/blog/TreeHole/TreeHole-back.png');
   background-size: cover;
   background-position: center;
-  width: 100vw;
+  min-width: 100vw;
   height: 100vh;
 
   // 内容

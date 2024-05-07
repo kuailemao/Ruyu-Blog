@@ -28,9 +28,9 @@ defineProps({
     <div>
       <slot name="banner"/>
     </div>
-    <div class="is_banner_container">
+    <div class="is_banner_container" style="display: flex;justify-content: center">
       <!-- 内容区 -->
-      <div class="content_container" style="width: 100%">
+      <div class="content_container" style="width: 100%;max-width: 100rem">
         <slot name="content"/>
       </div>
       <!-- 侧边栏 -->
@@ -74,6 +74,7 @@ defineProps({
 .content_container {
   height: 100%;
   width: 60%;
+  max-width: 70rem;
   transition: padding 0.5s;
   //border: red 1px solid;
   @media screen and (max-width: 910px) {
@@ -89,6 +90,7 @@ defineProps({
 .information_container {
   width: 23%;
   height: 100%;
+  max-width: 25rem;
   transition: width 0.5s;
   @media screen and (max-width: 910px) {
     display: none;

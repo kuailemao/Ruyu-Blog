@@ -33,7 +33,7 @@ const modules = ref([Navigation,Pagination,Autoplay]);
       </div>
     </el-divider>
   </div>
-  <div>
+  <div v-if="recommendArticles.length > 0">
     <swiper class="h-[200px] recommend"
             loop
             navigation
@@ -60,6 +60,7 @@ const modules = ref([Navigation,Pagination,Autoplay]);
       <div class="swiper-pagination"></div>
     </swiper>
   </div>
+  <el-skeleton v-else :rows="5" animated />
 </template>
 
 <style scoped lang="scss">
