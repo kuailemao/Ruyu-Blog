@@ -1,6 +1,8 @@
 .parent_container {
   width: 100%;
   height: 100vh;
+  display: flex;
+  justify-content: center;
   @media screen and (max-width: 1000px) {
     padding: .2rem;
     transition: padding 0.3s;
@@ -12,9 +14,10 @@
   //border: 1px solid red;
 
   .container {
-    width: 100%;
+    max-width: 100rem;
     height: 100%;
     display: flex;
+
 
     .left_card {
       width: 20%;
@@ -34,7 +37,7 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        width: 15rem;
+        width: 100%;
 
 
         .title {
@@ -240,6 +243,9 @@
         .header {
           font-size: 1.2rem;
           font-weight: bold;
+        }
+        @media screen and (max-width: 650px) {
+          display: none;
         }
       }
 
