@@ -108,6 +108,12 @@ export const constantRouter = [
             }
         ]
     },
+    // 设置
+    {
+        path: '/setting',
+        component: () => import('@/views/Setting/index.vue'),
+        name: 'setting',
+    },
     // 访问其他任何不存在的路由，重定向到首页
     {
         path: '/:pathMatch(.*)*',

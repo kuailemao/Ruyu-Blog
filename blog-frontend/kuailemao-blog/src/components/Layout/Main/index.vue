@@ -83,7 +83,7 @@ defineProps({
   }
   padding: 1rem;
   background-color: var(--el-bg-color);
-  border-radius: $border-radius;
+  border-radius: .5em;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
