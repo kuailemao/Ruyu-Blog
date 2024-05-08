@@ -9,6 +9,7 @@ import {
   Link,
   UserFilled,
   Headset,
+  Collection,
   Setting, ChatLineSquare, Promotion, Clock, DocumentCopy, PriceTag, Fries, Close
 } from '@element-plus/icons-vue'
 import SvgIcon from '@/components/SvgIcon/index.vue'
@@ -251,24 +252,22 @@ function changeToggle({detail}) {
                 <el-avatar style="margin-right: 3rem"
                            :src="userStore.userInfo?.avatar"></el-avatar>
                 <template #dropdown>
-                  <!-- TODO: 设置 -->
-<!--                  <el-dropdown-item>-->
-<!--                    <template #default>-->
-<!--                      <el-icon>-->
-<!--                        <Setting/>-->
-<!--                      </el-icon>-->
-<!--                      个人设置-->
-<!--                    </template>-->
-<!--                  </el-dropdown-item>-->
-                  <!-- TODO: 收藏 -->
-<!--                  <el-dropdown-item>-->
-<!--                    <template #default>-->
-<!--                      <el-icon>-->
-<!--                        <Collection/>-->
-<!--                      </el-icon>-->
-<!--                      我的收藏-->
-<!--                    </template>-->
-<!--                  </el-dropdown-item>-->
+                  <el-dropdown-item @click="router.push('/setting')">
+                    <template #default>
+                      <el-icon>
+                        <Setting/>
+                      </el-icon>
+                      个人设置
+                    </template>
+                  </el-dropdown-item>
+                  <el-dropdown-item>
+                    <template #default>
+                      <el-icon>
+                        <Collection/>
+                      </el-icon>
+                      我的收藏
+                    </template>
+                  </el-dropdown-item>
                   <el-dropdown-item @click="logoutSub">
                     <template #default>
                       <el-icon>
