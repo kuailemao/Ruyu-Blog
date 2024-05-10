@@ -130,6 +130,7 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
         </div>
         <div class="mt-5 p-3 bg-white rounded" style="border: 1px solid #dcdfe6">
           <div>账号注册时间：1970/1/1 08:00:00</div>
+          <div>最近登录时间：1970/1/1 08:00:00</div>
           <div style="color: grey">
             欢迎加入个人博客！
           </div>

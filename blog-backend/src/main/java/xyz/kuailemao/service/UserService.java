@@ -91,4 +91,11 @@ public interface UserService extends IService<User>, UserDetailsService {
      * @return 是否成功
      */
     ResponseResult<Void> deleteUser(List<Long> ids);
+
+    /**
+     *  修改用户信息
+     * @param userUpdateDTO 参数
+     * @return 是否成功
+     */
+    ResponseResult<Void> updateUser(UserUpdateDTO userUpdateDTO);
 }
