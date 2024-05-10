@@ -365,6 +365,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return ResponseResult.failure();
     }
 
+    @Override
+    public ResponseResult<Void> updateUser(UserUpdateDTO userUpdateDTO) {
+        Long userId = SecurityUtils.getUserId();
+        User user = userUpdateDTO.asViewObject(User.class, v -> v.setId(userId));
+//        if (this.updateById(user)) {
+//            return ResponseResult.success();
+//        }
+        return ResponseResult.failure();
+    }
+
     /**
      * 判断用户名或邮箱是否已存在
      *

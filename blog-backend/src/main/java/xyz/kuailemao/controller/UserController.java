@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import xyz.kuailemao.annotation.AccessLimit;
@@ -43,9 +42,23 @@ public class UserController {
         return ControllerUtils.messageHandler(() -> userService.findAccountById(SecurityUtils.getUserId()));
     }
 
+    /**
+     * 前台修改用户信息
+     *
+     * @param userUpdateDTO 用户信息
+     * @return 是否成功
+     */
+    @Operation(summary = "修改用户信息")
+    @Parameter(name = "userUpdateDTO", description = "修改用户信息")
+    @AccessLimit(seconds = 60, maxCount = 30)
+    @PostMapping("/auth/update")
+    public ResponseResult<Void> updateUser(@RequestBody @Valid UserUpdateDTO userUpdateDTO) {
+        return userService.updateUser(userUpdateDTO);
+    }
+
     @Operation(summary = "用户注册")
     @AccessLimit(seconds = 60, maxCount = 30)
-    @LogAnnotation(module="前台注册",operation= LogConst.INSERT)
+    @LogAnnotation(module = "前台注册", operation = LogConst.INSERT)
     @PostMapping("/register")
     public ResponseResult<Void> register(@RequestBody @Valid UserRegisterDTO userRegisterDTO) {
         return userService.userRegister(userRegisterDTO);
@@ -53,7 +66,7 @@ public class UserController {
 
     @Operation(summary = "重置密码-确认邮件")
     @AccessLimit(seconds = 60, maxCount = 30)
-    @LogAnnotation(module="邮件确认",operation= LogConst.RESET_CONFIRM)
+    @LogAnnotation(module = "邮件确认", operation = LogConst.RESET_CONFIRM)
     @PostMapping("/reset-confirm")
     public ResponseResult<Void> resetConfirm(@RequestBody @Valid UserResetConfirmDTO userResetDTO) {
         return userService.userResetConfirm(userResetDTO);
@@ -61,7 +74,7 @@ public class UserController {
 
     @Operation(summary = "重置密码")
     @AccessLimit(seconds = 60, maxCount = 30)
-    @LogAnnotation(module="重置密码",operation= LogConst.RESET_PASSWORD)
+    @LogAnnotation(module = "重置密码", operation = LogConst.RESET_PASSWORD)
     @PostMapping("/reset-password")
     public ResponseResult<Void> resetPassword(@RequestBody @Valid UserResetPasswordDTO userResetDTO) {
         return userService.userResetPassword(userResetDTO);
@@ -87,10 +100,10 @@ public class UserController {
     @Operation(summary = "更新用户状态")
     @Parameter(name = "roleDeleteDTO", description = "修改用户状态")
     @AccessLimit(seconds = 60, maxCount = 30)
-    @LogAnnotation(module="用户管理",operation=LogConst.UPDATE)
+    @LogAnnotation(module = "用户管理", operation = LogConst.UPDATE)
     @PostMapping("/update/status")
     public ResponseResult<Void> updateStatus(@RequestBody @Valid UpdateRoleStatusDTO updateRoleStatusDTO) {
-        return userService.updateStatus(updateRoleStatusDTO.getId(),updateRoleStatusDTO.getStatus());
+        return userService.updateStatus(updateRoleStatusDTO.getId(), updateRoleStatusDTO.getStatus());
     }
 
     @PreAuthorize("hasAnyAuthority('system:user:details')")
@@ -106,7 +119,7 @@ public class UserController {
     @Operation(summary = "删除用户")
     @Parameter(name = "id", description = "用户id")
     @AccessLimit(seconds = 60, maxCount = 30)
-    @LogAnnotation(module="用户管理",operation=LogConst.DELETE)
+    @LogAnnotation(module = "用户管理", operation = LogConst.DELETE)
     @DeleteMapping("/delete")
     public ResponseResult<Void> deleteUser(@RequestBody UserDeleteDTO userDeleteDTO) {
         return userService.deleteUser(userDeleteDTO.getIds());
