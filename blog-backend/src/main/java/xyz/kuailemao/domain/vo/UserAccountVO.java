@@ -1,9 +1,12 @@
 package xyz.kuailemao.domain.vo;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import xyz.kuailemao.domain.BaseData;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -43,4 +46,10 @@ public class UserAccountVO implements BaseData {
     // 账号权限
     @Schema(description = "用户权限")
     private List<String> permissions;
+    //用户最近登录时间
+    @Schema(description = "用户最近登录时间")
+    private Date loginTime;
+    //用户创建时间
+    @Schema(description = "用户创建时间")
+    private Date createTime;
 }

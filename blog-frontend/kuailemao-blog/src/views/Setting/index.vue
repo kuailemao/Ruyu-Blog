@@ -18,9 +18,6 @@ const accountForm = ref<any>({
 
 const avatarImg = ref()
 
-// 是否修改头像标识
-const flag = ref(false)
-
 const userStore = useUserStore()
 
 function updateUser(){
@@ -34,10 +31,11 @@ function updateUser(){
   })
 }
 
+// 第一次的图片路径
+const firstImg = ref('')
+
 const submitUploadAntUpdate = () => {
-  if (flag.value) {
-    alert('上传图片')
-    flag.value = false
+  if (firstImg.value !== avatarImg.value) {
     uploadRef.value!.submit()
   }else updateUser()
 }
@@ -56,7 +54,7 @@ const handleAvatarSuccess: UploadProps['onSuccess'] = (
   }
   accountForm.value.avatar = response.data
   updateUser()
-  alert('成功')
+  firstImg.value = avatarImg.value
 }
 
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
@@ -79,14 +77,10 @@ onMounted(() => {
     if (userStore.userInfo) {
       accountForm.value = userStore.userInfo
       avatarImg.value = userStore.userInfo.avatar
+      firstImg.value = userStore.userInfo.avatar
     }
   });
 })
-
-watch(avatarImg.value,() =>{
-  alert('调用')
-})
-
 </script>
 
 <template>
@@ -118,7 +112,7 @@ watch(avatarImg.value,() =>{
                     ref="uploadRef"
                     name="avatarFile"
                 >
-                  <img v-if="avatarImg" :src="avatarImg" class="avatar" alt="头像"/>
+                  <img v-if="avatarImg" :src="avatarImg" class="avatar" alt="头像" style="border-radius: 50%"/>
                   <el-icon v-else class="avatar-uploader-icon">
                     <Plus/>
                   </el-icon>
@@ -185,7 +179,7 @@ watch(avatarImg.value,() =>{
       <div class="md:ml-10 md:w-[20rem] w-full p-5 " style="min-height: 20px;position: sticky;top: 20px">
         <div class="bg-white rounded" style="border: 1px solid #dcdfe6">
           <div style="text-align: center;padding: 15px 15px 10px 15px">
-            <el-avatar :size="70" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"/>
+            <el-avatar :size="70" :src="userStore.userInfo?.avatar"/>
             <div style="font-weight: bold">
               你好，{{ userStore.userInfo?.nickname }}
             </div>
@@ -196,10 +190,10 @@ watch(avatarImg.value,() =>{
           </div>
         </div>
         <div class="mt-5 p-3 bg-white rounded" style="border: 1px solid #dcdfe6">
-          <div>账号注册时间：1970/1/1 08:00:00</div>
-          <div>最近登录时间：1970/1/1 08:00:00</div>
+          <div>注册时间：{{ userStore.userInfo?.createTime }}</div>
+          <div>登录时间：{{ userStore.userInfo?.loginTime }}</div>
           <div style="color: grey">
-            欢迎加入个人博客！
+            欢迎加入Ruyu个人博客！
           </div>
         </div>
       </div>
