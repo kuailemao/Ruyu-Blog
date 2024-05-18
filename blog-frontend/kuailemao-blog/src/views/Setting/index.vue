@@ -1,30 +1,92 @@
 <script setup lang="ts">
-import {ElMessage} from 'element-plus'
+import {ElMessage, UploadInstance} from 'element-plus'
 import {Plus, User, Select, Message, Refresh} from '@element-plus/icons-vue'
 
 import type {UploadProps} from 'element-plus'
+import useUserStore from "@/store/modules/user.ts";
+import {updateUserAccount} from "@/apis/user";
 
-const radio = ref('保密')
 
-const imageUrl = ref('')
+const uploadRef = ref<UploadInstance>()
+
+const accountForm = ref<any>({
+  nickname: '',
+  gender: undefined,
+  intro: '',
+  avatar: ''
+})
+
+const avatarImg = ref()
+
+// 是否修改头像标识
+const flag = ref(false)
+
+const userStore = useUserStore()
+
+function updateUser(){
+  updateUserAccount(accountForm.value).then((resp: any) => {
+    if (resp.code == 200) {
+      ElMessage.success('信息更新成功')
+      userStore.userInfo = accountForm.value
+    } else {
+      ElMessage.error(resp.data.msg)
+    }
+  })
+}
+
+const submitUploadAntUpdate = () => {
+  if (flag.value) {
+    alert('上传图片')
+    flag.value = false
+    uploadRef.value!.submit()
+  }else updateUser()
+}
+
+// 上传头像
+const uploadAvatar = import.meta.env.VITE_SERVE + '/user/auth/upload/avatar'
+// token
+const token = localStorage.getItem('Token') || sessionStorage.getItem('Token') || ''
 
 const handleAvatarSuccess: UploadProps['onSuccess'] = (
-    response,
-    uploadFile
+    response
 ) => {
-  imageUrl.value = URL.createObjectURL(uploadFile.raw!)
+  if (response.code !== 200) {
+    ElMessage.error('头像上传失败！' + response.msg)
+    return
+  }
+  accountForm.value.avatar = response.data
+  updateUser()
+  alert('成功')
 }
 
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
-  if (rawFile.type !== 'image/jpeg') {
-    ElMessage.error('Avatar picture must be JPG format!')
+  if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
+    ElMessage.error('头像图片需要jpg或者png类型的图片！！')
     return false
   } else if (rawFile.size / 1024 / 1024 > 2) {
-    ElMessage.error('Avatar picture size can not exceed 2MB!')
+    ElMessage.error('头像图片大小不能超过2MB！')
     return false
   }
   return true
 }
+
+const handleChange = (uploadFile: any) => {
+  avatarImg.value = URL.createObjectURL(uploadFile.raw)
+}
+
+onMounted(() => {
+  watchEffect(() => {
+    if (userStore.userInfo) {
+      accountForm.value = userStore.userInfo
+      avatarImg.value = userStore.userInfo.avatar
+    }
+  });
+})
+
+watch(avatarImg.value,() =>{
+  alert('调用')
+})
+
 </script>
 
 <template>
@@ -46,12 +108,17 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
               <div class="flex justify-center">
                 <el-upload
                     class="avatar-uploader"
-                    action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+                    :action="uploadAvatar"
                     :show-file-list="false"
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload"
+                    :on-change="handleChange"
+                    :headers="{'Authorization': 'Bearer ' + JSON.parse(token).token}"
+                    :auto-upload="false"
+                    ref="uploadRef"
+                    name="avatarFile"
                 >
-                  <img v-if="imageUrl" :src="imageUrl" class="avatar" alt="头像"/>
+                  <img v-if="avatarImg" :src="avatarImg" class="avatar" alt="头像"/>
                   <el-icon v-else class="avatar-uploader-icon">
                     <Plus/>
                   </el-icon>
@@ -64,21 +131,21 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
                     class="w-full mt-5"
                 >
                   <el-form-item label="用户昵称">
-                    <el-input placeholder="请输入用户昵称"/>
+                    <el-input placeholder="请输入用户昵称" v-model="accountForm.nickname"/>
                   </el-form-item>
                   <el-form-item label="性别">
-                    <el-radio-group v-model="radio">
-                      <el-radio label="男">男</el-radio>
-                      <el-radio label="女">女</el-radio>
-                      <el-radio label="保密">保密</el-radio>
+                    <el-radio-group v-model="accountForm.gender">
+                      <el-radio :label="1">男</el-radio>
+                      <el-radio :label="2">女</el-radio>
+                      <el-radio :label="0">保密</el-radio>
                     </el-radio-group>
                   </el-form-item>
                   <el-form-item label="个人简介">
-                    <el-input type="textarea" placeholder="请输入个人简介"/>
+                    <el-input type="textarea" placeholder="请输入个人简介" v-model="accountForm.intro"/>
                   </el-form-item>
                 </el-form>
               </div>
-              <el-button type="success" :icon="Select">更新信息</el-button>
+              <el-button type="success" :icon="Select" @click="submitUploadAntUpdate">更新信息</el-button>
             </div>
           </div>
         </div>
@@ -120,11 +187,11 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
           <div style="text-align: center;padding: 15px 15px 10px 15px">
             <el-avatar :size="70" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"/>
             <div style="font-weight: bold">
-              你好，mao
+              你好，{{ userStore.userInfo?.nickname }}
             </div>
             <el-divider style="margin: 10px 0"/>
             <div style="font-size: 14px;color: grey;padding: 10px">
-              {{ '这个用户很懒，没有填写个人简介~' }}
+              {{ userStore.userInfo?.intro || '这个用户很懒，没有填写个人简介~' }}
             </div>
           </div>
         </div>

@@ -34,6 +34,9 @@ public class UserAccountVO implements BaseData {
     //用户邮箱
     @Schema(description = "用户邮箱")
     private String email;
+    //用户性别
+    @Schema(description = "用户性别")
+    private Integer gender;
     // 账号角色
     @Schema(description = "用户角色")
     private List<String> roles;

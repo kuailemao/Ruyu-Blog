@@ -34,7 +34,7 @@ public class User implements BaseData {
     private String username;
     //用户密码
     private String password;
-    //用户性别
+    //用户性别(0,未定义,1,男,2女)
     private Integer gender;
     //用户头像
     private String avatar;

@@ -9,6 +9,7 @@ export interface UserInfo {
     registerType: number;
     email: string;
     roles: string[];
+    gender: number;
     permissions: string[];
 }
 
@@ -79,6 +80,15 @@ export function resetPasswordStepOne(data: any) {
 export function resetPasswordStepTwo(data: any) {
     return http({
         url: '/user/reset-password',
+        data: data,
+        method: 'post'
+    })
+}
+
+// 修改用户信息
+export function updateUserAccount(data: any) {
+    return http({
+        url: '/user/auth/update',
         data: data,
         method: 'post'
     })
