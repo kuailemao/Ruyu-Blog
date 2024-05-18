@@ -7,6 +7,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import xyz.kuailemao.annotation.AccessLimit;
 import xyz.kuailemao.annotation.LogAnnotation;
 import xyz.kuailemao.constants.LogConst;
@@ -54,6 +55,18 @@ public class UserController {
     @PostMapping("/auth/update")
     public ResponseResult<Void> updateUser(@RequestBody @Valid UserUpdateDTO userUpdateDTO) {
         return userService.updateUser(userUpdateDTO);
+    }
+
+    /**
+     *  上传用户头像
+     * @param avatarFile  头像
+     * @return 是否成功, 头像地址
+     */
+    @Operation(summary = "用户头像上传")
+    @AccessLimit(seconds = 60, maxCount = 3)
+    @PostMapping("/auth/upload/avatar")
+    public ResponseResult<String> uploadAvatar(@RequestParam("avatarFile") MultipartFile avatarFile) {
+        return userService.uploadAvatar(avatarFile);
     }
 
     @Operation(summary = "用户注册")

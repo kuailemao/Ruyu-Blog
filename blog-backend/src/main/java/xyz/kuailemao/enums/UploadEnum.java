@@ -22,7 +22,9 @@ public enum UploadEnum {
     // 文章封面
     ARTICLE_COVER("article/articleCover/", "文章封面", List.of("jpg", "jpeg", "png")),
     // 文章图片
-    ARTICLE_IMAGE("article/articleImage/", "文章图片", List.of("jpg", "jpeg", "png","gif"));
+    ARTICLE_IMAGE("article/articleImage/", "文章图片", List.of("jpg", "jpeg", "png", "gif")),
+    // 用户头像
+    USER_AVATAR("user/avatar/", "用户头像", List.of("jpg", "jpeg", "png"));
 
 
     // 上传目录

@@ -1,8 +1,8 @@
 package xyz.kuailemao.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.multipart.MultipartFile;
 import xyz.kuailemao.domain.dto.*;
 import xyz.kuailemao.domain.entity.User;
 import xyz.kuailemao.domain.response.ResponseResult;
@@ -98,4 +98,12 @@ public interface UserService extends IService<User>, UserDetailsService {
      * @return 是否成功
      */
     ResponseResult<Void> updateUser(UserUpdateDTO userUpdateDTO);
+
+    /**
+     * 上传用户头像
+     *
+     * @param avatarFile 头像
+     * @return 是否成功, 返回头像地址
+     */
+    ResponseResult<String> uploadAvatar(MultipartFile avatarFile);
 }
