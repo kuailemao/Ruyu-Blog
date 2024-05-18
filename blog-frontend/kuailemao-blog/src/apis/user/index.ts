@@ -11,6 +11,8 @@ export interface UserInfo {
     roles: string[];
     gender: number;
     permissions: string[];
+    loginTime: string;
+    createTime: string;
 }
 
 // 用户登录
