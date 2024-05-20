@@ -377,14 +377,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public ResponseResult<String> uploadAvatar(MultipartFile avatarFile) {
-        try {
-            String upload = fileUploadUtils.upload(UploadEnum.USER_AVATAR, avatarFile);
-            return ResponseResult.success(upload);
-        } catch (Exception e) {
-            log.error("上传头像失败", e);
-            return ResponseResult.failure("上传失败，请联系管理员");
-        }
+    public ResponseResult<String> uploadAvatar(MultipartFile avatarFile) throws Exception {
+        String upload = fileUploadUtils.upload(UploadEnum.USER_AVATAR, avatarFile);
+        return ResponseResult.success(upload);
     }
 
     /**

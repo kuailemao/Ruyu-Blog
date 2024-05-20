@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.kuailemao.constants.Const;
 import xyz.kuailemao.enums.UploadEnum;
+import xyz.kuailemao.exceptions.FileUploadException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,6 +48,8 @@ public class FileUploadUtils {
      * @throws Exception 异常
      */
     public String upload(UploadEnum uploadEnum,MultipartFile file) throws Exception {
+        // 验证文件大小
+        if (verifyTheFileSize(file.getSize(), uploadEnum.getLimitSize())) throw new FileUploadException("上传文件大小超过限制");
         if (isFormatFile(file.getOriginalFilename(),uploadEnum.getFormat())){
             InputStream stream = file.getInputStream();
             String name = UUID.randomUUID().toString();
@@ -65,7 +68,29 @@ public class FileUploadUtils {
             return endpoint + "/" + bucketName + "/" + uploadEnum.getDir() + name + "." + fileExtension;
         }
         log.error("--------------------上传文件格式不正确--------------------");
-        return null;
+        throw new FileUploadException("上传文件类型错误");
+    }
+
+    public Boolean verifyTheFileSize(Long fileSize, Double limitSize) {
+        // 转为相同大小格式
+        double formatFileSize = convertFileSizeToMB(fileSize);
+        if (formatFileSize < limitSize) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * B 转 MB
+     *
+     * @param sizeInBytes 文件大小 B
+     * @return 文件大小 MB
+     */
+    public double convertFileSizeToMB(long sizeInBytes) {
+        double sizeInMB = (double) sizeInBytes / (1024 * 1024);
+        String formatted = String.format("%.2f", sizeInMB);
+        // String转为Long
+        return Double.parseDouble(formatted);
     }
 
     /**
