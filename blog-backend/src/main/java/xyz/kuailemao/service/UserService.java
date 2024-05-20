@@ -105,5 +105,5 @@ public interface UserService extends IService<User>, UserDetailsService {
      * @param avatarFile 头像
      * @return 是否成功, 返回头像地址
      */
-    ResponseResult<String> uploadAvatar(MultipartFile avatarFile);
+    ResponseResult<String> uploadAvatar(MultipartFile avatarFile) throws Exception;
 }

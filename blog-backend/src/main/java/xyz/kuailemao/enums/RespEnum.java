@@ -59,7 +59,11 @@ public enum RespEnum {
     /**
      * 未删除子菜单
      */
-    NO_DELETE_CHILD_MENU(1010, "请先删除子菜单");
+    NO_DELETE_CHILD_MENU(1010, "请先删除子菜单"),
+    /**
+     * 文件上传错误
+     */
+    FILE_UPLOAD_ERROR(1011, "文件上传错误");
 
 
 

@@ -65,7 +65,7 @@ public class UserController {
     @Operation(summary = "用户头像上传")
     @AccessLimit(seconds = 60, maxCount = 3)
     @PostMapping("/auth/upload/avatar")
-    public ResponseResult<String> uploadAvatar(@RequestParam("avatarFile") MultipartFile avatarFile) {
+    public ResponseResult<String> uploadAvatar(@RequestParam("avatarFile") MultipartFile avatarFile) throws Exception {
         return userService.uploadAvatar(avatarFile);
     }
 

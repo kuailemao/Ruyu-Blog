@@ -24,7 +24,7 @@ function updateUser(){
   updateUserAccount(accountForm.value).then((resp: any) => {
     if (resp.code == 200) {
       ElMessage.success('信息更新成功')
-      userStore.userInfo = accountForm.value
+      userStore.getInfo()
     } else {
       ElMessage.error(resp.data.msg)
     }
@@ -58,6 +58,7 @@ const handleAvatarSuccess: UploadProps['onSuccess'] = (
 }
 
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+  firstImg.value = avatarImg.value
   if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
     ElMessage.error('头像图片需要jpg或者png类型的图片！！')
     return false
@@ -150,7 +151,7 @@ onMounted(() => {
             </el-icon>
             <span class="font-bold text-xl ml-2">电子邮件设置</span>
           </div>
-          <span style="color: gray;font-size: 0.8rem">在这里可以编辑你的个人信息，个人简介等等……</span>
+          <span style="color: gray;font-size: 0.8rem">在这里可以修改绑定的电子邮箱信息</span>
           <el-divider style="margin-top: 0.5rem"/>
           <div class="flex justify-center">
             <div class="w-full mb-5">
