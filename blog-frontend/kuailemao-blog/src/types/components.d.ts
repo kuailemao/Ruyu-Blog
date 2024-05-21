@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AudioControls: typeof import('./../components/Music/controls/components/audio-controls.vue')['default']
     Banner: typeof import('./../components/Banner/index.vue')['default']
+    BottomRightLayout: typeof import('./../components/BottomRightLayout/index.vue')['default']
     Card: typeof import('./../components/Card/index.vue')['default']
     CardEssay: typeof import('./../components/CardEssay/index.vue')['default']
     CardInfo: typeof import('./../components/CardInfo/index.vue')['default']
@@ -20,6 +21,7 @@ declare module 'vue' {
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElBacktop: typeof import('element-plus/es')['ElBacktop']
     ElButton: typeof import('element-plus/es')['ElButton']
+    ElCard: typeof import('element-plus/es')['ElCard']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElDialog: typeof import('element-plus/es')['ElDialog']

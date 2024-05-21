@@ -21,7 +21,7 @@ const noDisplayComponent = computed(() => {
   <template v-if="noDisplayComponent">
     <Footer/>
   </template>
-  <ToTop/>
+  <BottomRightLayout to-top/>
 </template>
 
 <style scoped lang="scss">

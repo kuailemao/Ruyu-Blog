@@ -20,7 +20,7 @@ const avatarImg = ref()
 
 const userStore = useUserStore()
 
-function updateUser(){
+function updateUser() {
   updateUserAccount(accountForm.value).then((resp: any) => {
     if (resp.code == 200) {
       ElMessage.success('信息更新成功')
@@ -37,7 +37,7 @@ const firstImg = ref('')
 const submitUploadAntUpdate = () => {
   if (firstImg.value !== avatarImg.value) {
     uploadRef.value!.submit()
-  }else updateUser()
+  } else updateUser()
 }
 
 // 上传头像
@@ -144,7 +144,7 @@ onMounted(() => {
             </div>
           </div>
         </div>
-        <div class="bg-white w-full p-5 mt-5 rounded shadow shadow-slate-300">
+        <div class="bg-white w-full p-5 mt-5 rounded shadow shadow-slate-300 mb-28">
           <div>
             <el-icon>
               <Message/>
@@ -154,7 +154,7 @@ onMounted(() => {
           <span style="color: gray;font-size: 0.8rem">在这里可以修改绑定的电子邮箱信息</span>
           <el-divider style="margin-top: 0.5rem"/>
           <div class="flex justify-center">
-            <div class="w-full mb-5">
+            <div class="w-full mb-5" v-if="userStore.userInfo?.registerType === 0">
               <div class="flex justify-center mx-6">
                 <el-form
                     label-position="top"
@@ -174,11 +174,15 @@ onMounted(() => {
               </div>
               <el-button class="ml-6" type="success" :icon="Refresh">更新信息</el-button>
             </div>
+            <div v-else>
+              <span>您是第三方的注册方式，无法修改哦！！</span>
+            </div>
           </div>
         </div>
       </div>
       <div class="md:ml-10 md:w-[20rem] w-full p-5 " style="min-height: 20px;position: sticky;top: 20px">
-        <div class="bg-white rounded" style="border: 1px solid #dcdfe6">
+        <transition name="el-fade-in-linear">
+        <div v-if="userStore.userInfo" class="bg-white rounded" style="border: 1px solid #dcdfe6">
           <div style="text-align: center;padding: 15px 15px 10px 15px">
             <el-avatar :size="70" :src="userStore.userInfo?.avatar"/>
             <div style="font-weight: bold">
@@ -190,13 +194,16 @@ onMounted(() => {
             </div>
           </div>
         </div>
-        <div class="mt-5 p-3 bg-white rounded" style="border: 1px solid #dcdfe6">
-          <div>注册时间：{{ userStore.userInfo?.createTime }}</div>
-          <div>登录时间：{{ userStore.userInfo?.loginTime }}</div>
-          <div style="color: grey">
-            欢迎加入Ruyu个人博客！
+        </transition>
+        <transition name="el-fade-in-linear">
+          <div v-if="userStore.userInfo" class="mt-5 p-3 bg-white rounded" style="border: 1px solid #dcdfe6">
+            <div class="text-gray-400 font-bold">
+              欢迎加入Ruyu个人博客！
+            </div>
+            <div>注册时间：{{ userStore.userInfo?.createTime }}</div>
+            <div>登录时间：{{ userStore.userInfo?.loginTime }}</div>
           </div>
-        </div>
+        </transition>
       </div>
     </div>
   </div>

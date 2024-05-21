@@ -14,6 +14,7 @@ import router from "@/router";
 import useWebsiteStore from "@/store/modules/website.ts";
 import {useColorMode} from "@vueuse/core";
 import MobileDirectoryCard from "./MobileDirectoryCard/index.vue";
+import {throttle} from "@/utils/optimize.ts";
 
 // .env
 const env = import.meta.env;
@@ -186,6 +187,30 @@ function isLikeFunc() {
   })
 }
 
+window.addEventListener("scroll", throttle(() => {
+  window.requestAnimationFrame(scrollWork)
+},40));
+
+// 页面滚动进度
+const progressY = ref('0%')
+
+// 监听页面滚动进度条
+function scrollWork(){
+  // 获取页面高度
+  let pageHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+  // 获取可视区域高度
+  let screenHeight = document.documentElement.clientHeight || document.body.clientHeight;
+  // 滚动高度
+  let scrollHeight = pageHeight - screenHeight;
+  // 获取滚动距离
+  let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+  // 计算进度
+  let progress: any = document.querySelector('.progress');
+  // 设置进度
+  progress.style.width = (scrollTop / scrollHeight) * 100 + '%';
+  progressY.value = Math.floor((scrollTop / scrollHeight) * 100) + '%';
+}
+
 </script>
 
 <template>
@@ -194,6 +219,7 @@ function isLikeFunc() {
       <Header/>
     </template>
     <template #content>
+      <div class="progress"></div>
       <div class="head_title" :style="`background-image: url('${articleDetail.articleCover}')`">
         <div class="head_title_text">
           <div class="classify">
@@ -341,7 +367,11 @@ function isLikeFunc() {
       <Footer/>
     </template>
   </Main>
-  <ToTop/>
+  <BottomRightLayout to-top scroll-percentage>
+    <template #scroll_percentage>
+      {{ progressY }}
+    </template>
+  </BottomRightLayout>
   <div>
     <el-affix position="bottom" :offset="200">
       <el-tooltip
@@ -603,5 +633,16 @@ function isLikeFunc() {
 
 :deep(.md-editor) {
   // 主题切换配置
+}
+
+.progress{
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px;
+  background: var(--mao-scroll-percentage-bar);
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+  z-index: 9999;
 }
 </style>
