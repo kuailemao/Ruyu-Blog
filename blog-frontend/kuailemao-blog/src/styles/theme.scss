@@ -20,6 +20,10 @@
   --mao-bg-comment: #F2F2F3;
   // 回复用户名
   --mao-bg-reply: rgba(245, 108, 108, 0.7);
+  // 文章页面右下角滚动进度背景色
+  --mao-scroll-percentage-bg: #ffffff;
+  // 文章页面底部滚动进度条背景色
+  --mao-scroll-percentage-bar: linear-gradient(135deg,#17ead9,#6078ea);
 
   // 音乐播放器变量
   --primary: #5cbfef;
@@ -63,6 +67,8 @@ html.dark {
   --mao-bg-left-card: #714e79;
   --mao-bg-comment: #a8a8b7;
   --mao-bg-reply: rgba(0, 0, 0, 0.7);
+  --mao-scroll-percentage-bg: #18222c;
+  --mao-scroll-percentage-bar: linear-gradient(135deg,#5b247a,#1bcedf);
 
   // 音乐播放器变量
   --global-white: #424242;

@@ -1,28 +1,39 @@
 <script setup lang="ts">
+import { throttle } from "@/utils/optimize.ts";
 
+// 距离顶部高度
+const top = ref(0)
+window.addEventListener("scroll", throttle(() => {
+  top.value = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0
+  console.log('top',top.value)
+},200));
+
+// 返回顶部
+function backToTop() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
 </script>
 
 <template>
-  <div>
-    <el-backtop :bottom="50">
-      <el-tooltip
-          effect="light"
-          content="回到顶部"
-          placement="right"
-      >
-        <div>
-          <svg-icon name="back_to_top" class="back-to-top"/>
-        </div>
-      </el-tooltip>
-    </el-backtop>
+  <transition name="el-zoom-in-bottom">
+  <div v-if="top >= 1000" @click="backToTop">
+    <el-tooltip
+        effect="light"
+        content="回到顶部"
+        placement="right"
+    >
+      <div>
+        <svg-icon name="back_to_top" class="back-to-top"/>
+      </div>
+    </el-tooltip>
   </div>
+  </transition>
 </template>
 
 <style scoped lang="scss">
-
-:deep(.el-backtop){
-  right: 2rem !important;
-}
 
 .back-to-top{
   height: 40px !important;
