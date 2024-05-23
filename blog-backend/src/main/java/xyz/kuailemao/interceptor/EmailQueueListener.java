@@ -45,9 +45,11 @@ public class EmailQueueListener {
         String type = (String) data.get("type");
         SimpleMailMessage message = switch (type) {
             case "register" ->
-                    createMessage("欢迎注册我们的网站", "您的邮件验证码为：" + code + "，有效时间5分钟，为了保障您的安全，请勿向他人泄露验证码信息。", email);
+                    createMessage("欢迎注册Ruyu-Blog", "您的邮件验证码为：" + code + "，有效时间5分钟，为了保障您的安全，请勿向他人泄露验证码信息。", email);
             case "reset" ->
                     createMessage("重置密码", "您的邮件验证码为：" + code + "，有效时间5分钟，为了保障您的安全，请勿向他人泄露验证码信息。", email);
+            case "resetEmail" ->
+                    createMessage("重置电子邮箱", "您的邮件验证码为：" + code + "，有效时间5分钟，为了保障您的安全，请勿向他人泄露验证码信息。", email);
             case "friendLinkApplication" ->
                     createMessage("友链申请通知", "有新的友链申请，请及时前往博客后台进行审核", email);
             case "friendLinkApplicationPass" ->
@@ -60,13 +62,15 @@ public class EmailQueueListener {
             mailSender.send(message);
             log.info(email + "：邮件发送成功");
             channel.basicAck(tag, false); // 成功则消费消息
-        } catch (MailException | IOException e) {
-            log.error(email + "：邮件发送失败");
+        } catch (MailException e) {
+            log.error(email + "：邮件发送失败", e);
             try {
-                channel.basicAck(tag, false);  // 失败也消费消息
+                channel.basicNack(tag, false, true); // 邮件发送失败，不确认消息，并且重新入队
             } catch (IOException ex) {
-                log.warn(email + ": 消息消费失败 ", ex);
+                log.warn(email + ": 消息重新入队失败", ex);
             }
+        } catch (IOException e) {
+            log.error(email + "：消息确认失败", e);
         }
     }
 

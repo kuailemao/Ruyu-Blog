@@ -95,3 +95,12 @@ export function updateUserAccount(data: any) {
         method: 'post'
     })
 }
+
+// 修改电子邮箱
+export function updateEmail(data: any) {
+    return http({
+        url: '/user/auth/update/email',
+        data: data,
+        method: 'post'
+    })
+}

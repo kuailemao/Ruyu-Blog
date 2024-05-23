@@ -24,6 +24,7 @@ import java.util.List;
 
 /**
  * @author kuailemao
+ * /auth/ 都是需要验证的
  * <p>
  * 创建时间：2023/10/10 14:29
  */
@@ -67,6 +68,18 @@ public class UserController {
     @PostMapping("/auth/upload/avatar")
     public ResponseResult<String> uploadAvatar(@RequestParam("avatarFile") MultipartFile avatarFile) throws Exception {
         return userService.uploadAvatar(avatarFile);
+    }
+
+    /**
+     * 修改用户绑定邮箱
+     * @param updateEmailDTO 所需参数
+     * @return 是否成功
+     */
+    @Operation(summary = "修改用户绑定邮箱")
+    @AccessLimit(seconds = 60, maxCount = 30)
+    @PostMapping("/auth/update/email")
+    public ResponseResult<Void> updateEmail(@RequestBody @Valid UpdateEmailDTO updateEmailDTO) {
+        return userService.updateEmailAndVerify(updateEmailDTO);
     }
 
     @Operation(summary = "用户注册")

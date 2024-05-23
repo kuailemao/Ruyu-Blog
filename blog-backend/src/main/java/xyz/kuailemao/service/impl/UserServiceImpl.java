@@ -11,6 +11,7 @@ import okhttp3.*;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -380,6 +381,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public ResponseResult<String> uploadAvatar(MultipartFile avatarFile) throws Exception {
         String upload = fileUploadUtils.upload(UploadEnum.USER_AVATAR, avatarFile);
         return ResponseResult.success(upload);
+    }
+
+    @Resource
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Override
+    public ResponseResult<Void> updateEmailAndVerify(UpdateEmailDTO updateEmailDTO) {
+        // 1.验证密码是否正确
+        User user = userMapper.selectById(SecurityUtils.getUserId());
+        // 邮箱是否改变
+        if (user.getEmail().equals(updateEmailDTO.getEmail())) return ResponseResult.failure("邮箱未更改");
+        if (bCryptPasswordEncoder.matches(updateEmailDTO.getPassword(), user.getPassword())) {
+            // 2.验证码是否正确
+            ResponseResult<Void> verifyCode = verifyCode(updateEmailDTO.getEmail(), updateEmailDTO.getCode(), RedisConst.RESET_EMAIL);
+            if (verifyCode == null){
+                // 3.修改
+                user.setEmail(updateEmailDTO.getEmail());
+                userMapper.updateById(user);
+                return ResponseResult.success();
+            }
+        }
+        return ResponseResult.failure("密码或验证码错误");
     }
 
     /**

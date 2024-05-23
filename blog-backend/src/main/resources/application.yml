@@ -66,6 +66,9 @@ spring:
 #    chat-gpt:
 #      email:  # 不可透露
 #      password:  # # 不可透露
+#    properties:
+#      mail.smtp.auth: true
+#      mail.smtp.starttls.enable: true
 #  servlet:
 #    multipart:
 #      max-file-size: 10MB

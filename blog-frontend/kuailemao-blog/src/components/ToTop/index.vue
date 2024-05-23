@@ -5,7 +5,6 @@ import { throttle } from "@/utils/optimize.ts";
 const top = ref(0)
 window.addEventListener("scroll", throttle(() => {
   top.value = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0
-  console.log('top',top.value)
 },200));
 
 // 返回顶部

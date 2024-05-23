@@ -47,7 +47,7 @@ public class PublicController {
     @GetMapping("/ask-code")
     public ResponseResult<String> askVerifyCode(
             @RequestParam @Email String email,
-            @RequestParam @Pattern(regexp = "(register|reset)") String type
+            @RequestParam @Pattern(regexp = "(register|reset|resetEmail)",message = "邮箱类型错误" ) String type
     ) {
         return ControllerUtils.messageHandler(() -> publicService.registerEmailVerifyCode(type, email));
     }

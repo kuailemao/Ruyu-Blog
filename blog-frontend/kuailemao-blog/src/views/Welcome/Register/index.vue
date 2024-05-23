@@ -166,7 +166,7 @@ function registerBtn() {
             </el-col>
             <el-col :span="5">
               <el-button type="success" @click="askCode" :disabled="!isEmailValid || coldTime != 0">
-                {{ coldTime > 0 ? `请稍后 ${coldTime} 秒` : '获取验证码' + coldTime }}
+                {{ coldTime > 0 ? `请稍后 ${coldTime} 秒` : '获取验证码' }}
               </el-button>
             </el-col>
           </el-row>

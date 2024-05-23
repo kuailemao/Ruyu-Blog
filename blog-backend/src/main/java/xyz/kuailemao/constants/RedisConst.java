@@ -36,6 +36,12 @@ public class RedisConst {
      * 重置密码
      */
     public static final String RESET = "reset";
+
+    /**
+     * 重置邮箱
+     */
+    public static final String RESET_EMAIL = "resetEmail";
+
     /**
      * 文章收藏数
      */
