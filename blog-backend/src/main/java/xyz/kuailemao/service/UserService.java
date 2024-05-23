@@ -106,4 +106,11 @@ public interface UserService extends IService<User>, UserDetailsService {
      * @return 是否成功, 返回头像地址
      */
     ResponseResult<String> uploadAvatar(MultipartFile avatarFile) throws Exception;
+
+    /**
+     *  修改邮箱
+     * @param updateEmailDTO 参数
+     * @return 是否成功
+     */
+    ResponseResult<Void> updateEmailAndVerify(UpdateEmailDTO updateEmailDTO);
 }

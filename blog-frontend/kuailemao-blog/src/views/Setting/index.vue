@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import {ElMessage, UploadInstance} from 'element-plus'
-import {Plus, User, Select, Message, Refresh} from '@element-plus/icons-vue'
+import {ElMessage, FormRules, UploadInstance} from 'element-plus'
+import {Plus, User, Select, Message, Refresh, Unlock} from '@element-plus/icons-vue'
 
 import type {UploadProps} from 'element-plus'
 import useUserStore from "@/store/modules/user.ts";
-import {updateUserAccount} from "@/apis/user";
+import {updateEmail, updateUserAccount} from "@/apis/user";
+import {sendEmail} from "@/apis/email";
 
 
 const uploadRef = ref<UploadInstance>()
@@ -20,14 +21,24 @@ const avatarImg = ref()
 
 const userStore = useUserStore()
 
+const emailForm = reactive({
+  email: '',
+  code: '',
+  password: '',
+})
+
 function updateUser() {
-  updateUserAccount(accountForm.value).then((resp: any) => {
-    if (resp.code == 200) {
-      ElMessage.success('信息更新成功')
-      userStore.getInfo()
-    } else {
-      ElMessage.error(resp.data.msg)
-    }
+  baseFormRef.value.validate((isValid: boolean) => {
+    if (isValid) {
+      updateUserAccount(accountForm.value).then((resp: any) => {
+        if (resp.code == 200) {
+          ElMessage.success('信息更新成功')
+          userStore.getInfo()
+        } else {
+          ElMessage.error(resp.data.msg)
+        }
+      })
+    } else ElMessage.warning('请完整填写信息')
   })
 }
 
@@ -79,14 +90,127 @@ onMounted(() => {
       accountForm.value = userStore.userInfo
       avatarImg.value = userStore.userInfo.avatar
       firstImg.value = userStore.userInfo.avatar
+      emailForm.email = userStore.userInfo.email
     }
   });
 })
+
+// 验证用户昵称
+const validateUsername = (_: any, value: any, callback: any) => {
+  if (value === '') {
+    callback(new Error('请输人用户昵称'))
+  } else if (!/[a-zA-Z0-9\u4e00-\u9fa5]+$/.test(value)) {
+    callback(new Error('用户名不能包含特殊字符，只能是中/英文'))
+  } else {
+    callback()
+  }
+}
+
+const baseFormRef = ref()
+const emailFormRef = ref()
+
+const nicknameRules = {
+  nickname: [
+    {validator: validateUsername, trigger: ['blur', 'change']},
+    {min: 2, max: 10, message: '用户昵称的长度必须在2-10个字符之间', trigger: ['blur', 'change']}
+  ]
+}
+
+const emailRules: FormRules = {
+  email: [
+    {required: true, message: '请输入邮件地址', trigger: 'blur'},
+    {type: 'email', message: '请输人合法的电子邮件地址', trigger: ['blur', 'change']}
+  ],
+  code: [
+    {required: true, message: '请输入获取的验证码', trigger: 'blur'},
+  ]
+}
+
+const centerDialogVisible = ref(false)
+
+function updateEmailFunc(){
+  if (emailForm.password === ''){
+    ElMessage.warning('密码不能为空')
+    return
+  }
+  updateEmail(emailForm).then((resp: any) => {
+    if(resp.code == 200){
+      ElMessage.success('邮件地址更新成功')
+      emailForm.code = ''
+      userStore.getInfo()
+      centerDialogVisible.value = false
+    }else ElMessage.error(resp.msg)
+  })
+}
+
+// 更新邮件
+function modifyEmail(){
+  emailFormRef.value.validate((isValid: boolean) => {
+    if (isValid) {
+      centerDialogVisible.value = true
+    } else ElMessage.warning('请完整填写信息')
+  })
+}
+
+// 判断邮箱是否正确
+const isEmailValid = computed(() => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(emailForm.email))
+
+// 邮件发送验证码冷却时间
+const coldTime = ref(0)
+
+/**
+ * 获取验证码
+ */
+function getEmailCode(){
+  if (emailForm.email === userStore.userInfo?.email){
+    ElMessage.warning('邮件地址未更改')
+    return
+  }
+  if(isEmailValid){
+    coldTime.value = 60
+    sendEmail(emailForm.email, 'resetEmail').then((resp: any) => {
+      if (resp.code == 200) {
+        ElMessage.success(`验证码已发送到邮箱：${emailForm.email}，请注意查收`)
+        const intervalId = setInterval(() => {
+          if (coldTime.value === 0) {
+            clearInterval(intervalId);
+          } else {
+            coldTime.value--;
+          }
+        }, 1000)
+      } else {
+        ElMessage.error(resp.msg)
+        coldTime.value = 0
+      }
+    })
+  }
+}
 </script>
 
 <template>
   <Header/>
   <div class="flex justify-center items-center">
+    <el-dialog
+        v-model="centerDialogVisible"
+        title="帐号安全验证"
+        width="500"
+        align-center
+        custom-class="custom-dialog"
+    >
+      <span class="font-bold">你正在进行敏感操作, 继续操作前请验证您的身份</span>
+      <div class="mt-6">
+        <span class="font-bold">密码验证</span>
+        <el-input v-model="emailForm.password" type="password" placeholder="请输入密码"/>
+      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="centerDialogVisible = false">关闭</el-button>
+          <el-button type="primary" @click="updateEmailFunc" :icon="Refresh">
+            更新邮件
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
     <div class="md:mt-16 mt-10 2xl:w-[100rem] w-full flex md:flex-row flex-col justify-center">
       <div class="md:w-1/2 w-full">
         <div class="bg-white w-full p-5 rounded shadow shadow-slate-300">
@@ -124,9 +248,12 @@ onMounted(() => {
                     label-position="top"
                     label-width="auto"
                     class="w-full mt-5"
+                    :model="accountForm"
+                    ref="baseFormRef"
+                    :rules="nicknameRules"
                 >
-                  <el-form-item label="用户昵称">
-                    <el-input placeholder="请输入用户昵称" v-model="accountForm.nickname"/>
+                  <el-form-item label="用户昵称" prop="nickname">
+                    <el-input placeholder="请输入用户昵称" maxlength="10" v-model="accountForm.nickname"/>
                   </el-form-item>
                   <el-form-item label="性别">
                     <el-radio-group v-model="accountForm.gender">
@@ -160,19 +287,24 @@ onMounted(() => {
                     label-position="top"
                     label-width="auto"
                     class="w-full mt-5"
+                    :model="emailForm"
+                    ref="emailFormRef"
+                    :rules="emailRules"
                 >
-                  <el-form-item label="电子邮件">
-                    <el-input placeholder="请输入电子邮件"/>
+                  <el-form-item label="电子邮件" prop="email">
+                    <el-input placeholder="请输入电子邮件" v-model="emailForm.email"/>
                   </el-form-item>
-                  <el-form-item>
+                  <el-form-item prop="code">
                     <div class="flex w-full">
-                      <el-input placeholder="请获取验证码"/>
-                      <el-button type="success" plain class="ml-2">获取验证码</el-button>
+                      <el-input placeholder="请获取验证码" v-model="emailForm.code"/>
+                      <el-button type="success" @click="getEmailCode" plain class="ml-2" :disabled="!isEmailValid || coldTime != 0">
+                        {{ coldTime > 0 ? `请稍后 ${coldTime} 秒` : '获取验证码' }}
+                      </el-button>
                     </div>
                   </el-form-item>
                 </el-form>
               </div>
-              <el-button class="ml-6" type="success" :icon="Refresh">更新信息</el-button>
+              <el-button class="mx-6" :icon="Unlock" type="success" @click="modifyEmail">安全验证</el-button>
             </div>
             <div v-else>
               <span>您是第三方的注册方式，无法修改哦！！</span>
@@ -182,18 +314,18 @@ onMounted(() => {
       </div>
       <div class="md:ml-10 md:w-[20rem] w-full p-5 " style="min-height: 20px;position: sticky;top: 20px">
         <transition name="el-fade-in-linear">
-        <div v-if="userStore.userInfo" class="bg-white rounded" style="border: 1px solid #dcdfe6">
-          <div style="text-align: center;padding: 15px 15px 10px 15px">
-            <el-avatar :size="70" :src="userStore.userInfo?.avatar"/>
-            <div style="font-weight: bold">
-              你好，{{ userStore.userInfo?.nickname }}
-            </div>
-            <el-divider style="margin: 10px 0"/>
-            <div style="font-size: 14px;color: grey;padding: 10px">
-              {{ userStore.userInfo?.intro || '这个用户很懒，没有填写个人简介~' }}
+          <div v-if="userStore.userInfo" class="bg-white rounded" style="border: 1px solid #dcdfe6">
+            <div style="text-align: center;padding: 15px 15px 10px 15px">
+              <el-avatar :size="70" :src="userStore.userInfo?.avatar"/>
+              <div style="font-weight: bold">
+                你好，{{ userStore.userInfo?.nickname }}
+              </div>
+              <el-divider style="margin: 10px 0"/>
+              <div style="font-size: 14px;color: grey;padding: 10px">
+                {{ userStore.userInfo?.intro || '这个用户很懒，没有填写个人简介~' }}
+              </div>
             </div>
           </div>
-        </div>
         </transition>
         <transition name="el-fade-in-linear">
           <div v-if="userStore.userInfo" class="mt-5 p-3 bg-white rounded" style="border: 1px solid #dcdfe6">
@@ -238,4 +370,12 @@ onMounted(() => {
   transition: var(--el-transition-duration-fast);
 }
 
+// 修改 el-dialog 内容区的默认padding
+:deep(.el-dialog__body) {
+  padding-top: 0;
+}
+
+:deep(.el-dialog){
+  border-radius: 10px;
+}
 </style>
