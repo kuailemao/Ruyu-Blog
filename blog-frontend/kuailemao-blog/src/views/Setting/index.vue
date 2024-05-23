@@ -195,7 +195,6 @@ function getEmailCode(){
         title="帐号安全验证"
         width="500"
         align-center
-        custom-class="custom-dialog"
     >
       <span class="font-bold">你正在进行敏感操作, 继续操作前请验证您的身份</span>
       <div class="mt-6">
@@ -213,7 +212,7 @@ function getEmailCode(){
     </el-dialog>
     <div class="md:mt-16 mt-10 2xl:w-[100rem] w-full flex md:flex-row flex-col justify-center">
       <div class="md:w-1/2 w-full">
-        <div class="bg-white w-full p-5 rounded shadow shadow-slate-300">
+        <div class="bg_card box_show w-full p-5 rounded shadow-slate-300" >
           <div>
             <el-icon>
               <User/>
@@ -271,7 +270,7 @@ function getEmailCode(){
             </div>
           </div>
         </div>
-        <div class="bg-white w-full p-5 mt-5 rounded shadow shadow-slate-300 mb-28">
+        <div class="bg_card box_show w-full p-5 mt-5 rounded  shadow-slate-300 mb-28">
           <div>
             <el-icon>
               <Message/>
@@ -312,9 +311,9 @@ function getEmailCode(){
           </div>
         </div>
       </div>
-      <div class="md:ml-10 md:w-[20rem] w-full p-5 " style="min-height: 20px;position: sticky;top: 20px">
+      <div class="md:ml-10 md:w-[20rem] w-full p-5 " style="min-height: 20px">
         <transition name="el-fade-in-linear">
-          <div v-if="userStore.userInfo" class="bg-white rounded" style="border: 1px solid #dcdfe6">
+          <div v-if="userStore.userInfo" class="bg_card box_show rounded">
             <div style="text-align: center;padding: 15px 15px 10px 15px">
               <el-avatar :size="70" :src="userStore.userInfo?.avatar"/>
               <div style="font-weight: bold">
@@ -328,7 +327,7 @@ function getEmailCode(){
           </div>
         </transition>
         <transition name="el-fade-in-linear">
-          <div v-if="userStore.userInfo" class="mt-5 p-3 bg-white rounded" style="border: 1px solid #dcdfe6">
+          <div v-if="userStore.userInfo" class="mt-5 p-3 bg_card box_show rounded">
             <div class="text-gray-400 font-bold">
               欢迎加入Ruyu个人博客！
             </div>
@@ -377,5 +376,13 @@ function getEmailCode(){
 
 :deep(.el-dialog){
   border-radius: 10px;
+}
+
+.bg_card{
+  background-color: var(--el-bg-color);
+}
+
+.box_show{
+  box-shadow: var(--mao-shadow)
 }
 </style>

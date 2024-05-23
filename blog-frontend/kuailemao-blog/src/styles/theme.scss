@@ -24,6 +24,8 @@
   --mao-scroll-percentage-bg: #ffffff;
   // 文章页面底部滚动进度条背景色
   --mao-scroll-percentage-bar: linear-gradient(135deg,#17ead9,#6078ea);
+  // 设置模块背景阴影
+  --mao-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 
   // 音乐播放器变量
   --primary: #5cbfef;
@@ -73,6 +75,7 @@ html.dark {
   // 音乐播放器变量
   --global-white: #424242;
   --global-shadow-white: #1D1D1D;
+  --mao-shadow: 0 2px 12px 0 rgba(255, 255, 255, 0.1);
 }
 
 // 全局字体

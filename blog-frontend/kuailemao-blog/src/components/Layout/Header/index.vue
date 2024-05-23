@@ -260,14 +260,14 @@ function changeToggle({detail}) {
                       个人设置
                     </template>
                   </el-dropdown-item>
-                  <el-dropdown-item>
-                    <template #default>
-                      <el-icon>
-                        <Collection/>
-                      </el-icon>
-                      我的收藏
-                    </template>
-                  </el-dropdown-item>
+<!--                  <el-dropdown-item>-->
+<!--                    <template #default>-->
+<!--                      <el-icon>-->
+<!--                        <Collection/>-->
+<!--                      </el-icon>-->
+<!--                      我的收藏-->
+<!--                    </template>-->
+<!--                  </el-dropdown-item>-->
                   <el-dropdown-item @click="logoutSub">
                     <template #default>
                       <el-icon>
@@ -333,7 +333,7 @@ function changeToggle({detail}) {
                     <el-avatar style="margin-right: 3rem"
                                :src="userStore.userInfo?.avatar"></el-avatar>
                     <template #dropdown>
-                      <el-dropdown-item>
+                      <el-dropdown-item @click="router.push('/setting')">
                         <template #default>
                           <el-icon>
                             <Setting/>
@@ -341,14 +341,14 @@ function changeToggle({detail}) {
                           个人设置
                         </template>
                       </el-dropdown-item>
-                      <el-dropdown-item>
-                        <template #default>
-                          <el-icon>
-                            <ChatLineSquare/>
-                          </el-icon>
-                          消息列表
-                        </template>
-                      </el-dropdown-item>
+                      <!--                  <el-dropdown-item>-->
+                      <!--                    <template #default>-->
+                      <!--                      <el-icon>-->
+                      <!--                        <Collection/>-->
+                      <!--                      </el-icon>-->
+                      <!--                      我的收藏-->
+                      <!--                    </template>-->
+                      <!--                  </el-dropdown-item>-->
                       <el-dropdown-item @click="logoutSub">
                         <template #default>
                           <el-icon>
