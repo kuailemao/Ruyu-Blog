@@ -88,7 +88,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     public ResponseResult<Void> updateOrInsertRole(RoleDTO roleDTO) {
         Role role = roleDTO.asViewObject(Role.class);
-        int i = 1 / 0;
         // 角色字符是否重复
         Role isRole = roleMapper.selectOne(new LambdaQueryWrapper<Role>().eq(Role::getRoleKey, role.getRoleKey().trim()));
         if (StringUtils.isNotNull(isRole) && !isRole.getId().equals(role.getId())) {
