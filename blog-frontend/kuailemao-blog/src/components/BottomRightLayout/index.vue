@@ -33,6 +33,14 @@ defineProps({
   justify-content: center;
   align-items: center;
 
+
+  // 屏幕宽度小于768时
+  @media screen and (max-width: 768px) {
+    height: 140px;
+    bottom: 0;
+    right: 1.2rem;
+  }
+
   .scroll_percentage{
     background: var(--mao-scroll-percentage-bg);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -44,6 +52,11 @@ defineProps({
     justify-content: center;
     align-items: center;
     font-weight: bold;
+
+    @media screen and (max-width: 768px) {
+      width: 40px;
+      height: 40px;
+    }
   }
 }
 </style>
