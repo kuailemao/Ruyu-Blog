@@ -47,7 +47,7 @@ function getArticleListFunc() {
   <!-- 封装文章列表卡片 -->
   <template v-if="articleList.length > 0">
     <template v-for="(article,index) in articleList" :key="article.id" v-if="articleList.length > 0">
-      <div @click="$router.push('/article/'+article.id)" class="w-full h-92 md:h-60 mt-4 flex flex-col md:flex-row card overflow-hidden shadow-md mb-5 dark:bg-[#1D1D1D]">
+      <div @click="$router.push('/article/'+article.id)" class=" h-92 md:h-60 mt-4 flex flex-col md:flex-row card overflow-hidden shadow-md mb-5 mx-2 dark:bg-[#1D1D1D]">
         <div class="w-full md:h-full md:w-1/2 h-40" v-if="index % 2 == 1 || width < 768">
           <div class="relative w-full h-full">
             <div class="relative img w-full h-full">

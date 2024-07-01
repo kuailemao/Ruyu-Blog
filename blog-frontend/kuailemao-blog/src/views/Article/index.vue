@@ -220,132 +220,134 @@ function scrollWork(){
     </template>
     <template #content>
       <div class="progress"></div>
-      <div class="head_title" :style="`background-image: url('${articleDetail.articleCover}')`">
-        <div class="head_title_text">
-          <div class="classify">
-            <div>{{ articleDetail.categoryName }}</div>
-            <div class="tag" v-for="tag in articleDetail.tags"># {{ tag.tagName }}</div>
-          </div>
-          <div class="title">{{ articleDetail.articleTitle }}</div>
-          <div class="statistics">
-            <div>字数统计:{{ countMd }}</div>
-          </div>
-          <div class="statistics">
-            <div>访问量:{{ articleDetail.visitCount }}</div>
-            <div>评论数:{{ articleDetail.commentCount }}</div>
-            <div>点赞量:{{ articleDetail.likeCount }}</div>
-            <div>收藏量:{{ articleDetail.favoriteCount }}</div>
-          </div>
-          <div class="time">
-            <div>发布：{{ articleDetail.createTime }}</div>
-            <div>更新：{{ articleDetail.updateTime }}</div>
-          </div>
-        </div>
-      </div>
-      <div>
-        <template v-if="articleDetail.articleContent">
-          <!-- 富文本预览 -->
-          <MdPreview :editorId="id" :theme="mode" :modelValue="articleDetail.articleContent" :on-html-changed="mdHtml"/>
-        </template>
-        <el-divider border-style="dashed" content-position="left">
-          <div style="display: flex;align-items: center">
-            <svg-icon name="author_statement"></svg-icon>
-            <span style="margin-left: 0.5em">声明</span>
-          </div>
-        </el-divider>
-        <!-- 作者著作权 -->
-        <div class="copyright">
-          <div class="author">
-            <svg-icon name="article_author"></svg-icon>
-            <strong>本文作者： {{ websiteStore.webInfo?.webmasterName }}</strong>
-          </div>
-          <div class="link">
-            <svg-icon name="author_link"></svg-icon>
-            <strong>本文链接： </strong>
-            <a :href="env.VITE_FRONTEND_URL + $route.path">{{ env.VITE_FRONTEND_URL + $route.path }}</a>
-          </div>
-          <div class="license">
-            <svg-icon name="author_copyright"></svg-icon>
-            <strong>版权声明： </strong>本站所有文章除特别声明外，均采用
-            <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">CC
-              BY-NC-SA 4.0</a>
-            许可协议。转载请注明文章出处！
-          </div>
-        </div>
-      </div>
-      <!-- 尾部标签与点赞收藏分享 -->
-      <div style="display: flex;justify-content: space-between">
-        <div class="tag">
-          <template v-for="tag in articleDetail.tags" :key="tag.id">
-            <div @click="$router.push(`/tags/${tag.id}`)"># {{ tag.tagName }}</div>
-          </template>
-        </div>
-        <div class="like">
-          <div @click="likeBtn(articleDetail)">
-            <SvgIcon v-show="!like" name="like"/>
-            <SvgIcon v-show="like" name="like-selected"/>
-            <span>{{ articleDetail.likeCount }}</span>
-          </div>
-          <div @click="collectionBtn(articleDetail)">
-            <SvgIcon v-show="!collection" name="collection"/>
-            <SvgIcon v-show="collection" name="collection-selected"/>
-            <span>{{ articleDetail.favoriteCount }}</span>
-          </div>
-          <div @click="copyToClipboard">
-            <SvgIcon name="share"/>
-            <span>分享</span>
-          </div>
-        </div>
-      </div>
-      <div>
-        <div class="tag" style="display: flex;justify-content: left;">
-          <div @click="$router.push(`/category/${articleDetail.categoryId}`)">{{ articleDetail.categoryName }}</div>
-        </div>
-      </div>
-      <!-- 打赏 -->
-      <div class="tipping">
-
-        <el-tooltip
-            class="box-item"
-            effect="light"
-            placement="top"
-        >
-          <template #content>
-            <div class="qrCode">
-              <div>
-                微信
-                <el-image
-                    src="http://blog.kuailemao.xyz:9000/blog/pay/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98%E4%BA%8C%E7%BB%B4%E7%A0%81.jpg"/>
-              </div>
+      <div class="p-1">
+        <div class="head_title" :style="`background-image: url('${articleDetail.articleCover}')`">
+          <div class="head_title_text">
+            <div class="classify">
+              <div>{{ articleDetail.categoryName }}</div>
+              <div class="tag" v-for="tag in articleDetail.tags"># {{ tag.tagName }}</div>
             </div>
+            <div class="title">{{ articleDetail.articleTitle }}</div>
+            <div class="statistics">
+              <div>字数统计:{{ countMd }}</div>
+            </div>
+            <div class="statistics">
+              <div>访问量:{{ articleDetail.visitCount }}</div>
+              <div>评论数:{{ articleDetail.commentCount }}</div>
+              <div>点赞量:{{ articleDetail.likeCount }}</div>
+              <div>收藏量:{{ articleDetail.favoriteCount }}</div>
+            </div>
+            <div class="time">
+              <div>发布：{{ articleDetail.createTime }}</div>
+              <div>更新：{{ articleDetail.updateTime }}</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <template v-if="articleDetail.articleContent">
+            <!-- 富文本预览 -->
+            <MdPreview :editorId="id" :theme="mode" :modelValue="articleDetail.articleContent" :on-html-changed="mdHtml"/>
           </template>
+          <el-divider border-style="dashed" content-position="left">
+            <div style="display: flex;align-items: center">
+              <svg-icon name="author_statement"></svg-icon>
+              <span style="margin-left: 0.5em">声明</span>
+            </div>
+          </el-divider>
+          <!-- 作者著作权 -->
+          <div class="copyright">
+            <div class="author">
+              <svg-icon name="article_author"></svg-icon>
+              <strong>本文作者： {{ websiteStore.webInfo?.webmasterName }}</strong>
+            </div>
+            <div class="link">
+              <svg-icon name="author_link"></svg-icon>
+              <strong>本文链接： </strong>
+              <a :href="env.VITE_FRONTEND_URL + $route.path">{{ env.VITE_FRONTEND_URL + $route.path }}</a>
+            </div>
+            <div class="license">
+              <svg-icon name="author_copyright"></svg-icon>
+              <strong>版权声明： </strong>本站所有文章除特别声明外，均采用
+              <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">CC
+                BY-NC-SA 4.0</a>
+              许可协议。转载请注明文章出处！
+            </div>
+          </div>
+        </div>
+        <!-- 尾部标签与点赞收藏分享 -->
+        <div style="display: flex;justify-content: space-between">
+          <div class="tag">
+            <template v-for="tag in articleDetail.tags" :key="tag.id">
+              <div @click="$router.push(`/tags/${tag.id}`)"># {{ tag.tagName }}</div>
+            </template>
+          </div>
+          <div class="like">
+            <div @click="likeBtn(articleDetail)">
+              <SvgIcon v-show="!like" name="like"/>
+              <SvgIcon v-show="like" name="like-selected"/>
+              <span>{{ articleDetail.likeCount }}</span>
+            </div>
+            <div @click="collectionBtn(articleDetail)">
+              <SvgIcon v-show="!collection" name="collection"/>
+              <SvgIcon v-show="collection" name="collection-selected"/>
+              <span>{{ articleDetail.favoriteCount }}</span>
+            </div>
+            <div @click="copyToClipboard">
+              <SvgIcon name="share"/>
+              <span>分享</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="tag" style="display: flex;justify-content: left;">
+            <div @click="$router.push(`/category/${articleDetail.categoryId}`)">{{ articleDetail.categoryName }}</div>
+          </div>
+        </div>
+        <!-- 打赏 -->
+        <div class="tipping">
+
+          <el-tooltip
+              class="box-item"
+              effect="light"
+              placement="top"
+          >
+            <template #content>
+              <div class="qrCode">
+                <div>
+                  微信
+                  <el-image
+                      src="http://blog.kuailemao.xyz:9000/blog/pay/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98%E4%BA%8C%E7%BB%B4%E7%A0%81.jpg"/>
+                </div>
+              </div>
+            </template>
+            <div>
+              <svg-icon name="gift"/>
+              <span class="max-[540px]:hidden">ヾ(≧▽≦*)o！</span>
+            </div>
+          </el-tooltip>
+        </div>
+        <!-- 上/下 篇文章-->
+        <div class="goOn">
+          <!-- 上一篇 -->
           <div>
-            <svg-icon name="gift"/>
-            <span class="max-[540px]:hidden">ヾ(≧▽≦*)o！</span>
+            <div v-if="articleDetail.preArticleId > 0">
+              <el-link @click="$router.push(`/article/${articleDetail.preArticleId}`)">
+                上一篇：{{ articleDetail.preArticleTitle }}
+              </el-link>
+            </div>
           </div>
-        </el-tooltip>
-      </div>
-      <!-- 上/下 篇文章-->
-      <div class="goOn">
-        <!-- 上一篇 -->
-        <div>
-          <div v-if="articleDetail.preArticleId > 0">
-            <el-link @click="$router.push(`/article/${articleDetail.preArticleId}`)">
-              上一篇：{{ articleDetail.preArticleTitle }}
-            </el-link>
-          </div>
-        </div>
-        <!-- 下一篇 -->
-        <div>
-          <div v-if="articleDetail.nextArticleId > 0">
-            <el-link @click="$router.push(`/article/${articleDetail.nextArticleId}`)">
-              下一篇：{{ articleDetail.nextArticleTitle }}
-            </el-link>
+          <!-- 下一篇 -->
+          <div>
+            <div v-if="articleDetail.nextArticleId > 0">
+              <el-link @click="$router.push(`/article/${articleDetail.nextArticleId}`)">
+                下一篇：{{ articleDetail.nextArticleTitle }}
+              </el-link>
+            </div>
           </div>
         </div>
+        <!-- 用户评论 -->
+        <Comment :type="1" :like-type="2" :author-id="articleDetail.userId" :type-id="articleDetail.id" v-if="loading"/>
       </div>
-      <!-- 用户评论 -->
-      <Comment :type="1" :like-type="2" :author-id="articleDetail.userId" :type-id="articleDetail.id" v-if="loading"/>
     </template>
     <template #information>
       <CardInfo/>

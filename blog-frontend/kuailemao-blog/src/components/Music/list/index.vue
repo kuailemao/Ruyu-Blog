@@ -216,7 +216,7 @@ onBeforeUnmount(() => {
         </el-row>
         <el-row v-loading="params.loading" class="body">
           <el-col
-            class="flex justify-start items-center overflow-auto"
+            class=" justify-start items-center overflow-auto"
             :span="24"
             v-for="item in currentMusicList"
             :key="item.id"
@@ -427,5 +427,9 @@ onBeforeUnmount(() => {
     top: 35px !important;
     left: 75% !important;
   }
+}
+
+:deep(.el-col-24, .el-col-24.is-guttered){
+  display: flex;
 }
 </style>

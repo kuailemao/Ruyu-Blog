@@ -95,88 +95,50 @@ function optionEmoji(index: number) {
 
 // 用户预览
 watch(() => textarea.value, (value) => {
-  // 第一次解析，把所有的表情包解析出来
-  value = value.replace(/\[.*?\]/g, (key) => {
-
-    // 拼接完整名称
-    const name = `O.o="${key}"`
-    // 判断name是否在value中
-    if (value.indexOf(name) === -1) {
-      // 不在，拼接
-      return `<emoji><img src="${heo[key]}" width="24" height="24" O.o="${key}" /></emoji>`
-    } else {
-      // 在，返回原本的
-      return key
-    }
-
-  })
-
-  // 第二次解析，把代码块中的解析好的表情包替换回去
-  // 判断是否有代码块
-  value = value.replace(/```[\s\S]*```/g, (key) => {
-
-    // 提取出代码块中 span img 的 O.o 属性
-    key = key.replace(/<span[^>]*>\s*<img[^>]*O\.o="([^"]*)"[^>]*>\s*<\/span>/, (key, $1) => {
-      // 判断是否有这个表情包
-      if (heo[$1]) {
-        // 有，返回解析好的
-        console.log("有这个表情包", $1)
-        return $1
-      } else {
-        console.log("没有这个表情包", $1)
-        // 没有，返回原本的
-        return key
-      }
-    })
-
-    return key
-  })
-
-  preview.value = value
+  preview.value = parsingCommentsFunc(value);
 })
 
 // 解析评论
 function parsingComments(value: string) {
+  return parsingCommentsFunc(value);
+}
 
-  // 第一次解析，把所有的表情包解析出来
-  value = value.replace(/\[.*?\]/g, (key) => {
+// 解析md公共方法
+function parsingCommentsFunc(value: string) {
+  const codeBlockRegex = /```[\s\S]*?```/g;
+  const codeBlocks = value.match(codeBlockRegex);
+  let protectedValue = value;
 
-    // 拼接完整名称
-    const name = `O.o="${key}"`
-    // 判断name是否在value中
-    if (value.indexOf(name) === -1) {
-      // 判断是否是emoji
-      if (emojis[key]) {
-        // 是，返回解析好的
-        return emojis[key]
+  // 保护代码块内容
+  if (codeBlocks) {
+    codeBlocks.forEach((block, index) => {
+      protectedValue = protectedValue.replace(block, `{{CODE_BLOCK_${index}}}`);
+    });
+  }
+
+  const matches = protectedValue.match(/\[[^\]]+\]/g);
+  console.log(matches); // 输出: ["翻白眼", "dddd", "1212"]
+  console.log(protectedValue);
+
+  // 判断是否有表情包
+  if (matches) {
+    // 遍历是否存在表情包
+    for (let i = 0; i < matches.length; i++) {
+      const match = matches[i];
+      if (heo[match]) {
+        // 有，替换 heo[match]
+        protectedValue = protectedValue.replace(match, `<span><img src="${heo[match]}" width="24" height="24" alt="Ruyu-blog-[1231256151315612]" /></span>`);
       }
-      // 不在，拼接
-      return `<emoji><img src="${heo[key]}" width="24" height="24" O.o="${key}" /></emoji>`
     }
-  })
+  }
 
-  // 第二次解析，把代码块中的解析好的表情包替换回去
-  // 判断是否有代码块
-  value = value.replace(/```[\s\S]*```/g, (key) => {
-
-    // 提取出代码块中 span img 的 O.o 属性
-    key = key.replace(/<span[^>]*>\s*<img[^>]*O\.o="([^"]*)"[^>]*>\s*<\/span>/, (key, $1) => {
-      // 判断是否有这个表情包
-      if (heo[$1]) {
-        // 有，返回解析好的
-        console.log("有这个表情包", $1)
-        return $1
-      } else {
-        console.log("没有这个表情包", $1)
-        // 没有，返回原本的
-        return key
-      }
-    })
-
-    return key
-  })
-
-  return value
+  // 恢复代码块内容
+  if (codeBlocks) {
+    codeBlocks.forEach((block, index) => {
+      protectedValue = protectedValue.replace(`{{CODE_BLOCK_${index}}}`, block);
+    });
+  }
+  return protectedValue;
 }
 
 function handleComments(commentContent: object[]) {
@@ -331,7 +293,7 @@ function addParentComment() {
         <div class="btn">
           <div>
             <svg-icon @click="isShowEmojis=!isShowEmojis" name="emojis" style="margin-right: 0.8rem;cursor: pointer"/>
-<!--            <svg-icon name="image"/>-->
+            <!--            <svg-icon name="image"/>-->
           </div>
           <!-- 表情包选择框 -->
           <div class="emojis_container" v-show="isShowEmojis">
@@ -396,11 +358,11 @@ function addParentComment() {
             </div>
           </div>
           <!-- TODO 评论信息 -->
-<!--          <div class="comment_content_footer">-->
-<!--            <div><span><SvgIcon name="windows_icon"/></span>window 11</div>-->
-<!--            <div><span><SvgIcon name="google_icon"/></span>google chrome</div>-->
-<!--            <div><span><SvgIcon name="address_icon"/></span>北京</div>-->
-<!--          </div>-->
+          <!--          <div class="comment_content_footer">-->
+          <!--            <div><span><SvgIcon name="windows_icon"/></span>window 11</div>-->
+          <!--            <div><span><SvgIcon name="google_icon"/></span>google chrome</div>-->
+          <!--            <div><span><SvgIcon name="address_icon"/></span>北京</div>-->
+          <!--          </div>-->
           <!-- 回复框 -->
           <template v-if="isLoading">
             <ReplyBox :type="type" :comment="comment" :get-comments="getComments" :page-size="pageSize"/>

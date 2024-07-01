@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --mode development",
-    "build": "vue-tsc && vite build",
+    "dev": "vite",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -18,7 +18,7 @@
     "element-plus": "^2.3.14",
     "gsap": "^3.12.5",
     "jquery": "^3.7.1",
-    "md-editor-v3": "^4.7.0",
+    "md-editor-v3": "^4.17.0",
     "nprogress": "^0.2.0",
     "pinia": "^2.1.6",
     "swiper": "^11.1.1",

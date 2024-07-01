@@ -63,6 +63,7 @@ const logoutSub = () => {
       REMOVE_TOKEN()
       userStore.userInfo = undefined
       ElMessage.success('退出登录成功')
+      router.push('/')
     }
   })
 }
@@ -287,7 +288,7 @@ function changeToggle({detail}) {
             <div @click="drawer = true">
               <SvgIcon name="directory_icon" width="30" height="30" color="#409EFF" class="icon"/>
             </div>
-            <!-- 日夜切换 -->
+            <!-- 移动端日夜切换 -->
             <div style="margin-left: 5rem">
               <toggle-button @change="changeToggle" size="1" ></toggle-button>
             </div>

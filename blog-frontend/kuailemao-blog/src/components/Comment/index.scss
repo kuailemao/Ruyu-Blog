@@ -294,6 +294,6 @@
 }
 
 // 预览图片表情包
-:deep(#md-editor-v3-preview p emoji img) {
+:deep(.md-editor-preview p span img){
   display: inline;
 }
