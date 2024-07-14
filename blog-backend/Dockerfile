@@ -1,8 +1,14 @@
-# Docker 镜像构建
-FROM openjdk:17 as builder
+# 使用官方的OpenJDK 17镜像作为基础镜像
+FROM openjdk:17
+
+# 设置工作目录
 WORKDIR /app
 
-COPY blog-backend-0.0.1-SNAPSHOT.jar /app/blog-backend-0.0.1-SNAPSHOT.jar
+# 复制项目的jar文件到容器中
+COPY blog-backend-0.0.1-SNAPSHOT.jar /app/app.jar
 
-# Run the web service on container startup.
-CMD ["java","-Duser.timezone=GMT+8","-jar","/app/user-center-0.0.1-SNAPSHOT.jar","--spring.profiles.active=prod"]
+# 暴露应用运行的端口
+EXPOSE 8088
+
+# 运行Spring Boot应用
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
