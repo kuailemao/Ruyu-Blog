@@ -6,7 +6,7 @@
     </div>
     <div>
       <Card title="公告" prefixIcon="announcement" suffix-icon="jt_y" :isDithering="true" :isArrow="true">
-        <p>{{useWebsite.webInfo?.sidebarAnnouncement}}</p>
+        <p>{{ useWebsite.webInfo?.sidebarAnnouncement }}</p>
       </Card>
     </div>
     <div>
@@ -28,11 +28,11 @@
     <div>
       <Card title="网站资讯" prefix-icon="statistics" :isScale="true">
         <div class="statistics">
-          <div>文章数目：<span>{{useWebsite.webInfo?.articleCount}}</span></div>
+          <div>文章数目：<span>{{ useWebsite.webInfo?.articleCount }}</span></div>
           <div>运行时长：<span>{{ differenceInDays }} 天</span></div>
-          <div>全站字数：<span>{{useWebsite.webInfo?.wordCount}}</span></div>
-          <div>访问次数：<span>{{useWebsite.webInfo?.visitCount}}</span></div>
-          <div>最后更新：<span>{{useWebsite.webInfo?.lastUpdateTime}}</span></div>
+          <div>全站字数：<span>{{ useWebsite.webInfo?.wordCount }}</span></div>
+          <div>访问次数：<span>{{ useWebsite.webInfo?.visitCount }}</span></div>
+          <div>最后更新：<span>{{ useWebsite.webInfo?.lastUpdateTime }}</span></div>
         </div>
       </Card>
     </div>
@@ -55,18 +55,29 @@ const week = ['星期日', '星期一', '星期二', '星期三', '星期四', '
 const timerID = setInterval(updateTime, 1000);
 updateTime();
 
-// 计算运行时长
-// 假设 startTime 是一个表示开始时间的 Date 对象
-let startTime = new Date(useWebsite.webInfo?.startTime); // 替换为你实际的开始时间
+const differenceInDays = ref(0)
+getDifferenceInDays()
 
-// 获取当前时间
-let now = new Date();
 
-// 计算两个日期之间的差值（以毫秒为单位）
-let differenceInMs = now.getTime() - startTime.getTime();
+// 监听数据是否过来
+watch(() => useWebsite.webInfo?.startTime, () => {
+  if (useWebsite.webInfo?.startTime) {
+    getDifferenceInDays()
+  }
+})
 
-// 转换为天数（向下取整，不考虑小时、分钟和秒）
-let differenceInDays = Math.floor(differenceInMs / (1000 * 60 * 60 * 24));
+// 计算天数方法
+function getDifferenceInDays() {
+  // 计算运行时长
+  // 假设 startTime 是一个表示开始时间的 Date 对象
+  let startTime = new Date(useWebsite.webInfo?.startTime); // 替换为你实际的开始时间
+  // 获取当前时间
+  let now = new Date();
+  // 计算两个日期之间的差值（以毫秒为单位）
+  let differenceInMs = now.getTime() - startTime.getTime();
+  // 转换为天数（向下取整，不考虑小时、分钟和秒）
+  differenceInDays.value = Math.floor(differenceInMs / (1000 * 60 * 60 * 24));
+}
 
 
 function updateTime() {
@@ -75,7 +86,7 @@ function updateTime() {
   date.value = zeroPadding(cd.getFullYear(), 4) + '-' + zeroPadding(cd.getMonth() + 1, 2) + '-' + zeroPadding(cd.getDate(), 2) + ' ' + week[cd.getDay()];
 }
 
-function zeroPadding(num:number, digit:number) {
+function zeroPadding(num: number, digit: number) {
   var zero = '';
   for (var i = 0; i < digit; i++) {
     zero += '0';
@@ -92,13 +103,13 @@ onUnmounted(() => {
 const soup = ref('')
 
 function soupSub() {
-  getSoup().then((res:any) => {
+  getSoup().then((res: any) => {
     soup.value = res.hitokoto
   })
 }
 
 onMounted(() => {
-  getSoup().then((res:any) => {
+  getSoup().then((res: any) => {
     soup.value = res.hitokoto
   })
 })
