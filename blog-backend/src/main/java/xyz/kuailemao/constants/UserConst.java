@@ -10,7 +10,7 @@ public class UserConst {
     /**
      * 用户默认头像
      */
-    public static final String DEFAULT_AVATAR = "http://cdn.kuailemao.lielfw.cn/userAvatar/21676863574334604.png";
+    public static final String DEFAULT_AVATAR = "http://kuailemao.xyz:9000/blog/user/avatar/默认头像.svg";
     /**
      * 用户默认昵称
      */
