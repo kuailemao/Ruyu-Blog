@@ -44,9 +44,12 @@ const scrollDown = () => {
 onMounted(() => {
   fetchData();
 });
-
+let myYiYan = import.meta.env.VITE_YIYAN_API
+if (!myYiYan){
+  myYiYan = 'https://v1.hitokoto.cn/?c=a&encode=json'
+}
 const fetchData = () => {
-  fetch("https://v1.hitokoto.cn?timestamp=" + Date.now())
+  fetch(myYiYan)
       .then((res) => {
         return res.json();
       })
