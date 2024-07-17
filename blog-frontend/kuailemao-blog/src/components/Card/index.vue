@@ -87,7 +87,7 @@ function invoke(){
   margin: $card-margin;
   border: 1px solid var(--el-border-color);
   border-radius: $border-radius;
-  margin-top: 2em;
+  margin-top: 1.5em;
   // 添加阴影
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 

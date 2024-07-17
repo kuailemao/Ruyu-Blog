@@ -21,6 +21,7 @@
     "md-editor-v3": "^4.17.0",
     "nprogress": "^0.2.0",
     "pinia": "^2.1.6",
+    "screenfull": "^6.0.2",
     "swiper": "^11.1.1",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4",

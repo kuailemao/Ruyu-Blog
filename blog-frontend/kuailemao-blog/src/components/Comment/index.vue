@@ -117,8 +117,6 @@ function parsingCommentsFunc(value: string) {
   }
 
   const matches = protectedValue.match(/\[[^\]]+\]/g);
-  console.log(matches); // 输出: ["翻白眼", "dddd", "1212"]
-  console.log(protectedValue);
 
   // 判断是否有表情包
   if (matches) {

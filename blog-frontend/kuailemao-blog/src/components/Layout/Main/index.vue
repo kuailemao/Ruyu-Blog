@@ -89,7 +89,7 @@ defineProps({
 
 .information_container {
   width: 23%;
-  height: 100%;
+  min-height: 100%;
   max-width: 25rem;
   transition: width 0.5s;
   @media screen and (max-width: 910px) {

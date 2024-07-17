@@ -41,6 +41,9 @@ dependencies:
   pinia:
     specifier: ^2.1.6
     version: 2.1.7(typescript@5.5.2)(vue@3.4.31)
+  screenfull:
+    specifier: ^6.0.2
+    version: 6.0.2
   swiper:
     specifier: ^11.1.1
     version: 11.1.4
@@ -4675,6 +4678,11 @@ packages:
       ajv: 6.12.6
       ajv-keywords: 3.5.2(ajv@6.12.6)
     dev: true
+
+  /screenfull@6.0.2:
+    resolution: {integrity: sha512-AQdy8s4WhNvUZ6P8F6PB21tSPIYKniic+Ogx0AacBMjKP1GUHN2E9URxQHtCusiwxudnCKkdy4GrHXPPJSkCCw==, tarball: https://registry.npmmirror.com/screenfull/-/screenfull-6.0.2.tgz}
+    engines: {node: ^14.13.1 || >=16.0.0}
+    dev: false
 
   /scss-tokenizer@0.4.3:
     resolution: {integrity: sha512-raKLgf1LI5QMQnG+RxHz6oK0sL3x3I4FN2UDLqgLOGO8hodECNnNh5BXn7fAyBxrA8zVzdQizQ6XjNJQ+uBwMw==, tarball: https://registry.npmmirror.com/scss-tokenizer/-/scss-tokenizer-0.4.3.tgz}
