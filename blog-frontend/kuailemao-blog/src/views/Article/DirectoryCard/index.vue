@@ -7,17 +7,15 @@ const id = 'preview-only';
 </script>
 
 <template>
-  <div class="card">
+  <div class="card px-[10px]" v-slide-in>
     <div class="title">
       <div class="title_text">
         <SvgIcon class="scale" name="directory" width="30" height="30"/>
         <span style="margin-left: 10px">目录</span>
       </div>
     </div>
-    <div style="height: 16em">
-      <el-scrollbar>
-        <MdCatalog :editorId="id" :scrollElement="scrollElement"/>
-      </el-scrollbar>
+    <div class="min-h-[16em] max-h-[40em] overflow-y-auto">
+      <MdCatalog :editorId="id" :scrollElement="scrollElement"/>
     </div>
   </div>
 </template>

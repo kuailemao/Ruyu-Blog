@@ -44,11 +44,11 @@ const handleScroll = () => {
 .move_catalog {
   :deep(.md-editor-catalog-link) {
     span {
-      font-size: 0.5em;
+      font-size: 2em;
       font-weight: bold;
     }
 
-    padding: 0.7rem;
+    padding: 0.4rem;
   }
 }
 
