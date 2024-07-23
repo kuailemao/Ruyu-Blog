@@ -111,24 +111,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                     if (Objects.equals(k, articleVO.getId().toString()))
                         articleVO.setCommentCount(Long.valueOf(v.toString()));
                 });
-            } else {
-                // 文章收藏量
-                articleVO.setFavoriteCount(favoriteService.count(new LambdaQueryWrapper<Favorite>().eq(Favorite::getTypeId, articleVO.getId()).eq(Favorite::getType, FavoriteEnum.FAVORITE_TYPE_ARTICLE.getType())));
-                // 文章点赞量
-                articleVO.setLikeCount(likeService.count(new LambdaQueryWrapper<Like>().eq(Like::getTypeId, articleVO.getId()).eq(Like::getType, LikeEnum.LIKE_TYPE_ARTICLE.getType())));
-                // 文章评论量
-                articleVO.setCommentCount(commentService.count(new LambdaQueryWrapper<Comment>().eq(Comment::getTypeId, articleVO.getId()).eq(Comment::getType, CommentEnum.COMMENT_TYPE_ARTICLE.getType())));
             }
         }).toList();
-        if (!hasKey) {
-            // 提取收藏量，点赞量，评论量,map
-            Map<String, Long> favoriteCount = articleVOS.stream().collect(Collectors.toMap(favorite -> favorite.getId().toString(), ArticleVO::getFavoriteCount));
-            Map<String, Long> likeCount = articleVOS.stream().collect(Collectors.toMap(like -> like.getId().toString(), ArticleVO::getLikeCount));
-            Map<String, Long> commentCount = articleVOS.stream().collect(Collectors.toMap(comment -> comment.getId().toString(), ArticleVO::getCommentCount));
-            redisCache.setCacheMap(RedisConst.ARTICLE_FAVORITE_COUNT, favoriteCount);
-            redisCache.setCacheMap(RedisConst.ARTICLE_LIKE_COUNT, likeCount);
-            redisCache.setCacheMap(RedisConst.ARTICLE_COMMENT_COUNT, commentCount);
-        }
 
         return new PageVO<>(articleVOS, page.getTotal());
     }
