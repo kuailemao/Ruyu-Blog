@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import xyz.kuailemao.constants.RedisConst;
 import xyz.kuailemao.constants.SQLConst;
 import xyz.kuailemao.domain.dto.CommentIsCheckDTO;
 import xyz.kuailemao.domain.dto.SearchCommentDTO;
@@ -22,10 +23,12 @@ import xyz.kuailemao.mapper.CommentMapper;
 import xyz.kuailemao.mapper.UserMapper;
 import xyz.kuailemao.service.CommentService;
 import xyz.kuailemao.service.LikeService;
+import xyz.kuailemao.utils.RedisCache;
 import xyz.kuailemao.utils.SecurityUtils;
 import xyz.kuailemao.utils.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -46,6 +49,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     @Resource
     private LikeService likeService;
+
+    @Resource
+    private RedisCache redisCache;
 
     @Override
     public PageVO<List<ArticleCommentVO>> getComment(Integer type, Integer typeId, Integer pageNum, Integer pageSize) {
@@ -92,7 +98,14 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     @Override
     public ResponseResult<Void> userComment(UserCommentDTO commentDTO) {
         Comment comment = commentDTO.asViewObject(Comment.class, commentDto -> commentDto.setCommentUserId(SecurityUtils.getUserId()));
-        if (this.save(comment)) return ResponseResult.success();
+        if (this.save(comment)) {
+            // 缓存评论数量+1
+            redisCache.getCacheMap(RedisConst.ARTICLE_COMMENT_COUNT).forEach((k, v) -> {
+                if (Objects.equals(k, commentDTO.getTypeId().toString()))
+                    redisCache.setCacheMap(RedisConst.ARTICLE_COMMENT_COUNT, Map.of(k, Long.parseLong(v.toString()) + 1L));
+            });
+            return ResponseResult.success();
+        }
         return ResponseResult.failure();
     }
 

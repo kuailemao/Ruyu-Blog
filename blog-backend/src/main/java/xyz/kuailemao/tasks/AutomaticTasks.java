@@ -22,9 +22,11 @@ public class AutomaticTasks implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        log.info("--------执行初始化任务--------");
+        log.info("--------开始执行初始化任务--------");
         redisService.articleCountClear();
         redisService.articleVisitCount();
         redisService.clearLimitCache();
+        redisService.initCount();
+        log.info("--------执行初始化任务结束--------");
     }
 }

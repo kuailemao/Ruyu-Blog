@@ -12,4 +12,9 @@ public interface RedisService {
     void articleVisitCount();
 
     void clearLimitCache();
+
+    /**
+     * 初始化收藏量，点赞量，评论量
+     */
+    void initCount();
 }
