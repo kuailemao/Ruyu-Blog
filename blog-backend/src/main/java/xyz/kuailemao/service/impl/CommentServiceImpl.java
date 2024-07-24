@@ -100,10 +100,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         Comment comment = commentDTO.asViewObject(Comment.class, commentDto -> commentDto.setCommentUserId(SecurityUtils.getUserId()));
         if (this.save(comment)) {
             // 缓存评论数量+1
-            redisCache.getCacheMap(RedisConst.ARTICLE_COMMENT_COUNT).forEach((k, v) -> {
-                if (Objects.equals(k, commentDTO.getTypeId().toString()))
-                    redisCache.setCacheMap(RedisConst.ARTICLE_COMMENT_COUNT, Map.of(k, Long.parseLong(v.toString()) + 1L));
-            });
+            redisCache.incrementCacheMapValue(RedisConst.ARTICLE_COMMENT_COUNT, commentDTO.getTypeId().toString(), 1);
             return ResponseResult.success();
         }
         return ResponseResult.failure();
