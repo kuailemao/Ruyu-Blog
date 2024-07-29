@@ -1,7 +1,7 @@
 <template>
   <div class="loading loading-active" v-show="loadingStore.isLoading">
     <div class="load-box">
-      <img class="loading-img" src="http://43.136.78.47:9000/blog/loading/loading-gif.gif" alt="Loading">
+      <img class="loading-img" src="https://image.kuailemao.xyz/blog/loading/loading-gif.gif" alt="Loading">
       <span>皮卡丘正在努力奔跑~~</span>
     </div>
   </div>

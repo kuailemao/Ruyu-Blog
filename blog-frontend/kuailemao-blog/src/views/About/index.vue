@@ -121,7 +121,7 @@ function initInformation() {
             <div class="content_author">
               <div class="author">
                 <div class="author_avatar">
-                  <img src="http://43.136.78.47:9000/blog/websiteInfo/avatar/76829cfe-f670-4e26-85c6-ab46f8b45250.jpg" alt="">
+                  <img src="https://image.kuailemao.xyz/blog/websiteInfo/avatar/76829cfe-f670-4e26-85c6-ab46f8b45250.jpg" alt="">
                 </div>
                 <div class="author_info">
                   <div class="author_name">
