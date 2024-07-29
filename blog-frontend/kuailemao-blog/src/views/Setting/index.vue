@@ -52,7 +52,7 @@ const submitUploadAntUpdate = () => {
 }
 
 // 上传头像
-const uploadAvatar = import.meta.env.VITE_SERVE + '/user/auth/upload/avatar'
+const uploadAvatar = import.meta.env.VITE_SERVE + '/api/user/auth/upload/avatar'
 // token
 const token = localStorage.getItem('Token') || sessionStorage.getItem('Token') || ''
 
