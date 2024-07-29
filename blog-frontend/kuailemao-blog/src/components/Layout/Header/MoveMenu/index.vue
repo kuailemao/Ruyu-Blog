@@ -16,6 +16,9 @@ const emit = defineEmits("update:closeDrawer")
 function isClose(){
   emit("update:closeDrawer")
 }
+
+// 是否显示音乐模块
+const env = import.meta.env
 </script>
 <template>
 <div>
@@ -88,12 +91,14 @@ function isClose(){
       </el-icon>
       友链
     </el-menu-item>
-    <el-menu-item index="/music">
-      <el-icon>
-        <Headset/>
-      </el-icon>
-      音乐
-    </el-menu-item>
+    <template v-if="env.VITE_MUSIC_FRONTEND_URL">
+      <el-menu-item index="/music">
+        <el-icon>
+          <Headset/>
+        </el-icon>
+        音乐
+      </el-menu-item>
+    </template>
     <el-menu-item index="/about" @click="isClose">
       <el-icon>
         <UserFilled/>
