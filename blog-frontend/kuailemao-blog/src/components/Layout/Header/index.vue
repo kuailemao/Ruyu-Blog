@@ -95,6 +95,9 @@ const drawer = ref(false)
 function changeToggle({detail}) {
   mode.value = detail
 }
+
+// 是否显示音乐模块
+const env = import.meta.env
 </script>
 <template>
   <div>
@@ -207,12 +210,14 @@ function changeToggle({detail}) {
             </el-icon>
             友链
           </el-menu-item>
+          <template v-if="env.VITE_MUSIC_FRONTEND_URL">
           <el-menu-item index="/music">
             <el-icon>
               <Headset/>
             </el-icon>
             音乐
           </el-menu-item>
+          </template>
           <el-menu-item index="/about">
             <el-icon>
               <UserFilled/>
