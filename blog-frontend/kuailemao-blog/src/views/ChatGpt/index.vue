@@ -291,7 +291,7 @@ function deleteConversation(id: string, event: any) {
                 <template v-if="item.type === 'response'">
                   <div class="right_questions">
                     <el-avatar size="default"
-                               src="http://43.136.78.47:9000/blog/gpt/chatgpt-de79290a.png"></el-avatar>
+                               src="https://image.kuailemao.xyz/blog/gpt/chatgpt-de79290a.png"></el-avatar>
                     <div class="questions_content">
                       <div class="name">
                         人工智能助手 (模型: {{ conversation.model }})

@@ -26,7 +26,7 @@ defineProps({
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  background-image: url("http://blog.kuailemao.xyz:9000/blog/background/%E5%AD%A6%E4%B9%A0%E7%9A%84%E5%8F%B2%E8%92%82%E5%A4%AB.jpg");
+  background-image: url("https://image.kuailemao.xyz/blog/background/%E5%AD%A6%E4%B9%A0%E7%9A%84%E5%8F%B2%E8%92%82%E5%A4%AB.jpg");
   background-size: cover;
   background-position: center;
 

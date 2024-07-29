@@ -70,7 +70,7 @@ function getTreeHole() {
 
 <style scoped lang="scss">
 .container {
-  background-image: url('http://blog.kuailemao.xyz:9000/blog/TreeHole/TreeHole-back.png');
+  background-image: url('https://image.kuailemao.xyz/blog/TreeHole/TreeHole-back.png');
   background-size: cover;
   background-position: center;
   min-width: 100vw;

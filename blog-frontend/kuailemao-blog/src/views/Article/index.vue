@@ -325,7 +325,7 @@ function ReadingModeFunc() {
                   <div>
                     微信
                     <el-image
-                        src="http://blog.kuailemao.xyz:9000/blog/pay/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98%E4%BA%8C%E7%BB%B4%E7%A0%81.jpg"/>
+                        src="https://image.kuailemao.xyz/blog/pay/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98%E4%BA%8C%E7%BB%B4%E7%A0%81.jpg"/>
                   </div>
                 </div>
               </template>
@@ -483,7 +483,7 @@ function ReadingModeFunc() {
               <div>
                 微信
                 <el-image
-                    src="http://blog.kuailemao.xyz:9000/blog/pay/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98%E4%BA%8C%E7%BB%B4%E7%A0%81.jpg"/>
+                    src="https://image.kuailemao.xyz/blog/pay/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98%E4%BA%8C%E7%BB%B4%E7%A0%81.jpg"/>
               </div>
             </div>
           </template>
