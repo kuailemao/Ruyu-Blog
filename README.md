@@ -1,7 +1,7 @@
 ## 博客介绍
 
 <p align="center">
-  <a href="http://www.kuailemao.xyz">
+  <a href="https://www.kuailemao.xyz">
     <img src="https://foruda.gitee.com/avatar/1667975309022664009/11937114_kuailemao_1667975308.png" alt="Ruyu的个人博客" style="border-radius: 50%;">
   </a>
 </p>
@@ -42,7 +42,7 @@
 
 **Github地址：** https://github.com/kuailemao/Ruyu-Blog
 
-**接口文档：** [API文档 (kuailemao.xyz)](http://kuailemao.xyz:8088/doc.html#/home)
+**接口文档：** [API文档 (kuailemao.xyz)](https://kuailemao.xyz:8088/doc.html#/home)
 
 **欢迎各位提交 PR ，一起改进项目**
 
@@ -66,7 +66,7 @@
 | node | 16.17.0 |
 
 ## 项目部署
-**部署文档地址：** http://kuailemao.xyz/article/48
+**部署文档地址：** https://kuailemao.xyz/article/48
 
 ## 项目特点
 
