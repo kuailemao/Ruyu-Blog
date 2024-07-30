@@ -1,248 +1,95 @@
 <script setup lang="ts">
-import * as echarts from 'echarts/core';
-import {GridComponent} from 'echarts/components';
-import {LineChart} from 'echarts/charts';
-import {UniversalTransition} from 'echarts/features';
-import {CanvasRenderer} from 'echarts/renderers';
-import {
-  TitleComponent,
-  ToolboxComponent,
-  TooltipComponent,
-  LegendComponent
-} from 'echarts/components';
-import {PieChart} from 'echarts/charts';
-import {LabelLayout} from 'echarts/features';
-
-const views = ref(null)
-const information = ref(null)
-
-onMounted(() => {
-  initViews()
-  initInformation()
-})
-
-// 浏览量
-function initViews() {
-  echarts.use([GridComponent, LineChart, CanvasRenderer, UniversalTransition]);
-
-  const chartDom = views.value!;
-  const myChart = echarts.init(chartDom);
-  let option;
-
-  option = {
-    xAxis: {
-      type: 'category',
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    },
-    yAxis: {
-      type: 'value'
-    },
-    series: [
-      {
-        data: [150, 230, 224, 218, 135, 147, 260],
-        type: 'line'
-      }
-    ]
-  };
-
-  option && myChart.setOption(option);
-}
-
-// 网站资料
-function initInformation() {
-  echarts.use([
-    TitleComponent,
-    ToolboxComponent,
-    TooltipComponent,
-    LegendComponent,
-    PieChart,
-    CanvasRenderer,
-    LabelLayout
-  ]);
-
-  const chartDom = information.value;
-  const myChart = echarts.init(chartDom);
-  let option;
-
-  option = {
-    tooltip: {
-      trigger: 'item',
-      formatter: '{a} <br/>{b} : {c} ({d}%)'
-    },
-    toolbox: {
-      show: false,
-      feature: {
-        mark: {show: true},
-        dataView: {show: true, readOnly: false},
-        restore: {show: true},
-        saveAsImage: {show: true}
-      }
-    },
-    series: [
-      {
-        name: '网站资料',
-        type: 'pie',
-        radius: [20, 140],
-        center: ['50%', '50%'],
-        roseType: 'area',
-        itemStyle: {
-          borderRadius: 5
-        },
-        data: [
-          {value: 30, name: '分类'},
-          {value: 28, name: '标签'},
-          {value: 26, name: '友链'},
-          {value: 24, name: '留言'},
-          {value: 22, name: '文章'},
-        ]
-      }
-    ]
-  };
-
-  option && myChart.setOption(option);
-
-}
 
 </script>
 
 <template>
-  <div>
-    <Main only-father-container>
-      <template #banner>
-        <Banner title="关于" subtitle="link"/>
-      </template>
-      <template #content>
-        <div class="title">
-          关于
+  <div class="flex justify-center items-center h-[100%] w-[99%]" >
+    <div class="flex justify-center items-center max-lg:flex-col h-full w-full xl:w-[90%]">
+      <div class="w-[40%] max-lg:w-full h-full flex flex-col justify-center items-center">
+        <div class="h-[20rem] w-[20rem] rounded-full overflow-hidden mt-[5rem] drop-shadow-lg">
+          <div class="bg-cover bg-no-repeat bg-center w-full h-full" style="background-image: url('https://image.kuailemao.xyz/blog/websiteInfo/avatar/52e4b3e9-b1e0-4e9b-ab6e-4effc237ab1a.jpg')"></div>
         </div>
-        <div class="content">
-          <div class="item_content" style="margin-bottom: 10rem;margin-top: 5rem">
-            <el-divider content-position="left">关于作者</el-divider>
-            <div class="content_author">
-              <div class="author">
-                <div class="author_avatar">
-                  <img src="https://image.kuailemao.xyz/blog/websiteInfo/avatar/76829cfe-f670-4e26-85c6-ab46f8b45250.jpg" alt="">
-                </div>
-                <div class="author_info">
-                  <div class="author_name">
-                    <span>ruyu</span>
-                  </div>
-                  <div class="author_desc">
-                    <span>啥也不会</span>
-                  </div>
-                </div>
-              </div>
-              <div class="author_desc">
-                <span>全栈开发小白</span>
-              </div>
-            </div>
+        <div>
+          <h1 data-shadow='RuYu'>RuYu</h1>
+        </div>
+        <div class="text-gray-600 w-full font-bold dark:text-gray-300 text-center">
+          人生如棋落子无悔道心稳固如箭离弦永不回头
+        </div>
+      </div>
+      <div class="flex flex-col justify-center items-center xl:w-[40%] lg:w-[60%] h-full">
+        <div class="w-full h-[60vh] flex flex-col justify-center items-center">
+          <div class="w-full text-[3rem] text-center text-gray-600 dark:text-gray-300 max-lg:text-[2rem] max-lg:pb-6">
+            一名中二Web全栈小白
           </div>
-          <div class="item_content">
-            <el-divider content-position="left">关于网站（后续计划）</el-divider>
-            <div class="content_site">
-              <div>
-                <div>近一周访问量</div>
-                <div ref="views" style="width: 100%;height: 100%"></div>
-              </div>
-              <div>
-                <div>网站资料</div>
-                <div ref="information" style="width: 100%;height: 100%"></div>
-              </div>
-            </div>
+          <div class="mt-4 text-center text-gray-500 dark:text-gray-300 max-lg:px-3">
+            千年以前，看见元婴强者自己的小世界，非常羡慕，于是心中立誓，我也要变强，后抛弃世间情爱，终踏上修仙一途，虽一介散修，但亦往，经历千磨万难，
+            炼气百年，四百年筑基，一千年结丹，两千年突破元婴，又一千年后遭遇瓶颈，决心闭死关，四千年后的今日，终于突破<span class="text-red-500 font-bold"> 化神</span>，感叹回首沧桑，
+            道不尽仙凡殊途，尽人间。
           </div>
         </div>
-      </template>
-    </Main>
+        <div class="w-full h-[40vh] flex flex-col justify-center items-center">
+          <div class="text-gray-600 dark:text-gray-300 ">------------------------我的个人导航------------------------</div>
+          <div class="flex justify-center items-center h-full">
+            <a href="https://github.com/kuailemao" target="_blank">
+              <div class="bg-white dark:bg-slate-800 w-[120px] h-[120px] flex justify-center items-center rounded-2xl drop-shadow-lg">
+                <SvgIcon name="github_icon" width="100px" height="100px"/>
+              </div>
+            </a>
+            <a href="https://gitee.com/kuailemao" target="_blank"  class="mx-10 max-lg:mx-4">
+              <div class="bg-white dark:bg-slate-800 w-[120px] h-[120px] flex justify-center items-center rounded-2xl drop-shadow-lg">
+                <SvgIcon name="gitee_icon" width="100px" height="100px"/>
+              </div>
+            </a>
+            <a href="https://space.bilibili.com/299105957" target="_blank">
+              <div class="bg-white dark:bg-slate-800 w-[120px] h-[120px] flex justify-center items-center rounded-2xl drop-shadow-lg">
+                <SvgIcon name="bilibili_icon" width="100px" height="100px"/>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+@import url(https://fonts.googleapis.com/css?family=Righteous);
 
-.content {
-  width: 100%;
-  height: 100%;
-
-  .item_content {
-    margin: 2rem 0;
-
-    .content_site {
-      width: 100%;
-      height: 20rem;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-
-      > div {
-        width: 50%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        font-weight: bold;
-        font-size: 1rem;
-
-        div:first-child {
-          font-size: 1rem;
-          margin-bottom: 1.5rem;
-        }
-      }
-    }
-
-    .content_author {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-
-      .author {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-
-        .author_avatar {
-          width: 4rem;
-          height: 4rem;
-          border-radius: 50%;
-          overflow: hidden;
-          margin-right: 1rem;
-
-          img {
-            width: 100%;
-            height: 100%;
-          }
-        }
-
-        .author_info {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-
-          .author_name {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-          }
-
-          .author_desc {
-            font-size: 1rem;
-            color: #999;
-          }
-        }
-      }
-
-      .author_desc {
-        font-size: 1rem;
-        color: #999;
-      }
-    }
-  }
+*, *:before, *:after {
+  box-sizing: border-box;
+  position: relative;
 }
 
+h1 {
+  display: inline-block;
+  color: white;
+  font-family: 'Righteous', serif;
+  font-size: 12em;
+  text-shadow: .03em .03em 0 hsla(230,40%,50%,1);
+}
+h1:after {
+  content: attr(data-shadow);
+  position: absolute;
+  top: .06em; left: 0.06em;
+  z-index: -1;
+  text-shadow: none;
+  background-image:
+      linear-gradient(
+              45deg,
+              transparent 45%,
+              hsla(48,20%,90%,1) 45%,
+              hsla(48,20%,90%,1) 55%,
+              transparent 0
+      );
+  background-size: .05em .05em;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 
-.title {
-  font-size: 1.5rem;
-  margin-bottom: 2rem;
+  animation: shad-anim 15s linear infinite;
+}
+
+@keyframes shad-anim {
+  0% {background-position: 0 0}
+  0% {background-position: 100% -100%}
 }
 </style>
