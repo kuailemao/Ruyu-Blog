@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -151,8 +152,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public LoginUser handlerLogin(User user, String equipmentHeader) {
         // 查询用户角色
         List<UserRole> userRoles = userRoleMapper.selectList(new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserId, user.getId()));
-        List<Role> roles = userRoles.stream().map(role -> roleMapper.selectById(role.getRoleId())).toList();
-
+        List<Role> roles = userRoles.stream().map(role -> roleMapper.selectById(role.getRoleId())).filter(role -> Objects.equals(role.getStatus(), RoleEnum.Role_STATUS_ARTICLE.getStatus())).toList();
         // 用户是否被禁用
         if (user.getIsDisable() == 1) {
             throw new BadCredentialsException(RespConst.ACCOUNT_DISABLED_MSG);
