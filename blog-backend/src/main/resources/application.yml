@@ -67,8 +67,11 @@ spring:
 #      email:  # 不可透露
 #      password:  # # 不可透露
 #    properties:
-#      mail.smtp.auth: true
-#      mail.smtp.starttls.enable: true
+#      mail:
+#        smtp:
+#          auth: true
+#          starttls:
+#            enable: true
 #  servlet:
 #    multipart:
 #      max-file-size: 10MB
