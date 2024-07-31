@@ -41,11 +41,6 @@ public class SQLConst {
     public static final String ARTICLE_ID = "1";
 
     /**
-     * 文章分类id
-     */
-    public static final String CATEGORY_ID = "category_id";
-
-    /**
      * 评论是否通过(0,否)
      */
     public static final Integer COMMENT_IS_CHECK = 1;
