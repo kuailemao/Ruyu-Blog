@@ -26,7 +26,6 @@ import java.util.Objects;
  */
 @Component
 @Slf4j
-@RabbitListener(queues = RabbitConst.MAIL_QUEUE)
 public class EmailQueueListener {
 
     @Resource
@@ -38,7 +37,9 @@ public class EmailQueueListener {
     /**
      * 监听邮件队列
      */
-    @RabbitHandler
+    @RabbitListener(queues = RabbitConst.MAIL_QUEUE,
+            errorHandler = "rabbitListenerErrorHandler",
+            containerFactory = "rabbitListenerContainerFactory")
     public void handlerMapMessage(Map<String, Object> data, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) {
         String email = (String) data.get("email");
         String code = (String) data.get("code");
@@ -58,20 +59,8 @@ public class EmailQueueListener {
         };
         if (Objects.isNull(message)) return;
         // 发送邮件
-        try {
-            mailSender.send(message);
-            log.info(email + "：邮件发送成功");
-            channel.basicAck(tag, false); // 成功则消费消息
-        } catch (MailException e) {
-            log.error(email + "：邮件发送失败", e);
-            try {
-                channel.basicNack(tag, false, true); // 邮件发送失败，不确认消息，并且重新入队
-            } catch (IOException ex) {
-                log.warn(email + ": 消息重新入队失败", ex);
-            }
-        } catch (IOException e) {
-            log.error(email + "：消息确认失败", e);
-        }
+        mailSender.send(message);
+        log.info("{}：邮件发送成功", email);
     }
 
     // 邮件信息
