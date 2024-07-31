@@ -42,6 +42,8 @@
 
 **Github地址：** https://github.com/kuailemao/Ruyu-Blog
 
+**B站视频介绍：** https://www.bilibili.com/video/BV181hNeiEDb/?vd_source=ff1e09f5473622b91dc0efc92418b537#reply112716668797561
+
 **接口文档：** [API文档 (kuailemao.xyz)](https://kuailemao.xyz:8088/doc.html#/home)
 
 **欢迎各位提交 PR ，一起改进项目**
