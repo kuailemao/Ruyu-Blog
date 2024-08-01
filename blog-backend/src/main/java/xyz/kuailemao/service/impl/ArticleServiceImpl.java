@@ -127,16 +127,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     public List<RandomArticleVO> listRandomArticle() {
-        List<Article> articles = this.query().eq(SQLConst.STATUS, SQLConst.PUBLIC_ARTICLE).list();
-        List<Long> ids = new ArrayList<>(articles.stream().map(Article::getId).toList());
-        // 打乱集合的顺序
-        Collections.shuffle(ids);
-        // 取前5个id
-        List<Long> idLimit5 = ids.stream().limit(SQLConst.RANDOM_ARTICLE_COUNT).toList();
-        // 根据id集合查询文章
-        List<Article> randomArticle = articleMapper.selectBatchIds(idLimit5);
-        Collections.shuffle(randomArticle);
-        return randomArticle.stream().map(article -> article.asViewObject(RandomArticleVO.class)).toList();
+        List<Article> randomArticles = articleMapper.selectRandomArticles(SQLConst.PUBLIC_ARTICLE, SQLConst.RANDOM_ARTICLE_COUNT);
+        return randomArticles.stream()
+                .map(article -> article.asViewObject(RandomArticleVO.class))
+                .toList();
     }
 
     @Override
