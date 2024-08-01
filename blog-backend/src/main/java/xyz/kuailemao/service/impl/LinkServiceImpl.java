@@ -3,6 +3,7 @@ package xyz.kuailemao.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import xyz.kuailemao.constants.SQLConst;
 import xyz.kuailemao.domain.dto.LinkDTO;
@@ -10,13 +11,11 @@ import xyz.kuailemao.domain.dto.LinkIsCheckDTO;
 import xyz.kuailemao.domain.dto.SearchLinkDTO;
 import xyz.kuailemao.domain.entity.Link;
 import xyz.kuailemao.domain.entity.User;
-import xyz.kuailemao.domain.entity.UserRole;
 import xyz.kuailemao.domain.response.ResponseResult;
 import xyz.kuailemao.domain.vo.LinkListVO;
 import xyz.kuailemao.domain.vo.LinkVO;
 import xyz.kuailemao.mapper.LinkMapper;
 import xyz.kuailemao.mapper.UserMapper;
-import xyz.kuailemao.mapper.UserRoleMapper;
 import xyz.kuailemao.service.LinkService;
 import xyz.kuailemao.service.PublicService;
 import xyz.kuailemao.utils.SecurityUtils;
@@ -44,8 +43,8 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
     @Resource
     private UserMapper userMapper;
 
-    @Resource
-    private UserRoleMapper userRoleMapper;
+    @Value("${spring.mail.username}")
+    private String email;
 
     @Override
     public ResponseResult<Void> applyLink(LinkDTO linkDTO) {
@@ -53,9 +52,7 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
         link.setUserId(SecurityUtils.getUserId());
         // 1.数据库添加
         if (this.save(link)) {
-            // 查询管理员
-            String email = userMapper.selectById(userRoleMapper.selectOne(new LambdaQueryWrapper<UserRole>().eq(UserRole::getRoleId, SQLConst.ADMIN_ID)).getUserId()).getEmail();
-            // 2.向管理员发送邮件
+            // 2.向站长发送邮件
             publicService.sendEmail("friendLinkApplication", email);
             return ResponseResult.success();
         }
