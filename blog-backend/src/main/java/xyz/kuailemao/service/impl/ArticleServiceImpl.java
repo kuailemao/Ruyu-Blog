@@ -28,7 +28,6 @@ import xyz.kuailemao.utils.SecurityUtils;
 import xyz.kuailemao.utils.StringUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * (Article)表服务实现类
@@ -100,16 +99,26 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         articleVOS = articleVOS.stream().peek(articleVO -> {
             if (hasKey) {
                 redisCache.getCacheMap(RedisConst.ARTICLE_FAVORITE_COUNT).forEach((k, v) -> {
-                    if (Objects.equals(k, articleVO.getId().toString()))
-                        articleVO.setFavoriteCount(Long.valueOf(v.toString()));
+                    if (Objects.equals(k, articleVO.getId().toString())) articleVO.setFavoriteCount(Long.valueOf(v.toString()));
+                    else {
+                        // 反正发布新文章时数量缓存不存在
+                        redisCache.setCacheMap(RedisConst.ARTICLE_FAVORITE_COUNT, Map.of(k, 0));
+                        articleVO.setFavoriteCount(0L);
+                    }
                 });
                 redisCache.getCacheMap(RedisConst.ARTICLE_LIKE_COUNT).forEach((k, v) -> {
-                    if (Objects.equals(k, articleVO.getId().toString()))
-                        articleVO.setLikeCount(Long.valueOf(v.toString()));
+                    if (Objects.equals(k, articleVO.getId().toString())) articleVO.setLikeCount(Long.valueOf(v.toString()));
+                    else {
+                        redisCache.setCacheMap(RedisConst.ARTICLE_LIKE_COUNT, Map.of(k, 0));
+                        articleVO.setLikeCount(0L);
+                    }
                 });
                 redisCache.getCacheMap(RedisConst.ARTICLE_COMMENT_COUNT).forEach((k, v) -> {
-                    if (Objects.equals(k, articleVO.getId().toString()))
-                        articleVO.setCommentCount(Long.valueOf(v.toString()));
+                    if (Objects.equals(k, articleVO.getId().toString())) articleVO.setCommentCount(Long.valueOf(v.toString()));
+                    else {
+                        redisCache.setCacheMap(RedisConst.ARTICLE_COMMENT_COUNT, Map.of(k, 0));
+                        articleVO.setCommentCount(0L);
+                    }
                 });
             }
         }).toList();
@@ -207,9 +216,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     public void addVisitCount(Long id) {
-        if (redisCache.isHasKey(RedisConst.ARTICLE_VISIT_COUNT + id)) {
-            redisCache.increment(RedisConst.ARTICLE_VISIT_COUNT + id, 1L);
-        }
+        if (redisCache.isHasKey(RedisConst.ARTICLE_VISIT_COUNT + id)) redisCache.increment(RedisConst.ARTICLE_VISIT_COUNT + id, 1L);
+        else redisCache.setCacheObject(RedisConst.ARTICLE_VISIT_COUNT + id, 0);
     }
 
     @Override
