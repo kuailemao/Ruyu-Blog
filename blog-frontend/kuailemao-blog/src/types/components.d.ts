@@ -11,7 +11,6 @@ declare module 'vue' {
     Banner: typeof import('./../components/Banner/index.vue')['default']
     BottomRightLayout: typeof import('./../components/BottomRightLayout/index.vue')['default']
     BottomRightMore: typeof import('./../components/BottomRightMore/index.vue')['default']
-    BottomRightSetting: typeof import('./../components/BottomRightSetting/index.vue')['default']
     Card: typeof import('./../components/Card/index.vue')['default']
     CardEssay: typeof import('./../components/CardEssay/index.vue')['default']
     CardInfo: typeof import('./../components/CardInfo/index.vue')['default']

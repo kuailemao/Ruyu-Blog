@@ -10,7 +10,7 @@ import {
 } from "@/apis/article";
 import {cancelLike, isLike, userLike} from '@/apis/like'
 import ChildComment from "./ChildComment.vue";
-import {ElMessage} from "element-plus";
+import {ElMessage, ElMessageBox} from "element-plus";
 
 const props = defineProps({
   authorId: {
@@ -263,9 +263,17 @@ function addParentComment() {
     typeId: props.typeId,
     commentContent: textarea.value
   }
-  addComment(data).then(res => {
+  addComment(data).then((res: any) => {
     if (res.code === 200) {
       ElMessage.success("评论成功");
+      if (res.data) {
+        ElNotification({
+          title: '评论成功',
+          duration: 4000,
+          type: 'warning',
+          message: h('i', { style: 'color: teal' }, res.data),
+        })
+      }
       textarea.value = ''
       getComments(props.typeId, '1', String(pageSize.value))
     } else if (res.code === 1002) {

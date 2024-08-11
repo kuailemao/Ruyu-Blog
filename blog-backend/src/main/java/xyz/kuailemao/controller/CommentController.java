@@ -61,7 +61,7 @@ public class CommentController {
     @Parameter(name = "commentDTO", description = "评论信息", required = true)
     @AccessLimit(seconds = 60, maxCount = 10)
     @PostMapping("/auth/add/comment")
-    public ResponseResult<Void> userComment(@Valid @RequestBody UserCommentDTO commentDTO) {
+    public ResponseResult<String> userComment(@Valid @RequestBody UserCommentDTO commentDTO) {
         return commentService.userComment(commentDTO);
     }
 

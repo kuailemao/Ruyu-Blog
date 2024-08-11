@@ -59,4 +59,9 @@ public class RedisConst {
      * 文章访问数
      */
     public static final String ARTICLE_VISIT_COUNT = "article:count:visit:";
+
+    /**
+     * 邮箱确认友链通过，状态码
+     */
+    public static final String EMAIL_VERIFICATION_LINK = "email:verification:link:";
 }

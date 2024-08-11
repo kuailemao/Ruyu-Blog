@@ -10,6 +10,7 @@ public class LogConst {
     public static final String UPDATE = "修改";
     public static final String INSERT = "新增";
     public static final String DELETE = "删除";
+    public static final String APPROVE = "审核";
     public static final String GET = "获取";
     public static final String GRANT = "授权";
     public static final String SEARCH = "搜索";

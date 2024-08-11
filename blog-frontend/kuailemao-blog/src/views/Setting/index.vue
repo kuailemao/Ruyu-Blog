@@ -277,10 +277,10 @@ function getEmailCode(){
             </el-icon>
             <span class="font-bold text-xl ml-2">电子邮件设置</span>
           </div>
-          <span style="color: gray;font-size: 0.8rem">在这里可以修改绑定的电子邮箱信息</span>
+          <span style="color: gray;font-size: 0.8rem">在这里可以修改或绑定的电子邮箱信息，绑定后可以开启邮箱提醒！</span>
           <el-divider style="margin-top: 0.5rem"/>
           <div class="flex justify-center">
-            <div class="w-full mb-5" v-if="userStore.userInfo?.registerType === 0">
+            <div class="w-full mb-5">
               <div class="flex justify-center mx-6">
                 <el-form
                     label-position="top"
@@ -304,9 +304,6 @@ function getEmailCode(){
                 </el-form>
               </div>
               <el-button class="mx-6" :icon="Unlock" type="success" @click="modifyEmail">安全验证</el-button>
-            </div>
-            <div v-else>
-              <span>您是第三方的注册方式，无法修改哦！！</span>
             </div>
           </div>
         </div>

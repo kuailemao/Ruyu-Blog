@@ -1,6 +1,7 @@
 package xyz.kuailemao.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.servlet.http.HttpServletResponse;
 import xyz.kuailemao.domain.dto.LinkDTO;
 import xyz.kuailemao.domain.dto.LinkIsCheckDTO;
 import xyz.kuailemao.domain.dto.SearchLinkDTO;
@@ -52,4 +53,11 @@ public interface LinkService extends IService<Link> {
      * @return 是否成功
      */
     ResponseResult<Void> deleteLink(List<Long> ids);
+
+    /**
+     * 邮箱审核友链申请
+     * @param verifyCode 校验码
+     * @return 是否成功
+     */
+    String emailApplyLink(String verifyCode, HttpServletResponse response);
 }

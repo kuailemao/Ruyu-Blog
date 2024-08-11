@@ -11,7 +11,7 @@ import xyz.kuailemao.domain.BaseData;
 
 
 /**
- * (Comment)表实体类
+ * (CommentEmail)表实体类
  *
  * @author kuailemao
  * @since 2023-10-19 15:44:56

@@ -14,7 +14,7 @@ import java.util.List;
 
 
 /**
- * (Comment)表服务接口
+ * (CommentEmail)表服务接口
  *
  * @author kuailemao
  * @since 2023-10-19 15:44:57
@@ -28,7 +28,7 @@ public interface CommentService extends IService<Comment> {
     /**
      * 添加评论
      */
-    ResponseResult<Void> userComment(UserCommentDTO commentDTO);
+    ResponseResult<String> userComment(UserCommentDTO commentDTO);
 
     /**
      * 后台评论列表

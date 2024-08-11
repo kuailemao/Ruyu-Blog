@@ -36,7 +36,8 @@ public class PublicServiceImpl implements PublicService {
 
     /**
      * 发送邮箱验证码
-     * @param type 邮箱类型
+     *
+     * @param type  邮箱类型
      * @param email 邮箱地址
      * @return 提示信息
      */
@@ -58,12 +59,19 @@ public class PublicServiceImpl implements PublicService {
 
     /**
      * 发送邮箱通知
-     * @param type 邮箱类型
+     *
+     * @param type  邮箱类型
      * @param email 邮箱地址
      */
     @Override
-    public void sendEmail(String type, String email) {
-        rabbitTemplate.convertAndSend(exchange,routingKey,Map.of("email",email,"type",type));
+    public void sendEmail(String type, String email, Map<String, Object> content) {
+        // 发送邮件
+        if (content != null) {
+            content.put("email", email);
+            content.put("type", type);
+            rabbitTemplate.convertAndSend(exchange, routingKey, content);
+        } else rabbitTemplate.convertAndSend(exchange, routingKey, Map.of("email", email, "type", type));
+
         log.info("邮件通知消息发送完毕，发送时间为：{}，发送的消息类型：{}，发送的邮箱：{}", new Date(), type, email);
     }
 }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +17,7 @@ import xyz.kuailemao.domain.dto.SearchArticleDTO;
 import xyz.kuailemao.domain.entity.*;
 import xyz.kuailemao.domain.response.ResponseResult;
 import xyz.kuailemao.domain.vo.*;
-import xyz.kuailemao.enums.CommentEnum;
-import xyz.kuailemao.enums.FavoriteEnum;
-import xyz.kuailemao.enums.LikeEnum;
-import xyz.kuailemao.enums.UploadEnum;
+import xyz.kuailemao.enums.*;
 import xyz.kuailemao.mapper.*;
 import xyz.kuailemao.service.*;
 import xyz.kuailemao.utils.FileUploadUtils;
@@ -27,6 +25,7 @@ import xyz.kuailemao.utils.RedisCache;
 import xyz.kuailemao.utils.SecurityUtils;
 import xyz.kuailemao.utils.StringUtils;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -35,6 +34,7 @@ import java.util.*;
  * @author kuailemao
  * @since 2023-10-15 02:29:13
  */
+@Slf4j
 @Service("articleService")
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
 
@@ -98,32 +98,35 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         articleVOS = articleVOS.stream().peek(articleVO -> {
             if (hasKey) {
-                redisCache.getCacheMap(RedisConst.ARTICLE_FAVORITE_COUNT).forEach((k, v) -> {
-                    if (Objects.equals(k, articleVO.getId().toString())) articleVO.setFavoriteCount(Long.valueOf(v.toString()));
-                    else {
-                        // 反正发布新文章时数量缓存不存在
-                        redisCache.setCacheMap(RedisConst.ARTICLE_FAVORITE_COUNT, Map.of(k, 0));
-                        articleVO.setFavoriteCount(0L);
-                    }
-                });
-                redisCache.getCacheMap(RedisConst.ARTICLE_LIKE_COUNT).forEach((k, v) -> {
-                    if (Objects.equals(k, articleVO.getId().toString())) articleVO.setLikeCount(Long.valueOf(v.toString()));
-                    else {
-                        redisCache.setCacheMap(RedisConst.ARTICLE_LIKE_COUNT, Map.of(k, 0));
-                        articleVO.setLikeCount(0L);
-                    }
-                });
-                redisCache.getCacheMap(RedisConst.ARTICLE_COMMENT_COUNT).forEach((k, v) -> {
-                    if (Objects.equals(k, articleVO.getId().toString())) articleVO.setCommentCount(Long.valueOf(v.toString()));
-                    else {
-                        redisCache.setCacheMap(RedisConst.ARTICLE_COMMENT_COUNT, Map.of(k, 0));
-                        articleVO.setCommentCount(0L);
-                    }
-                });
+                // 老代码：文章列表查询耗时:1203ms
+                //  优化后的：文章列表查询耗时:220ms
+                setArticleCount(articleVO, RedisConst.ARTICLE_FAVORITE_COUNT, CountTypeEnum.FAVORITE);
+                setArticleCount(articleVO, RedisConst.ARTICLE_LIKE_COUNT, CountTypeEnum.LIKE);
+                setArticleCount(articleVO, RedisConst.ARTICLE_COMMENT_COUNT, CountTypeEnum.COMMENT);
             }
         }).toList();
 
         return new PageVO<>(articleVOS, page.getTotal());
+    }
+
+    private void setArticleCount(ArticleVO articleVO, String redisKey, CountTypeEnum articleFieldName) {
+        String articleId = articleVO.getId().toString();
+        Object countObj = redisCache.getCacheMap(redisKey).get(articleId);
+        long count = 0L;
+        if (countObj != null) {
+            count = Long.parseLong(countObj.toString());
+        } else {
+            // 缓存发布新文章时数量缓存不存在
+            redisCache.setCacheMap(redisKey, Map.of(articleId, 0));
+        }
+
+        if (articleFieldName.equals(CountTypeEnum.FAVORITE)) {
+            articleVO.setFavoriteCount(count);
+        } else if (articleFieldName.equals(CountTypeEnum.LIKE)) {
+            articleVO.setLikeCount(count);
+        } else if (articleFieldName.equals(CountTypeEnum.COMMENT)) {
+            articleVO.setCommentCount(count);
+        }
     }
 
     @Override

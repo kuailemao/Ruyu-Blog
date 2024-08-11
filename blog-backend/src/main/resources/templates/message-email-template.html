@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎邮件</title>
+    <style type="text/css">
+        /* 媒体查询 */
+        @media screen and (max-width: 740px) {
+            .div_container {
+                font-size: 16px !important;
+            }
+
+            .but-container {
+                margin-top: 1rem !important;
+            }
+
+            .butt_to {
+                width: 150px !important;
+                height: 40px !important;
+                line-height: 40px !important;
+                font-size: 16px !important;
+            }
+        }
+
+        @media screen and (max-width: 550px) {
+            .title_container {
+                flex-direction: column !important;
+            }
+
+            .title_container div:nth-of-type(2) {
+                margin-top: .5rem !important;
+            }
+        }
+
+        .butt_to:hover {
+            cursor: pointer;
+            background: linear-gradient(135deg, #f02fc2, #6094ea);
+            color: white;
+            transition: 0.5s;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+<div>
+    <div class="div_container"
+         style="
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         flex-direction: column;
+         font-size: 20px;
+         color: #333333;
+         border-radius: 1rem;
+         min-height: 100vh;
+         width: 100%;
+         background: linear-gradient(135deg, #f02fc2, #6094ea);
+">
+        <div style="height: 100%;width: 100%;display: flex;flex-direction: column;align-items: center;justify-content: center">
+            <div class="avatar_container" style="width: 150px; height: 150px; margin: 0 auto; padding-top: 2rem;">
+                <img src="https://image.kuailemao.xyz/blog/websiteInfo/avatar/52e4b3e9-b1e0-4e9b-ab6e-4effc237ab1a.jpg"
+                     alt="头像"
+                     style="width: 100%; height: 100%; border-radius: 40%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);">
+            </div>
+            <div class="title_container"
+                 style="
+                 margin-top: 20px;
+                 margin-bottom: 40px;
+                 display: flex;
+                 justify-content: center;
+                 align-items: center;
+            ">
+                <div style="display: flex;flex-direction: column;align-items: center">
+                    <span style="color: #ffffff;font-weight: bold;font-size: 25px;margin-bottom: 20px">Ruyu-Blog</span>
+                    <span style="color: #ffffff;font-weight: bold;font-size: 25px">有新的留言</span>
+                </div>
+            </div>
+            <div style="margin: 1rem 0;width: 90%;display: flex;justify-content: center;align-items: center">
+                <div style="
+                width: 95%;
+                height: auto;
+                min-height: 200px;
+                border: 1px solid #E4E7ED;
+                border-radius: 5px;
+                background-color: white;
+            ">
+                    <!-- 头像 名称 -->
+                    <div style="display: flex;justify-content: space-between;align-items: center;padding: 20px">
+                        <div style="display: flex;justify-content: center;align-items: center">
+                            <div class="avatar_container" style="width: 50px; height: 50px; border-radius: 50%;margin-right: 20px">
+                                <img th:src="${avatar}"
+                                     alt="头像"
+                                     style="width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);">
+                            </div>
+                            <div style="font-size: 20px" th:text="${nickname}">
+
+                            </div>
+                        </div>
+                        <div style="color: #999999;font-size: 15px" th:text="${time}">
+
+                        </div>
+                    </div>
+                    <hr style="background-color: #DCDFE6; height: 1px; border: none;margin: 0">
+                    <!-- 内容 -->
+                    <div style="padding: 20px" th:text="${content}">
+
+                    </div>
+                </div>
+            </div>
+            <div class="but-container"
+                 style="display: flex; justify-content: space-around; align-items: center; margin: 2rem 0;">
+                <a th:href="${toUrl}">
+                    <div class="butt_to"
+                         style="width: 200px; height: 50px; line-height: 50px; text-align: center; font-size: 20px; font-weight: bold; color: #333333; background: white; border-radius: 1rem; margin: 0 auto;"
+                         onmouseover="this.style.background='linear-gradient(135deg, #f02fc2, #6094ea)'; this.style.color='white'; this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.4)'; this.style.transition='0.5s';"
+                         onmouseout="this.style.background='white'; this.style.color='#333333'; this.style.boxShadow='none';">
+                        前往查看
+                    </div>
+                </a>
+            </div>
+            <div style="text-align: center;padding-bottom: 1rem;font-size: 15px">此为系统邮件，请勿回复。</div>
+        </div>
+    </div>
+</div>
+<script>
+    // 针对旧版 Outlook 的特殊处理
+    if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0) {
+        var elements = document.querySelectorAll('.butt_to');
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].style.width = '200px';
+            elements[i].style.height = '50px';
+        }
+    }
+</script>
+</body>
+</html>
