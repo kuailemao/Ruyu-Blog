@@ -108,7 +108,7 @@ public class LogAspect {
                     .state(2)
                     .exception(e.getMessage())
                     .method(className + "." + methodName + "()")
-                    .reqParameter(!multipartFile.isEmpty() ? multipartFile.toString() : JSON.toJSONString(joinPoint.getArgs()[0]))
+                    .reqParameter(!multipartFile.isEmpty() ? multipartFile.toString() : JSON.toJSONString(joinPoint.getArgs()))
                     .reqAddress(request.getRequestURI())
                     .time(time)
                     .build();
@@ -153,7 +153,7 @@ public class LogAspect {
                 .reqMapping(request.getMethod())
                 .userName(StringUtils.isNull(user) ? FunctionConst.UNKNOWN_USER : user.getUsername())
                 .method(className + "." + methodName + "()")
-                .reqParameter(!multipartFile.isEmpty() ? multipartFile.toString() : JSON.toJSONString(joinPoint.getArgs()[0]))
+                .reqParameter(!multipartFile.isEmpty() ? multipartFile.toString() : JSON.toJSONString(joinPoint.getArgs()))
                 .returnParameter(JSON.toJSONString(result))
                 .reqAddress(request.getRequestURI())
                 .time(time)
