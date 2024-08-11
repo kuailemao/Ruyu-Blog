@@ -409,8 +409,8 @@ const env = import.meta.env
 }
 
 .content-header {
-  background-color: rgba(248, 249, 250, 0.4);
-  border-bottom: solid 1px var(--el-border-color);
+  background-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   height: 45px;
@@ -440,6 +440,10 @@ const env = import.meta.env
     @media screen and (max-width: 910px) {
       display: none;
     }
+  }
+
+  .el-menu-item.is-active {
+    background: rgba(248, 249, 250, 0.2);
   }
 
   // 更改element-ui默认样式

@@ -1,5 +1,7 @@
 package xyz.kuailemao.service;
 
+import java.util.Map;
+
 /**
  * @author kuailemao
  * <p>
@@ -19,6 +21,7 @@ public interface PublicService {
      * 邮箱通知
      * @param type 邮箱类型
      * @param email 邮箱地址
+     * @param content 邮箱内容
      */
-    void sendEmail(String type, String email);
+    void sendEmail(String type, String email, Map<String, Object> content);
 }

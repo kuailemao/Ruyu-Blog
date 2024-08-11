@@ -52,6 +52,8 @@
   --global-font-size: 14px;
   --card-box-shadow: 0 3px 6px 3px rgba(7, 17, 27, 0.06);
   --card-hover-box-shadow: 0 3px 6px 3px rgba(7, 17, 27, 0.15);
+  // 亮色滚动条
+  --scroll-bar-color: linear-gradient(135deg,#17ead9,#6078ea);
 }
 
 // 暗色模式下的主题色
@@ -76,6 +78,8 @@ html.dark {
   --global-white: #424242;
   --global-shadow-white: #1D1D1D;
   --mao-shadow: 0 2px 12px 0 rgba(255, 255, 255, 0.1);
+  // 暗色滚动条
+  --scroll-bar-color: linear-gradient(135deg,#43cbff,#9708cc);
 }
 
 // 全局字体

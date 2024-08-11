@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import xyz.kuailemao.constants.FunctionConst;
 import xyz.kuailemao.constants.SQLConst;
@@ -15,12 +16,17 @@ import xyz.kuailemao.domain.vo.LeaveWordListVO;
 import xyz.kuailemao.domain.vo.LeaveWordVO;
 import xyz.kuailemao.enums.CommentEnum;
 import xyz.kuailemao.enums.LikeEnum;
+import xyz.kuailemao.enums.MailboxAlertsEnum;
 import xyz.kuailemao.mapper.*;
 import xyz.kuailemao.service.LeaveWordService;
+import xyz.kuailemao.service.PublicService;
 import xyz.kuailemao.utils.SecurityUtils;
 import xyz.kuailemao.utils.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -63,6 +69,15 @@ public class LeaveWordServiceImpl extends ServiceImpl<LeaveWordMapper, LeaveWord
                 }).toList();
     }
 
+    @Resource
+    private PublicService publicService;
+
+    @Value("${spring.mail.username}")
+    private String email;
+
+    @Value("${mail.message-new-notice}")
+    private Boolean messageNewNotice;
+
     @Override
     public ResponseResult<Void> userLeaveWord(String content) {
         String parse = (String) JSON.parse(content);
@@ -71,7 +86,20 @@ public class LeaveWordServiceImpl extends ServiceImpl<LeaveWordMapper, LeaveWord
         }
         LeaveWord build = LeaveWord.builder().content(parse)
                 .userId(SecurityUtils.getUserId()).build();
-        return this.save(build) ? ResponseResult.success() : ResponseResult.failure();
+
+        if (this.save(build)){
+            // 是否是站长本人留言
+            User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, SecurityUtils.getUserId()));
+            if (Objects.equals(user.getEmail(), email) || !messageNewNotice) return ResponseResult.success();
+
+            // 留言成功，发送邮箱提醒给站长
+            Map<String, Object> map = new HashMap<>();
+            map.put("messageId",build.getId());
+            publicService.sendEmail(MailboxAlertsEnum.MESSAGE_NOTIFICATION_EMAIL.getCodeStr(), email, map);
+
+            return ResponseResult.success();
+        }
+        return ResponseResult.failure();
     }
 
     @Override

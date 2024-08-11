@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import xyz.kuailemao.constants.RedisConst;
 import xyz.kuailemao.constants.SQLConst;
@@ -19,21 +20,24 @@ import xyz.kuailemao.domain.vo.ArticleCommentVO;
 import xyz.kuailemao.domain.vo.CommentListVO;
 import xyz.kuailemao.domain.vo.PageVO;
 import xyz.kuailemao.enums.LikeEnum;
+import xyz.kuailemao.enums.MailboxAlertsEnum;
 import xyz.kuailemao.mapper.CommentMapper;
 import xyz.kuailemao.mapper.UserMapper;
 import xyz.kuailemao.service.CommentService;
 import xyz.kuailemao.service.LikeService;
+import xyz.kuailemao.service.PublicService;
 import xyz.kuailemao.utils.RedisCache;
 import xyz.kuailemao.utils.SecurityUtils;
 import xyz.kuailemao.utils.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * (Comment)表服务实现类
+ * (CommentEmail)表服务实现类
  *
  * @author kuailemao
  * @since 2023-10-19 15:44:57
@@ -95,16 +99,97 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         return new PageVO<>(collect, commentMapper.selectCount(countWrapper));
     }
 
+    @Resource
+    private PublicService publicService;
+
+    @Value("${spring.mail.username}")
+    private String fromUser;
+
+    @Value("${mail.article-email-notice}")
+    private Boolean articleEmailNotice;
+
+    @Value("${mail.article-reply-notice}")
+    private Boolean articleReplyNotice;
+
+    @Value("${mail.message-email-notice}")
+    private Boolean messageEmailNotice;
+
+    @Value("${mail.message-reply-notice}")
+    private Boolean messageReplyNotice;
+
     @Override
-    public ResponseResult<Void> userComment(UserCommentDTO commentDTO) {
+    public ResponseResult<String> userComment(UserCommentDTO commentDTO) {
         Comment comment = commentDTO.asViewObject(Comment.class, commentDto -> commentDto.setCommentUserId(SecurityUtils.getUserId()));
         if (this.save(comment)) {
-            // 缓存评论数量+1
-            redisCache.incrementCacheMapValue(RedisConst.ARTICLE_COMMENT_COUNT, commentDTO.getTypeId().toString(), 1);
-            return ResponseResult.success();
+            // 判断用是否为第三方登录没有邮箱
+            User user = userMapper.selectById(SecurityUtils.getUserId());
+            if (StringUtils.isEmpty(user.getEmail())) {
+                // 提示绑定邮箱
+                return ResponseResult.success("检测到您尚未绑定邮箱,无法开启邮箱提醒，请先绑定邮箱");
+            }
+            // 文章评论
+            if (commentDTO.getType() == 1) {
+                return this.commentEmailReminder(commentDTO, user, comment);
+            }
+            // 留言评论
+            if (commentDTO.getType() == 2) {
+                return this.commentEmailReminder(commentDTO, user, comment);
+            }
         }
         return ResponseResult.failure();
     }
+
+    /**
+     * 评论邮箱提醒
+     * @param commentDTO 前端DTO
+     * @param user 用户
+     * @param comment 新增评论消息
+     * @return ResponseResult
+     */
+    public ResponseResult<String> commentEmailReminder(UserCommentDTO commentDTO, User user, Comment comment) {
+        // 缓存评论数量+1
+        redisCache.incrementCacheMapValue(RedisConst.ARTICLE_COMMENT_COUNT, commentDTO.getTypeId().toString(), 1);
+        // 评论
+        if (StringUtils.isNull(commentDTO.getReplyId())) {
+
+            // 如果发送评论的是站长本人则不发邮件
+            if (Objects.equals(fromUser, user.getEmail()) || (commentDTO.getType() == 1 && !articleEmailNotice) || commentDTO.getType() == 2 && !messageEmailNotice) return ResponseResult.success();
+
+            Map<String, Object> selectWhereMap = new HashMap<>();
+            selectWhereMap.put("commentType", commentDTO.getType());
+            selectWhereMap.put("commentId", comment.getId());
+            // 发邮箱给站长
+            publicService.sendEmail(MailboxAlertsEnum.COMMENT_NOTIFICATION_EMAIL.getCodeStr(), fromUser, selectWhereMap);
+        }
+        // 回复评论
+        if (Objects.nonNull(commentDTO.getReplyId())) {
+            User replyUser = userMapper.selectById(commentDTO.getReplyUserId());
+            if ((commentDTO.getType() == 1 && !articleReplyNotice) || (commentDTO.getType() == 1 && !messageReplyNotice)) return ResponseResult.success();
+
+            // 如果用户回复自己并且回复人是站长就无需提醒
+            if (Objects.equals(replyUser.getEmail(), user.getEmail()) && Objects.equals(fromUser, user.getEmail())) {
+                return ResponseResult.success();
+            }
+
+            Map<String, Object> selectWhereMap = new HashMap<>();
+            selectWhereMap.put("commentType", commentDTO.getType());
+            selectWhereMap.put("commentId", comment.getId());
+            selectWhereMap.put("replyCommentId", commentDTO.getReplyId());
+
+            // 回复人与被回复人不是站长本人的话就发送新增评论邮箱给站长
+            if (!Objects.equals(user.getEmail(), fromUser) && !Objects.equals(replyUser.getEmail(), fromUser)) {
+                publicService.sendEmail(MailboxAlertsEnum.COMMENT_NOTIFICATION_EMAIL.getCodeStr(), fromUser, selectWhereMap);
+            }
+
+            // 回复人不是站长本人并且不是自己回复自己，就发送回复通知
+            if (!Objects.equals(user.getEmail(), replyUser.getEmail())) {
+                publicService.sendEmail(MailboxAlertsEnum.REPLY_COMMENT_NOTIFICATION_EMAIL.getCodeStr(), replyUser.getEmail(), selectWhereMap);
+            }
+        }
+        return ResponseResult.success();
+    }
+
+
 
     @Override
     public List<CommentListVO> getBackCommentList(SearchCommentDTO searchDTO) {
@@ -130,7 +215,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     public ResponseResult<Void> isCheckComment(CommentIsCheckDTO isCheckDTO) {
         LambdaUpdateWrapper<Comment> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(Comment::getId, isCheckDTO.getId()).or().eq(Comment::getParentId, isCheckDTO.getId());
-        if (commentMapper.update(Comment.builder().id(isCheckDTO.getId()).isCheck(isCheckDTO.getIsCheck()).build(),wrapper) > 0)
+        if (commentMapper.update(Comment.builder().id(isCheckDTO.getId()).isCheck(isCheckDTO.getIsCheck()).build(), wrapper) > 0)
             return ResponseResult.success();
 
         return ResponseResult.failure();

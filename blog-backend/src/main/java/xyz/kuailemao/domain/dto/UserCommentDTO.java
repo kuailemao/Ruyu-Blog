@@ -13,8 +13,8 @@ import xyz.kuailemao.domain.BaseData;
  */
 @Data
 public class UserCommentDTO implements BaseData {
-    //评论类型 (1文章 2友链 3说说)
-    @Schema(description = "评论类型 (1文章 2友链 3说说)")
+    //评论类型 (1文章 2留言板)
+    @Schema(description = "评论类型 (1文章 2留言板)")
     @NotNull
     private Integer type;
     //类型id

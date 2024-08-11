@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎邮件</title>
+    <style type="text/css">
+        /* 媒体查询 */
+        @media screen and (max-width: 740px) {
+            .div_container {
+                font-size: 16px !important;
+            }
+
+            .but-container {
+                margin-top: 1rem !important;
+            }
+
+            .butt_to {
+                width: 150px !important;
+                height: 40px !important;
+                line-height: 40px !important;
+                font-size: 16px !important;
+            }
+        }
+
+        @media screen and (max-width: 550px) {
+            .title_container {
+                flex-direction: column !important;
+            }
+
+            .title_container div:nth-of-type(2) {
+                margin-top: .5rem !important;
+            }
+        }
+
+        .butt_to:hover {
+            cursor: pointer;
+            background: linear-gradient(135deg, #f02fc2, #6094ea);
+            color: white;
+            transition: 0.5s;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+<div>
+    <div class="div_container"
+         style="
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         flex-direction: column;
+         font-size: 20px;
+         color: #333333;
+         border-radius: 1rem;
+         min-height: 100vh;
+         width: 100%;
+         background: linear-gradient(135deg, #f02fc2, #6094ea);
+">
+        <div style="height: 100%;width: 100%;display: flex;flex-direction: column;align-items: center;justify-content: center;">
+            <div class="avatar_container" style="width: 150px; height: 150px; margin: 0 auto; padding-top: 2rem;">
+                <img src="https://image.kuailemao.xyz/blog/websiteInfo/avatar/52e4b3e9-b1e0-4e9b-ab6e-4effc237ab1a.jpg"
+                     alt="头像"
+                     style="width: 100%; height: 100%; border-radius: 40%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);">
+            </div>
+            <div class="title_container"
+                 style="
+                 margin-top: 20px;
+                 margin-bottom: 40px;
+                 display: flex;
+                 justify-content: center;
+                 align-items: center;
+            ">
+                <div style="display: flex;flex-direction: column;align-items: center">
+                    <span style="color: #ffffff;font-weight: bold;font-size: 25px;margin-bottom: 20px">Ruyu-Blog</span>
+                    <span style="color: #ffffff;font-weight: bold;font-size: 25px" th:text="${type == 1 ? '文章有新的评论' : '留言有新的评论'}"></span>
+                </div>
+            </div>
+            <div style="margin: 1rem 0; display: flex; flex-direction: column; align-items: start;width: 90%;background: white;border-radius: 10px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);padding: 1rem">
+                <div>
+                    <span style="font-weight: bold" th:text="${type == 1 ? '文章标题：' : ''}"></span>
+                    <span th:text="${type == 1 ? title : ''}"></span>
+                </div>
+                <div style="margin-top: .5rem"><span style="font-weight: bold" th:text="${type == 1 ? '文章地址：' : '留言地址：'}">文章地址</span>
+                    <span>
+                        <a th:href="${url}" th:text="${url}" style="text-decoration: none"></a>
+                    </span>
+                </div>
+                <div style="margin-top: .5rem">
+                    <div style="font-weight: bold">评论内容：</div>
+                </div>
+                <div style="margin-top: .5rem;display: flex;background: white;padding: 1rem;border-radius: 10px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);">
+                    <!-- 评论头像 -->
+                    <div style="font-weight: bold;max-width: 50px;max-height: 50px;border: 1px solid #cccccc;border-radius: 5px;">
+                        <img style="border-radius: 5px;background: #C0C4CC" width="50px" height="50px"
+                             th:src="${avatar}"
+                             alt="头像">
+                    </div>
+                    <!-- 评论内容 -->
+                    <div style="margin-left: 10px;">
+                        <div style="display: flex">
+                            <!-- 名称  时间 -->
+                            <div style="font-size: 17px;font-weight: bold" th:text="${nickname}"></div>
+                            <div style="margin-left: 20px">
+                                <span style="font-size: 13px" th:text="${time}"></span>
+                            </div>
+                        </div>
+                        <div style="background: #F2F2F3;padding: .8rem;border-radius: 10px;font-size: 17px" th:text="${content}">
+                            <!-- 内容 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="but-container"
+                 style="display: flex; justify-content: space-around; align-items: center; margin: 2rem 0;">
+                <a th:href="${toUrl}">
+                    <div class="butt_to"
+                         style="width: 200px; height: 50px; line-height: 50px; text-align: center; font-size: 20px; font-weight: bold; color: #333333; background: white; border-radius: 1rem; margin: 0 auto;"
+                         onmouseover="this.style.background='linear-gradient(135deg, #f02fc2, #6094ea)'; this.style.color='white'; this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.4)'; this.style.transition='0.5s';"
+                         onmouseout="this.style.background='white'; this.style.color='#333333'; this.style.boxShadow='none';">
+                        前往查看
+                    </div>
+                </a>
+            </div>
+            <div style="text-align: center;padding-bottom: 1rem;font-size: 15px">此为系统邮件，请勿回复。</div>
+        </div>
+    </div>
+</div>
+<script>
+    // 针对旧版 Outlook 的特殊处理
+    if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0) {
+        var elements = document.querySelectorAll('.butt_to');
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].style.width = '200px';
+            elements[i].style.height = '50px';
+        }
+    }
+</script>
+</body>
+</html>

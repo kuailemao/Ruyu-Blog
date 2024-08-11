@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.kuailemao.mapper.EmailInformMapper">
+
+
+    <select id="getCommentEmailOne" resultType="xyz.kuailemao.domain.email.CommentEmail">
+        <if test="type == 1">
+            SELECT
+            a.article_title AS title,
+            u.avatar,
+            u.nickname,
+            c.comment_content AS content,
+            c.type_id,
+            c.type,
+            c.create_time AS time
+            FROM
+            t_comment AS c
+            INNER JOIN t_article AS a ON c.type_id = a.id AND c.id = #{commentId} AND c.type = #{type}
+            INNER JOIN sys_user AS u ON c.comment_user_id = u.id
+        </if>
+        <if test="type == 2">
+            SELECT
+            u.avatar,
+            u.nickname,
+            c.comment_content AS content,
+            c.type_id,
+            c.type,
+            c.create_time AS time
+            FROM
+            t_comment AS c
+            INNER JOIN t_leave_word AS a ON c.type_id = a.id AND c.id = #{commentId} AND c.type = #{type}
+            INNER JOIN sys_user AS u ON c.comment_user_id = u.id
+        </if>
+    </select>
+</mapper>

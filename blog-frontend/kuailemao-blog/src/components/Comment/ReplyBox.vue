@@ -96,7 +96,15 @@ function addChildComment(comment: any) {
   }
   addComment(data).then(res => {
     if (res.code === 200) {
-      ElMessage.success("评论成功");
+      ElMessage.success("回复成功");
+      if (res.data) {
+        ElNotification({
+          title: '回复成功',
+          duration: 4000,
+          type: 'warning',
+          message: h('i', { style: 'color: teal' }, res.data),
+        })
+      }
       comment.replyText = ''
       prop.getComments(route.params.id, '1', prop.pageSize)
     } else if (res.code === 1002) {
