@@ -392,6 +392,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = userMapper.selectById(SecurityUtils.getUserId());
         // 邮箱是否改变
         if (user.getEmail().equals(updateEmailDTO.getEmail())) return ResponseResult.failure("邮箱未更改");
+        // 是否已经存在该邮箱
+        if (userIsExist(null, updateEmailDTO.getEmail())) return ResponseResult.failure("该邮箱已被注册");
         if (bCryptPasswordEncoder.matches(updateEmailDTO.getPassword(), user.getPassword())) {
             // 2.验证码是否正确
             ResponseResult<Void> verifyCode = verifyCode(updateEmailDTO.getEmail(), updateEmailDTO.getCode(), RedisConst.RESET_EMAIL);
@@ -401,6 +403,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 userMapper.updateById(user);
                 return ResponseResult.success();
             }
+        }
+        return ResponseResult.failure("密码或验证码错误");
+    }
+
+    @Override
+    public ResponseResult<Void> thirdUpdateEmail(UpdateEmailDTO updateEmailDTO) {
+        // 1.验证密码是否正确
+        User user = userMapper.selectById(SecurityUtils.getUserId());
+        // 邮箱是否改变
+        if (user.getEmail() != null && user.getEmail().equals(updateEmailDTO.getEmail())) return ResponseResult.failure("邮箱未更改");
+        // 2.验证码是否正确
+        ResponseResult<Void> verifyCode = verifyCode(updateEmailDTO.getEmail(), updateEmailDTO.getCode(), RedisConst.RESET_EMAIL);
+        // 是否已经存在该邮箱
+        if (userIsExist(null, updateEmailDTO.getEmail())) return ResponseResult.failure("该邮箱已被注册");
+        if (verifyCode == null){
+            // 3.修改
+            user.setEmail(updateEmailDTO.getEmail());
+            userMapper.updateById(user);
+            return ResponseResult.success();
         }
         return ResponseResult.failure("密码或验证码错误");
     }

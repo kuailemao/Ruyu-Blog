@@ -113,4 +113,11 @@ public interface UserService extends IService<User>, UserDetailsService {
      * @return 是否成功
      */
     ResponseResult<Void> updateEmailAndVerify(UpdateEmailDTO updateEmailDTO);
+
+    /**
+     * 第三方登录修改用户邮箱
+     * @param updateEmailDTO 参数
+     * @return 是否成功
+     */
+    ResponseResult<Void> thirdUpdateEmail(UpdateEmailDTO updateEmailDTO);
 }
