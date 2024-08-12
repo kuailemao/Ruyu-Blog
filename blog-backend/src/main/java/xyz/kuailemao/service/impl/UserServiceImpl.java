@@ -250,7 +250,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 4.保存用户信息
         User user = User.builder()
                 .id(null)
-                .nickname(UserConst.DEFAULT_NICKNAME)
+                .nickname(userRegisterDTO.getUsername())
                 .username(userRegisterDTO.getUsername())
                 .password(enPassword)
                 // TODO 用户注册类型待完善

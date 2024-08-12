@@ -14,6 +14,7 @@ import xyz.kuailemao.domain.dto.CommentIsCheckDTO;
 import xyz.kuailemao.domain.dto.SearchCommentDTO;
 import xyz.kuailemao.domain.dto.UserCommentDTO;
 import xyz.kuailemao.domain.entity.Comment;
+import xyz.kuailemao.domain.entity.LeaveWord;
 import xyz.kuailemao.domain.entity.User;
 import xyz.kuailemao.domain.response.ResponseResult;
 import xyz.kuailemao.domain.vo.ArticleCommentVO;
@@ -22,6 +23,7 @@ import xyz.kuailemao.domain.vo.PageVO;
 import xyz.kuailemao.enums.LikeEnum;
 import xyz.kuailemao.enums.MailboxAlertsEnum;
 import xyz.kuailemao.mapper.CommentMapper;
+import xyz.kuailemao.mapper.LeaveWordMapper;
 import xyz.kuailemao.mapper.UserMapper;
 import xyz.kuailemao.service.CommentService;
 import xyz.kuailemao.service.LikeService;
@@ -102,6 +104,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     @Resource
     private PublicService publicService;
 
+    @Resource
+    private LeaveWordMapper leaveWordMapper;
+
     @Value("${spring.mail.username}")
     private String fromUser;
 
@@ -127,14 +132,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                 // 提示绑定邮箱
                 return ResponseResult.success("检测到您尚未绑定邮箱,无法开启邮箱提醒，请先绑定邮箱");
             }
-            // 文章评论
-            if (commentDTO.getType() == 1) {
-                return this.commentEmailReminder(commentDTO, user, comment);
-            }
-            // 留言评论
-            if (commentDTO.getType() == 2) {
-                return this.commentEmailReminder(commentDTO, user, comment);
-            }
+            return this.commentEmailReminder(commentDTO, user, comment);
         }
         return ResponseResult.failure();
     }
@@ -152,19 +150,33 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         // 评论
         if (StringUtils.isNull(commentDTO.getReplyId())) {
 
-            // 如果发送评论的是站长本人则不发邮件
-            if (Objects.equals(fromUser, user.getEmail()) || (commentDTO.getType() == 1 && !articleEmailNotice) || commentDTO.getType() == 2 && !messageEmailNotice) return ResponseResult.success();
+            if ((commentDTO.getType() == 1 && !articleEmailNotice) || commentDTO.getType() == 2 && !messageEmailNotice) return ResponseResult.success();
 
             Map<String, Object> selectWhereMap = new HashMap<>();
             selectWhereMap.put("commentType", commentDTO.getType());
             selectWhereMap.put("commentId", comment.getId());
-            // 发邮箱给站长
-            publicService.sendEmail(MailboxAlertsEnum.COMMENT_NOTIFICATION_EMAIL.getCodeStr(), fromUser, selectWhereMap);
+
+            // 留言提示对应发布留言的用户
+            if(commentDTO.getType() == 1) {
+                if (Objects.equals(fromUser, user.getEmail())) return ResponseResult.success();
+                // 发邮箱给站长
+                publicService.sendEmail(MailboxAlertsEnum.COMMENT_NOTIFICATION_EMAIL.getCodeStr(), fromUser, selectWhereMap);
+            }
+
+            if (commentDTO.getType() == 2) {
+               // 查出回复的该留言用户的邮箱
+                LeaveWord leaveWord = leaveWordMapper.selectOne(new LambdaQueryWrapper<LeaveWord>().eq(LeaveWord::getId, commentDTO.getTypeId()));
+                User replyUser = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, leaveWord.getUserId()));
+                // 用户没绑定邮箱，或者回复的留言是自己
+                if (Objects.equals(replyUser.getEmail(), null) || Objects.equals(replyUser.getEmail(), user.getEmail())) return ResponseResult.success();
+                // 发送邮箱给该留言的用户
+                publicService.sendEmail(MailboxAlertsEnum.COMMENT_NOTIFICATION_EMAIL.getCodeStr(), replyUser.getEmail(), selectWhereMap);
+            }
         }
         // 回复评论
         if (Objects.nonNull(commentDTO.getReplyId())) {
             User replyUser = userMapper.selectById(commentDTO.getReplyUserId());
-            if ((commentDTO.getType() == 1 && !articleReplyNotice) || (commentDTO.getType() == 1 && !messageReplyNotice)) return ResponseResult.success();
+            if ((commentDTO.getType() == 1 && !articleReplyNotice) || (commentDTO.getType() == 2 && !messageReplyNotice)) return ResponseResult.success();
 
             // 如果用户回复自己并且回复人是站长就无需提醒
             if (Objects.equals(replyUser.getEmail(), user.getEmail()) && Objects.equals(fromUser, user.getEmail())) {
@@ -206,9 +218,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                     .eq(StringUtils.isNotNull(searchDTO.getIsCheck()), Comment::getIsCheck, searchDTO.getIsCheck());
         }
 
-        return commentMapper.selectList(wrapper).stream().map(comment -> comment.asViewObject(CommentListVO.class, v -> {
-            v.setCommentUserName(userMapper.selectById(comment.getCommentUserId()).getUsername());
-        })).collect(Collectors.toList());
+        return commentMapper.selectList(wrapper).stream().map(comment -> comment.asViewObject(CommentListVO.class,
+                v -> v.setCommentUserName(userMapper.selectById(comment.getCommentUserId()).getUsername()))).collect(Collectors.toList());
     }
 
     @Override
