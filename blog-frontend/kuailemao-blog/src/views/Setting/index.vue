@@ -4,7 +4,7 @@ import {Plus, User, Select, Message, Refresh, Unlock} from '@element-plus/icons-
 
 import type {UploadProps} from 'element-plus'
 import useUserStore from "@/store/modules/user.ts";
-import {updateEmail, updateUserAccount} from "@/apis/user";
+import {updateEmail, updateThirdEmail, updateUserAccount} from "@/apis/user";
 import {sendEmail} from "@/apis/email";
 
 
@@ -148,6 +148,23 @@ function modifyEmail(){
   emailFormRef.value.validate((isValid: boolean) => {
     if (isValid) {
       centerDialogVisible.value = true
+    } else ElMessage.warning('请完整填写信息')
+  })
+}
+
+// TODO 第三方登录绑定邮箱
+function thirdPartyLoginEmail(){
+  emailFormRef.value.validate((isValid: boolean) => {
+    if (isValid) {
+      emailForm.password = '第三方登录'
+      // 发送请求
+      updateThirdEmail(emailForm).then((resp: any) => {
+        if(resp.code == 200){
+          ElMessage.success('邮件地址更新成功')
+          emailForm.code = ''
+          userStore.getInfo()
+        }else ElMessage.error(resp.msg)
+      })
     } else ElMessage.warning('请完整填写信息')
   })
 }
@@ -303,7 +320,12 @@ function getEmailCode(){
                   </el-form-item>
                 </el-form>
               </div>
-              <el-button class="mx-6" :icon="Unlock" type="success" @click="modifyEmail">安全验证</el-button>
+              <template v-if="userStore.userInfo?.registerType === 0" >
+                <el-button class="mx-6" :icon="Unlock" type="success" @click="modifyEmail">安全验证</el-button>
+              </template>
+              <template v-else>
+                <el-button class="mx-6" :icon="Message" type="success" @click="thirdPartyLoginEmail">确定</el-button>
+              </template>
             </div>
           </div>
         </div>

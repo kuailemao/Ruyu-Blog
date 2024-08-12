@@ -97,13 +97,13 @@ function userLogin() {
     <div>
       <div class="other_login">
         <div>
-          <el-link :href="env.VITE_SERVE + '/oauth/gitee/render'">
+          <el-link :href="env.VITE_SERVE + '/api/oauth/gitee/render'">
             <svg-icon name="gitee" width="20px" height="20px" color="#4E86F1"/>
           </el-link>
         </div>
         <div style="margin-left: 1rem">
-          <el-link :href="env.VITE_SERVE + '/oauth/github/render'">
-          <svg-icon name="github" width="20px" height="20px" color="#4E86F1"/>
+          <el-link :href="env.VITE_SERVE + '/api/oauth/github/render'">
+            <svg-icon name="github" width="20px" height="20px" color="#4E86F1"/>
           </el-link>
         </div>
       </div>

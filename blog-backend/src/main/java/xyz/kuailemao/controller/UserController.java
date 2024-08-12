@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -80,6 +81,14 @@ public class UserController {
     @PostMapping("/auth/update/email")
     public ResponseResult<Void> updateEmail(@RequestBody @Valid UpdateEmailDTO updateEmailDTO) {
         return userService.updateEmailAndVerify(updateEmailDTO);
+    }
+
+    // 第三方登录用户绑定邮箱
+    @Operation(summary = "第三方登录用户绑定邮箱")
+    @AccessLimit(seconds = 60, maxCount = 30)
+    @PostMapping("/auth/third/update/email")
+    public ResponseResult<Void> thirdUpdateEmail(@RequestBody @Valid UpdateEmailDTO updateEmailDTO) {
+        return userService.thirdUpdateEmail(updateEmailDTO);
     }
 
     @Operation(summary = "用户注册")

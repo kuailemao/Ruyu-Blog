@@ -104,3 +104,12 @@ export function updateEmail(data: any) {
         method: 'post'
     })
 }
+
+// 修改第三方登录电子邮箱
+export function updateThirdEmail(data: any) {
+    return http({
+        url: '/user/auth/third/update/email',
+        data: data,
+        method: 'post'
+    })
+}
