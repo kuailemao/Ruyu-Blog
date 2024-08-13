@@ -152,7 +152,7 @@ function modifyEmail(){
   })
 }
 
-// TODO 第三方登录绑定邮箱
+// 三方登录绑定邮箱
 function thirdPartyLoginEmail(){
   emailFormRef.value.validate((isValid: boolean) => {
     if (isValid) {

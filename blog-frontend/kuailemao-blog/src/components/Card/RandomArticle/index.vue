@@ -93,10 +93,11 @@ function formatDate(date: []) {
   margin: 10px 0;
 
   .random_image {
-    width: 130px;
+    width: 45%;
     height: 70px;
     overflow: hidden;
     cursor: pointer;
+    border-radius: 0.5rem;
 
     img {
       width: 100%;
@@ -111,12 +112,20 @@ function formatDate(date: []) {
   }
 
   .random_text {
+    width: 55%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     line-height: 30px;
 
     :first-child {
+      // 文章超出一行显示省略号
+      white-space: nowrap;
+      // 超出部分隐藏
+      overflow: hidden;
+      // 显示省略号
+      text-overflow: ellipsis;
+
       margin-left: 1rem;
       font-size: 1em;
       color: $menuActiveText;

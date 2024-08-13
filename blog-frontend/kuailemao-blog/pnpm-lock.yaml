@@ -32,6 +32,9 @@ dependencies:
   jquery:
     specifier: ^3.7.1
     version: 3.7.1
+  js-confetti:
+    specifier: ^0.12.0
+    version: 0.12.0
   md-editor-v3:
     specifier: ^4.17.0
     version: 4.17.0(@codemirror/view@6.28.3)(@lezer/common@1.2.1)(vue@3.4.31)
@@ -3348,6 +3351,10 @@ packages:
   /js-base64@2.6.4:
     resolution: {integrity: sha512-pZe//GGmwJndub7ZghVHz7vjb2LgC1m8B07Au3eYqeqv9emhESByMXxaEgkUkEqJe87oBbSniGYoQNIBklc7IQ==, tarball: https://registry.npmmirror.com/js-base64/-/js-base64-2.6.4.tgz}
     dev: true
+
+  /js-confetti@0.12.0:
+    resolution: {integrity: sha512-1R0Akxn3Zn82pMqW65N1V2NwKkZJ75bvBN/VAb36Ya0YHwbaSiAJZVRr/19HBxH/O8x2x01UFAbYI18VqlDN6g==, tarball: https://registry.npmmirror.com/js-confetti/-/js-confetti-0.12.0.tgz}
+    dev: false
 
   /js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==, tarball: https://registry.npmmirror.com/js-tokens/-/js-tokens-4.0.0.tgz}
