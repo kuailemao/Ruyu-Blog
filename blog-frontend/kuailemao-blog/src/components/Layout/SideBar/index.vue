@@ -27,7 +27,7 @@
           <div>运行时长：<span>{{ differenceInDays }} 天</span></div>
           <div>全站字数：<span>{{ useWebsite.webInfo?.wordCount }}</span></div>
           <div>访问次数：<span>{{ useWebsite.webInfo?.visitCount }}</span></div>
-          <div>最后更新：<span>{{ useWebsite.webInfo?.lastUpdateTime }}</span></div>
+          <div>最后更新：<span>{{ useWebsite.webInfo?.lastUpdateTime }}前</span></div>
         </div>
       </Card>
     </div>

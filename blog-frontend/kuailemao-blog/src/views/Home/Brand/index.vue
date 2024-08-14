@@ -4,9 +4,11 @@
       <!-- 标题 -->
       <p class="artboard">{{ useWebsite?.webInfo?.websiteName }}</p>
       <!-- 打字机 -->
-      <div class="title">
-        {{obj.output}}
-        <span class="easy-typed-cursor">|</span>
+      <div class="brand-text">
+        <div class="title">
+          {{obj.output}}
+          <span class="easy-typed-cursor">|</span>
+        </div>
       </div>
     </div>
     <!-- 波浪 -->
@@ -93,10 +95,10 @@ const fetchData = () => {
   .artboard {
     font-family: "Fredericka the Great", Mulish, -apple-system, "PingFang SC", "Microsoft YaHei",
     sans-serif;
-    font-size: 3.5em;
+    font-size: 4.5em;
 
     @media (max-width: 500px) {
-      font-size: 2em;
+      font-size: 3em;
       // 字体大小过渡效果
       @keyframes titleScale {
         0% {
@@ -122,8 +124,23 @@ const fetchData = () => {
     0 10px 10px rgba(0, 0, 0, 0.2), 0 20px 20px rgba(0, 0, 0, 0.3);
   }
 
+  .brand-text{
+    // 白色半透明背景
+    background: rgba(255, 255, 255, 0.5);
+    padding: 0.5em;
+    border-radius: 0.5em;
+  }
+
   .title {
     letter-spacing: 0.1em;
+    background: linear-gradient(90deg, #f79533, #f37055, #ef4e7b, #a166ab, #5073b8, #1098ad, #07b39b, #6fba82);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    font-size: 1.5rem;
+    @media (max-width: 500px) {
+      font-size: 1em;
+    }
   }
 }
 
@@ -132,6 +149,12 @@ const fetchData = () => {
   -webkit-animation: blink 0.7s infinite;
   -moz-animation: blink 0.7s infinite;
   animation: blink 0.7s infinite;
+  background: linear-gradient(90deg, #f79533, #f37055, #ef4e7b, #a166ab, #5073b8, #1098ad, #07b39b, #6fba82);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  @media (max-width: 500px) {
+    font-size: 1em;
+  }
 }
 
 .arrow-down {
