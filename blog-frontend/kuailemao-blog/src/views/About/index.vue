@@ -11,7 +11,7 @@ jsConfetti.addConfetti()
     <div class="flex justify-center items-center max-lg:flex-col h-full w-full xl:w-[90%]">
       <div class="w-[40%] max-lg:w-full h-full flex flex-col justify-center items-center">
         <div class="h-[20rem] w-[20rem] rounded-full overflow-hidden mt-[5rem] drop-shadow-lg">
-          <div class="bg-cover bg-no-repeat bg-center w-full h-full" style="background-image: url('https://image.kuailemao.xyz/blog/websiteInfo/avatar/52e4b3e9-b1e0-4e9b-ab6e-4effc237ab1a.jpg')"></div>
+          <div class="bg-cover bg-no-repeat bg-center w-full h-full" style="background-image: url('https://image.kuailemao.xyz/blog/websiteInfo/avatar/7fee5695-a0c9-4a39-9b05-f2940474adfb.jpg')"></div>
         </div>
         <div>
           <h1 data-shadow='RuYu'>RuYu</h1>

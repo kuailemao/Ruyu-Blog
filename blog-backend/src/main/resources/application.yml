@@ -110,11 +110,6 @@ spring:
 #  apply-notice: true
 #  # 是否开启友链审核通知提醒对方
 #  pass-notice: true
-#mail:
-#  link:
-#    apply:
-#      # 邮箱审核友链回调地址
-#      redirect-uri: http://[后端地址:端口]/link/email/apply
 #mybatis:
 #  mapper-locations: classpath:mapper/*.xml
 #  configuration:
