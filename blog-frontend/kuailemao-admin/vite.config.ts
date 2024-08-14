@@ -11,14 +11,6 @@ const baseSrc = fileURLToPath(new URL('./src', import.meta.url))
 // https://vitejs.dev/config/
 export default ({ mode }: ConfigEnv): UserConfig => {
   const env = loadEnv(mode, process.cwd())
-  const proxyObj = {}
-  if (mode === 'development' && env.VITE_APP_BASE_API_DEV && env.VITE_APP_BASE_URL_DEV) {
-    proxyObj[env.VITE_APP_BASE_API_DEV] = {
-      target: env.VITE_APP_BASE_URL_DEV,
-      changeOrigin: true,
-      rewrite: path => path.replace(new RegExp(`^${env.VITE_APP_BASE_API_DEV}`), ''),
-    }
-  }
   return {
     plugins: createVitePlugins(env),
     resolve: {
@@ -94,7 +86,6 @@ export default ({ mode }: ConfigEnv): UserConfig => {
       port: 6678,
       host: '0.0.0.0',
       proxy: {
-        ...proxyObj,
         [env.VITE_APP_BASE_API]: {
           target: env.VITE_APP_BASE_URL,
           changeOrigin: true,

@@ -18,6 +18,7 @@ import xyz.kuailemao.domain.entity.*;
 import xyz.kuailemao.domain.response.ResponseResult;
 import xyz.kuailemao.domain.vo.*;
 import xyz.kuailemao.enums.*;
+import xyz.kuailemao.exceptions.FileUploadException;
 import xyz.kuailemao.mapper.*;
 import xyz.kuailemao.service.*;
 import xyz.kuailemao.utils.FileUploadUtils;
@@ -226,7 +227,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     public ResponseResult<String> uploadArticleCover(MultipartFile articleCover) {
         try {
-            String articleCoverUrl = fileUploadUtils.upload(UploadEnum.ARTICLE_COVER, articleCover);
+            String articleCoverUrl = null;
+            try {
+                articleCoverUrl = fileUploadUtils.upload(UploadEnum.ARTICLE_COVER, articleCover);
+            } catch (FileUploadException e) {
+                return ResponseResult.failure(e.getMessage());
+            }
             if (StringUtils.isNotNull(articleCoverUrl))
                 return ResponseResult.success(articleCoverUrl);
             else

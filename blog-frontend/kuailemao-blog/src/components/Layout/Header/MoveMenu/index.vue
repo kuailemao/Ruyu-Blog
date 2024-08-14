@@ -78,12 +78,6 @@ const env = import.meta.env
         </el-icon>
         留言版
       </el-menu-item>
-      <el-menu-item index="/chat-gpt" @click="isClose">
-        <el-icon>
-          <Bowl/>
-        </el-icon>
-        ChatGPT
-      </el-menu-item>
     </el-sub-menu>
     <el-menu-item index="/link" @click="isClose">
       <el-icon>

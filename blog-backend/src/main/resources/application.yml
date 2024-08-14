@@ -63,9 +63,6 @@ spring:
 #    host: smtp.qq.com
 #    username:  # 不可透露，邮件发送账号
 #    password:  # 不可透露，邮件发送账号密钥
-#    chat-gpt:
-#      email:  # 不可透露
-#      password:  # # 不可透露
 #    properties:
 #      mail:
 #        smtp:

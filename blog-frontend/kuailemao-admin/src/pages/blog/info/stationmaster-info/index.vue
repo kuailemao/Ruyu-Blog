@@ -52,9 +52,6 @@ if(formData.webmasterAvatar && formData.webmasterProfileBackground){
 const headers = {
   'Authorization': `Bearer ${JSON.parse(<string>useAuthorization().value).token}`,
 }
-// 上传地址
-const uploadAddress = import.meta.env.VITE_APP_BASE_URL
-
 
 function handleChangeAvatar(info: UploadChangeParam) {
   if (info.file.status === 'uploading') {
@@ -111,6 +108,8 @@ function updateStationmasterInfo(){
 function resetStationmasterInfo(){
   emit('reset:stationmaster:info')
 }
+
+const env = import.meta.env
 </script>
 
 <template>
@@ -124,7 +123,7 @@ function resetStationmasterInfo(){
             class="avatar-uploader"
             :headers="headers"
             :show-upload-list="false"
-            :action="uploadAddress + '/websiteInfo/upload/avatar'"
+            :action="env.MODE === 'production' ? env.VITE_APP_BASE_URL + env.VITE_APP_BASE_API + '/websiteInfo/upload/avatar' : env.VITE_APP_BASE_URL + '/websiteInfo/upload/avatar'"
             :before-upload="beforeUpload"
             @change="handleChangeAvatar"
         >
@@ -154,7 +153,7 @@ function resetStationmasterInfo(){
               :headers="headers"
               :before-upload="beforeUpload"
               :max-count="1"
-              :action="uploadAddress + '/websiteInfo/upload/background'"
+              :action="env.MODE === 'production' ? env.VITE_APP_BASE_URL + env.VITE_APP_BASE_API + '/websiteInfo/upload/background' : env.VITE_APP_BASE_URL + '/websiteInfo/upload/background'"
               @change="handleChangeBack"
           >
             <div style="display: flex;">

@@ -197,12 +197,6 @@ const env = import.meta.env
               </el-icon>
               留言版
             </el-menu-item>
-            <el-menu-item index="/chat-gpt">
-              <el-icon>
-                <Bowl/>
-              </el-icon>
-              ChatGPT
-            </el-menu-item>
           </el-sub-menu>
           <el-menu-item index="/link">
             <el-icon>

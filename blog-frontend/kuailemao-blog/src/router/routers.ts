@@ -52,11 +52,6 @@ export const constantRouter = [
                     }
                 ]
             },
-            {
-                path: '/chat-gpt',
-                component: () => import('@/views/ChatGpt/index.vue'),
-                name: 'chat-gpt',
-            },
             // 友链
             {
                 path: '/link',
