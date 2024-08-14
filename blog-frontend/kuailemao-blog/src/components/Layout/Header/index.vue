@@ -195,7 +195,7 @@ const env = import.meta.env
               <el-icon>
                 <Postcard/>
               </el-icon>
-              留言版
+              留言板
             </el-menu-item>
           </el-sub-menu>
           <el-menu-item index="/link">
