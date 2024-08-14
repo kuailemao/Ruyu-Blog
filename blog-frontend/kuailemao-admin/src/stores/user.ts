@@ -41,8 +41,6 @@ export const useUserStore = defineStore('user', () => {
     // 获取用户信息
     const { data } = await getUserInfoApi()
     userInfo.value = data
-    console.log(roles.value)
-    console.log(permissions.value)
   }
 
   const logout = async () => {

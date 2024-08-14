@@ -20,7 +20,7 @@ public enum UploadEnum {
     // 站长背景
     WEBSITE_INFO_BACKGROUND("websiteInfo/background/", "站长背景", List.of("jpg", "jpeg", "png"),5.0),
     // 文章封面
-    ARTICLE_COVER("article/articleCover/", "文章封面", List.of("jpg", "jpeg", "png"),5.0),
+    ARTICLE_COVER("article/articleCover/", "文章封面", List.of("jpg", "jpeg", "png"),0.8),
     // 文章图片
     ARTICLE_IMAGE("article/articleImage/", "文章图片", List.of("jpg", "jpeg", "png", "gif"),5.0),
     // 用户头像
