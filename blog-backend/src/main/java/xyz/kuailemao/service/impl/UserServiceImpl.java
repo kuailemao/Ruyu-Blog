@@ -150,6 +150,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     public LoginUser handlerLogin(User user, String equipmentHeader) {
+        HttpServletRequest request = SecurityUtils.getCurrentHttpRequest();
+        String header = null;
+        if (request != null) {
+            header = request.getHeader(Const.TYPE_HEADER);
+        }
         // 查询用户角色
         List<UserRole> userRoles = userRoleMapper.selectList(new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserId, user.getId()));
         List<Role> roles = userRoles.stream().map(role -> roleMapper.selectById(role.getRoleId())).filter(role -> Objects.equals(role.getStatus(), RoleEnum.Role_STATUS_ARTICLE.getStatus())).toList();
@@ -157,8 +162,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (user.getIsDisable() == 1) {
             throw new BadCredentialsException(RespConst.ACCOUNT_DISABLED_MSG);
         }
-        // 是否测试账号
-        if (roles.stream().anyMatch(role -> role.getRoleKey().equals(SecurityConst.ROLE_TESTER))) {
+        // 是否测试账号前台
+        if (header == null || (roles.stream().anyMatch(role -> role.getRoleKey().equals(SecurityConst.ROLE_TESTER)) && !header.equals(Const.BACKEND_REQUEST))) {
             throw new BadCredentialsException(RespConst.TEST_ACCOUNT_MSG);
         }
 
