@@ -157,6 +157,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (user.getIsDisable() == 1) {
             throw new BadCredentialsException(RespConst.ACCOUNT_DISABLED_MSG);
         }
+        // 是否测试账号
+        if (roles.stream().anyMatch(role -> role.getRoleKey().equals(SecurityConst.ROLE_TESTER))) {
+            throw new BadCredentialsException(RespConst.TEST_ACCOUNT_MSG);
+        }
 
         // 判断用户是否具备任何权限,
         if ((equipmentHeader != null && equipmentHeader.equals(Const.BACKEND_REQUEST) && ObjectUtils.isEmpty(roles))) {
@@ -177,6 +181,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     // 修改用户登录状态
+    @Override
     public void userLoginStatus(Long id) {
         // ip地址
         String ipAddr = IpUtils.getIpAddr(SecurityUtils.getCurrentHttpRequest());
