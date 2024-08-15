@@ -95,4 +95,9 @@ public class SecurityConst {
      * 角色前缀
      */
     public static final String ROLE_PREFIX = "ROLE_";
+
+    /**
+     * 测试账号
+     */
+    public static final String ROLE_TESTER = "Test";
 }

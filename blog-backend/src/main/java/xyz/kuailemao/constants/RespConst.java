@@ -28,6 +28,11 @@ public class RespConst {
     public static final String ACCOUNT_DISABLED_MSG = "该账号已被停用，无法登录";
 
     /**
+     * 测试账号
+     */
+    public static final String TEST_ACCOUNT_MSG = "该账号为后台测试账号，无法登录前台";
+
+    /**
      * 账号无权限（后台）
      */
     public static final String NO_PERMISSION_MSG = "该账号不具备任何权限，无法登录";
