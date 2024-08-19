@@ -28,6 +28,7 @@ import xyz.kuailemao.utils.StringUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * (Article)表服务实现类
@@ -81,6 +82,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     public PageVO<List<ArticleVO>> listAllArticle(Integer pageNum, Integer pageSize) {
+        // 时间记录
+        long start = System.currentTimeMillis();
         boolean hasKey = redisCache.isHasKey(RedisConst.ARTICLE_COMMENT_COUNT) && redisCache.isHasKey(RedisConst.ARTICLE_FAVORITE_COUNT) && redisCache.isHasKey(RedisConst.ARTICLE_LIKE_COUNT);
         // 文章
         Page<Article> page = new Page<>(pageNum, pageSize);
@@ -97,17 +100,36 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             articleVO.setTags(tags.stream().filter(tag -> articleTags.stream().anyMatch(at -> Objects.equals(at.getArticleId(), article.getId()) && Objects.equals(at.getTagId(), tag.getId()))).map(Tag::getTagName).toList());
         })).toList();
 
+//        // 1. 优化：使用 Map 存储分类和标签信息，避免 N+1 问题
+//        Map<Long, String> categoryMap = categoryMapper.selectBatchIds(list.stream().map(Article::getCategoryId).toList())
+//                .stream().collect(Collectors.toMap(Category::getId, Category::getCategoryName));
+//
+//        List<ArticleTag> articleTags = articleTagMapper.selectBatchIds(list.stream().map(Article::getId).toList());
+//        Map<Long, String> tagMap = tagMapper.selectBatchIds(articleTags.stream().map(ArticleTag::getTagId).toList())
+//                .stream().collect(Collectors.toMap(Tag::getId, Tag::getTagName));
+//
+//        List<ArticleVO> articleVOS = list.stream().map(article -> {
+//            ArticleVO articleVO = article.asViewObject(ArticleVO.class);
+//            // 2. 优化：使用 Map 获取分类和标签信息
+//            articleVO.setCategoryName(categoryMap.get(article.getCategoryId()));
+//            articleVO.setTags(articleTags.stream()
+//                    .filter(at -> Objects.equals(at.getArticleId(), article.getId()))
+//                    .map(at -> tagMap.get(at.getTagId()))
+//                    .toList());
+//            return articleVO;
+//        }).toList();
+
         articleVOS = articleVOS.stream().peek(articleVO -> {
             if (hasKey) {
-                // 老代码：文章列表查询耗时:1203ms
-                //  优化后的：文章列表查询耗时:220ms
                 setArticleCount(articleVO, RedisConst.ARTICLE_FAVORITE_COUNT, CountTypeEnum.FAVORITE);
                 setArticleCount(articleVO, RedisConst.ARTICLE_LIKE_COUNT, CountTypeEnum.LIKE);
                 setArticleCount(articleVO, RedisConst.ARTICLE_COMMENT_COUNT, CountTypeEnum.COMMENT);
             }
         }).toList();
-
-        return new PageVO<>(articleVOS, page.getTotal());
+        PageVO<List<ArticleVO>> listPageVO = new PageVO<>(articleVOS, page.getTotal());
+        // 新代码平均170ms
+        log.info("文章列表查询耗时：{}ms", System.currentTimeMillis() - start);
+        return listPageVO;
     }
 
     private void setArticleCount(ArticleVO articleVO, String redisKey, CountTypeEnum articleFieldName) {

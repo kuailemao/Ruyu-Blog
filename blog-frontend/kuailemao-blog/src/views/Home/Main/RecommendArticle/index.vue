@@ -9,18 +9,20 @@ import 'swiper/css/pagination';
 
 const recommendArticles = ref([])
 
-getRecommendArticleList().then(res => {
-  // 过滤内容
-  res.data = res.data.map((item: any) => {
-    item.articleContent = item.articleContent.replace(/[*#>`~\-\\[\]()\s]|(\n\n)/g, '')
-    // 提取前 50 个字符
-    item.articleContent = item.articleContent.substring(0, 25) + '...';
-    return item;
-  });
-  recommendArticles.value = res.data
-})
-
 const modules = ref([Navigation,Pagination,Autoplay]);
+
+function loadContent(){
+  getRecommendArticleList().then(res => {
+    // 过滤内容
+    res.data = res.data.map((item: any) => {
+      item.articleContent = item.articleContent.replace(/[*#>`~\-\\[\]()\s]|(\n\n)/g, '')
+      // 提取前 50 个字符
+      item.articleContent = item.articleContent.substring(0, 25) + '...';
+      return item;
+    });
+    recommendArticles.value = res.data
+  })
+}
 
 </script>
 
@@ -33,7 +35,7 @@ const modules = ref([Navigation,Pagination,Autoplay]);
       </div>
     </el-divider>
   </div>
-  <div v-if="recommendArticles.length > 0">
+  <div  v-view-request="{ callback: loadContent }">
     <swiper class="h-[200px] recommend"
             loop
             navigation
@@ -60,7 +62,7 @@ const modules = ref([Navigation,Pagination,Autoplay]);
       <div class="swiper-pagination"></div>
     </swiper>
   </div>
-  <el-skeleton v-else :rows="5" animated />
+  <el-skeleton v-if="recommendArticles.length == 0" :rows="5" animated />
 </template>
 
 <style scoped lang="scss">

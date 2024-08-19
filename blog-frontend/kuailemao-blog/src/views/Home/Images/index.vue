@@ -12,7 +12,7 @@
 <script setup lang="ts">
 
 const imageList = [
-  "https://image.kuailemao.xyz/blog/article/articleCover/8a9f081a-e6e0-4104-84e7-c3db5c16bca0.png",
+  "https://image.kuailemao.xyz/blog/article/articleCover/8a9f081a-e6e0-4104-84e7-c3db5c16bca0_compressed.png",
   "https://image.kuailemao.xyz/blog/article/articleCover/dc20756c-57ed-48d2-98b1-f3e66100fd80.png",
   "https://image.kuailemao.xyz/blog/article/articleCover/75407c94-c41e-4adc-b952-b10603256844.png",
   "https://image.kuailemao.xyz/blog/article/articleCover/a7775a52-1377-4d49-9547-5573f5854bc5.png",

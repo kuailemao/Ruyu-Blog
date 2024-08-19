@@ -21,11 +21,13 @@ import pinia from '@/store'
 // 全局指令
 import vSlideIn from '@/directives/vSlideIn.ts'
 import vLazy from '@/directives/vLazy.ts'
+import vViewRequest from '@/directives/vViewRequest.ts'
 
 // 获取应用实例对象
 const app = createApp(App)
 app.directive('slide-in',vSlideIn)
 app.directive('lazy',vLazy)
+app.directive('view-request',vViewRequest)
 // 安装自定义插件
 app.use(gloablComponent)
 // 安装路由

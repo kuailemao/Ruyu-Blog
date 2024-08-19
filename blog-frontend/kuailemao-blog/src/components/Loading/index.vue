@@ -2,7 +2,7 @@
   <div class="loading loading-active" v-show="loadingStore.isLoading">
     <div class="load-box">
       <img class="loading-img" src="https://image.kuailemao.xyz/blog/loading/loading-gif.gif" alt="Loading">
-      <span>皮卡丘正在努力奔跑~~</span>
+      <span>比卡丘正在带着数据走向你~~</span>
     </div>
   </div>
 </template>

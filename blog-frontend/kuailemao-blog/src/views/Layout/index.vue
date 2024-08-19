@@ -2,9 +2,7 @@
 
 const noDisplayComponent = computed(() => {
   // 树洞不显示底部
-  if (useRoute().path == '/tree-hole') {
-    return false
-  } else return useRoute().path != '/chat-gpt';
+  return useRoute().path != '/tree-hole';
 })
 
 </script>
