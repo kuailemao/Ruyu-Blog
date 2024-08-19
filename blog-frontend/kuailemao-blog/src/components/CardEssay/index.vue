@@ -18,11 +18,6 @@ watch(() => paginationStore.articlePagination.current, () => {
 // 屏幕宽度
 const { width } = useWindowSize()
 
-// 页面加载时获取文章列表
-onMounted(() => {
-  getArticleListFunc()
-})
-
 function getArticleListFunc() {
   getArticleList(paginationStore.articlePagination.current, paginationStore.articlePagination.pageSize).then(res => {
     if (res.code === 200) {
@@ -40,12 +35,14 @@ function getArticleListFunc() {
     }
   })
 }
-
+function loadContent() {
+  getArticleListFunc()
+}
 </script>
 
 <template>
   <!-- 封装文章列表卡片 -->
-  <template v-if="articleList.length > 0">
+  <div v-view-request="{ callback: loadContent }">
     <template v-for="(article,index) in articleList" :key="article.id" v-if="articleList.length > 0">
       <div @click="$router.push('/article/'+article.id)" class=" h-92 md:h-60 mt-4 flex flex-col md:flex-row card overflow-hidden shadow-md mb-5 mx-2 dark:bg-[#1D1D1D]">
         <div class="w-full md:h-full md:w-1/2 h-40" v-if="index % 2 == 1 || width < 768">
@@ -104,8 +101,8 @@ function getArticleListFunc() {
         </div>
       </div>
     </template>
-  </template>
-  <template v-else>
+  </div>
+  <template v-if="articleList.length == 0">
     <el-skeleton :rows="8" animated />
   </template>
 </template>

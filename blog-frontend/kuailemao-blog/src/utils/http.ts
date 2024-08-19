@@ -6,7 +6,8 @@ import 'nprogress/nprogress.css';
 import {Jwt_Prefix} from "@/const/Jwt";
 import {GET_TOKEN} from "@/utils/auth.ts";
 import useLoadingStore from "@/store/modules/loading.ts";
-import {loadEnv} from "vite";
+import {REQUEST_LOADING_PATH} from "@/utils/enum.ts";
+import router from "@/router";
 
 
 // 创建axios实例
@@ -18,7 +19,10 @@ const http: AxiosInstance = axios.create({
     }
 })
 
-let pendingRequestCount = 0; // 初始化请求计数器
+const env = import.meta.env
+const pathRequestCount = new Map();
+const firstRequestPaths = new Set(); // 使用 Set 来记录已经请求过的路径
+let loadingShown = false;
 
 // request拦截器
 http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
@@ -26,16 +30,19 @@ http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     if (url?.startsWith(import.meta.env.VITE_MUSIC_BASE_API)){
         config.baseURL = "";
     }
+    let matchingPath = REQUEST_LOADING_PATH.find(path => url?.startsWith(path));
 
-    if (!(url?.startsWith("https://v1.hitokoto.cn"))){
-        // 判断请求前缀
-        if (pendingRequestCount === 0) {
-            // TODO 绝对应该反过来判断
-            // const loadingStore = useLoadingStore();
-            // loadingStore.show();
-            NProgress.start();
-        }
-        pendingRequestCount++;
+    if (!(url?.startsWith(env.VITE_YIYAN_API)) || matchingPath) {
+        if (matchingPath && !firstRequestPaths.has(matchingPath)) { // 仅在第一次请求时
+            firstRequestPaths.add(matchingPath);
+            pathRequestCount.set(matchingPath, (pathRequestCount.get(matchingPath) || 0) + 1);
+            if (!loadingShown){
+                loadingShown = true;
+                const loadingStore = useLoadingStore();
+                loadingStore.show();
+                NProgress.start();
+            }
+        } else NProgress.start();
     }
 
 
@@ -52,13 +59,22 @@ http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 // response拦截器
 http.interceptors.response.use(
     (response) => {
-        pendingRequestCount--;
-        if (pendingRequestCount === 0) {
-            // TODO 皮卡丘 Loading
-            // const loadingStore = useLoadingStore();
-            // loadingStore.hide();
-            NProgress.done();
-        }
+        let url = response.config?.url;
+        let matchingPath = REQUEST_LOADING_PATH.find(path => url?.startsWith(path));
+
+        if (matchingPath) {
+            pathRequestCount.set(matchingPath, pathRequestCount.get(matchingPath) - 1);
+
+            if (pathRequestCount.get(matchingPath) === 0) { // 所有特定路径的请求都已完成
+                loadingShown = false;
+                const loadingStore = useLoadingStore();
+                loadingStore.hide();
+                // 延迟删除操作
+                console.log('开启路径', matchingPath)
+                pathRequestCount.clear(); // 清空整个 Map
+                NProgress.done();
+            }
+        } else NProgress.done();
         return response.data
     },
     (error: AxiosError) => {
