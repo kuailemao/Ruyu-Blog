@@ -30,7 +30,7 @@ const resetCounter = 60
 const submitLoading = shallowRef(false)
 const errorAlert = shallowRef(false)
 const bubbleCanvas = ref<HTMLCanvasElement>()
-const { counter, pause, reset, resume, isActive } = useInterval(1000, {
+const { pause, reset } = useInterval(1000, {
   controls: true,
   immediate: false,
   callback(count) {
@@ -40,7 +40,7 @@ const { counter, pause, reset, resume, isActive } = useInterval(1000, {
     }
   },
 })
-
+const userStore = useUserStore()
 async function submit() {
   submitLoading.value = true
   try {
@@ -69,15 +69,20 @@ async function submit() {
     })
     // 获取当前是否存在重定向的链接，如果存在就走重定向的地址
     const redirect = getQueryParam('redirect', '/')
-    router.push({
+    // 获取用户信息
+    await userStore.getUserInfo()
+    // 获取路由菜单的信息
+    const currentRoute = await userStore.generateDynamicRoutes()
+    router.addRoute(currentRoute)
+    await router.push({
       path: redirect,
       replace: true,
     })
   }
   catch (e) {
     notification.error({
-      message: '登录失败',
-      description: e as string,
+      message: `登录失败${e}`,
+      description: e instanceof Error ? e.message : '请联系管理员',
       duration: 3,
     })
     if (e instanceof AxiosError)
@@ -168,7 +173,8 @@ onBeforeUnmount(() => {
                 <a-form-item name="password" :rules="[{ required: true, message: t('pages.login.password.required') }]">
                   <a-input-password
                     v-model:value="loginModel.password" allow-clear
-                    :placeholder="t('pages.login.password.placeholder')" size="large" @press-enter="submit"
+                    :placeholder="t('pages.login.password.placeholder')" size="large" autocomplete="current-password"
+                    @press-enter="submit"
                   >
                     <template #prefix>
                       <LockOutlined />
