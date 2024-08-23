@@ -15,6 +15,7 @@ import xyz.kuailemao.domain.dto.SearchCommentDTO;
 import xyz.kuailemao.domain.dto.UserCommentDTO;
 import xyz.kuailemao.domain.entity.Comment;
 import xyz.kuailemao.domain.entity.LeaveWord;
+import xyz.kuailemao.domain.entity.Like;
 import xyz.kuailemao.domain.entity.User;
 import xyz.kuailemao.domain.response.ResponseResult;
 import xyz.kuailemao.domain.vo.ArticleCommentVO;
@@ -22,9 +23,7 @@ import xyz.kuailemao.domain.vo.CommentListVO;
 import xyz.kuailemao.domain.vo.PageVO;
 import xyz.kuailemao.enums.LikeEnum;
 import xyz.kuailemao.enums.MailboxAlertsEnum;
-import xyz.kuailemao.mapper.CommentMapper;
-import xyz.kuailemao.mapper.LeaveWordMapper;
-import xyz.kuailemao.mapper.UserMapper;
+import xyz.kuailemao.mapper.*;
 import xyz.kuailemao.service.CommentService;
 import xyz.kuailemao.service.LikeService;
 import xyz.kuailemao.service.PublicService;
@@ -59,11 +58,15 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     @Resource
     private RedisCache redisCache;
 
+    @Resource
+    private LikeMapper likeMapper;
+
     @Override
     public PageVO<List<ArticleCommentVO>> getComment(Integer type, Integer typeId, Integer pageNum, Integer pageSize) {
         // 查询父评论
         LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper
+                .orderByDesc(Comment::getCreateTime)
                 .eq(Comment::getType, type)
                 .eq(Comment::getTypeId, typeId)
                 .eq(Comment::getIsCheck, SQLConst.COMMENT_IS_CHECK)
@@ -74,6 +77,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         // 查询所有子评论
         LambdaQueryWrapper<Comment> childQueryWrapper = new LambdaQueryWrapper<>();
         childQueryWrapper
+                .orderByDesc(Comment::getCreateTime)
                 .eq(Comment::getType, type)
                 .eq(Comment::getTypeId, typeId)
                 .eq(Comment::getIsCheck, SQLConst.COMMENT_IS_CHECK)
@@ -218,7 +222,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                     .eq(StringUtils.isNotNull(searchDTO.getIsCheck()), Comment::getIsCheck, searchDTO.getIsCheck());
         }
 
-        return commentMapper.selectList(wrapper).stream().map(comment -> comment.asViewObject(CommentListVO.class,
+        return commentMapper.selectList(wrapper.orderByDesc(Comment::getCreateTime)).stream().map(comment -> comment.asViewObject(CommentListVO.class,
                 v -> v.setCommentUserName(userMapper.selectById(comment.getCommentUserId()).getUsername()))).collect(Collectors.toList());
     }
 
@@ -238,7 +242,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         if (commentMapper.selectCount(new LambdaQueryWrapper<Comment>().eq(Comment::getParentId, id)) > 0) {
             return ResponseResult.failure("该评论还有子评论");
         }
-        if (commentMapper.deleteById(id) > 0) return ResponseResult.success();
+        if (commentMapper.deleteById(id) > 0) {
+            // 删除评论的点赞
+            likeMapper.delete(new LambdaQueryWrapper<Like>().eq(Like::getType, LikeEnum.LIKE_TYPE_COMMENT.getType()).and(a -> a.in(Like::getTypeId, id)));
+            return ResponseResult.success();
+        }
         return ResponseResult.failure();
     }
 

@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 public class Like {
     //点赞表id
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private String id;
     //点赞的用户id
     private Long userId;
     //点赞类型(1,文章，2,评论)

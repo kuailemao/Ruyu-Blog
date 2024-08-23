@@ -15,6 +15,7 @@ import xyz.kuailemao.domain.response.ResponseResult;
 import xyz.kuailemao.domain.vo.LeaveWordListVO;
 import xyz.kuailemao.domain.vo.LeaveWordVO;
 import xyz.kuailemao.enums.CommentEnum;
+import xyz.kuailemao.enums.FavoriteEnum;
 import xyz.kuailemao.enums.LikeEnum;
 import xyz.kuailemao.enums.MailboxAlertsEnum;
 import xyz.kuailemao.mapper.*;
@@ -137,6 +138,10 @@ public class LeaveWordServiceImpl extends ServiceImpl<LeaveWordMapper, LeaveWord
     @Override
     public ResponseResult<Void> deleteLeaveWord(List<Long> ids) {
         if (leaveWordMapper.deleteBatchIds(ids) > 0) {
+            // 删除点赞、收藏、评论
+            likeMapper.delete(new LambdaQueryWrapper<Like>().eq(Like::getType, LikeEnum.LIKE_TYPE_LEAVE_WORD.getType()).and(a -> a.in(Like::getTypeId, ids)));
+            favoriteMapper.delete(new LambdaQueryWrapper<Favorite>().eq(Favorite::getType, FavoriteEnum.FAVORITE_TYPE_LEAVE_WORD.getType()).and(a -> a.in(Favorite::getTypeId, ids)));
+            commentMapper.delete(new LambdaQueryWrapper<Comment>().eq(Comment::getType, CommentEnum.COMMENT_TYPE_LEAVE_WORD.getType()).and(a -> a.in(Comment::getTypeId, ids)));
             return ResponseResult.success();
         }
         return ResponseResult.failure();
