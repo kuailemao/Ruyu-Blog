@@ -381,14 +381,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Transactional
     @Override
-    public ResponseResult<Void> deleteArticle(List<Long> id) {
-        if (this.removeByIds(id)) {
+    public ResponseResult<Void> deleteArticle(List<Long> ids) {
+        if (this.removeByIds(ids)) {
             // 删除标签关系
-            articleTagMapper.delete(new LambdaQueryWrapper<ArticleTag>().in(ArticleTag::getArticleId, id));
+            articleTagMapper.delete(new LambdaQueryWrapper<ArticleTag>().in(ArticleTag::getArticleId, ids));
             // 删除点赞、收藏、评论
-            likeMapper.delete(new LambdaQueryWrapper<Like>().eq(Like::getType, SQLConst.ARTICLE_ID).and(a -> a.in(Like::getTypeId, id)));
-            favoriteMapper.delete(new LambdaQueryWrapper<Favorite>().eq(Favorite::getType, SQLConst.ARTICLE_ID).and(a -> a.in(Favorite::getTypeId, id)));
-            commentMapper.delete(new LambdaQueryWrapper<Comment>().eq(Comment::getType, SQLConst.ARTICLE_ID).and(a -> a.in(Comment::getTypeId, id)));
+            likeMapper.delete(new LambdaQueryWrapper<Like>().eq(Like::getType, LikeEnum.LIKE_TYPE_ARTICLE.getType()).and(a -> a.in(Like::getTypeId, ids)));
+            favoriteMapper.delete(new LambdaQueryWrapper<Favorite>().eq(Favorite::getType, FavoriteEnum.FAVORITE_TYPE_ARTICLE.getType()).and(a -> a.in(Favorite::getTypeId, ids)));
+            commentMapper.delete(new LambdaQueryWrapper<Comment>().eq(Comment::getType, CommentEnum.COMMENT_TYPE_ARTICLE.getType()).and(a -> a.in(Comment::getTypeId, ids)));
             return ResponseResult.success();
         }
         return ResponseResult.failure();

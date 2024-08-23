@@ -10,7 +10,7 @@ spring:
 #      expire: 7
 #  datasource:
 #    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://[数据库IP]:[数据库端口]/blog?useSSL=false&allowPublicKeyRetrieval=true
+#    url: jdbc:mysql://[数据库IP]:[数据库端口]/blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Hong_Kong
 #    username: root
 #    password: [数据库密码]
 #  data:
@@ -88,7 +88,7 @@ spring:
 #          dataSource:
 #            quartz_jobs:
 #              driver: com.mysql.cj.jdbc.Driver
-#              URL: jdbc:mysql://[数据库IP]:[数据库端口]/blog?useSSL=false&allowPublicKeyRetrieval=true
+#              URL: jdbc:mysql://[数据库IP]:[数据库端口]/blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Hong_Kong
 #              user: root
 #              password: [数据库密码]
 #mail:

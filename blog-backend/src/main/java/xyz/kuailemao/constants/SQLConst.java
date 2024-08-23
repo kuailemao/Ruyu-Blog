@@ -27,18 +27,9 @@ public class SQLConst {
     public static final Integer PUBLIC_ARTICLE = 1;
 
     /**
-     * 文章状态
-     */
-    public static final String STATUS = "status";
-    /**
      * 公开
      */
     public static final Integer STATUS_PUBLIC = 1;
-
-    /**
-     * 文章id
-     */
-    public static final String ARTICLE_ID = "1";
 
     /**
      * 评论是否通过(0,否)
@@ -64,6 +55,7 @@ public class SQLConst {
      * id
      */
     public static final String ID = "id";
+
     /**
      * 管理员id
      */

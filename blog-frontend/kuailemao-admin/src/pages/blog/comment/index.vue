@@ -266,7 +266,7 @@ const domain = import.meta.env.VITE_APP_DOMAIN_NAME_FRONT
         >
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'operation'">
-              <a :href="`${domain}article/${record.id}`" target="_blank">
+              <a :href="record.type === 1 ? `${domain}article/${record.typeId}` : `${domain}message/detail/${record.typeId}`" target="_blank">
                 <a-button type="link" style="padding: 0;">
                   <template #icon>
                     <LinkOutlined />
