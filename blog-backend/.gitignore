@@ -6,6 +6,7 @@ target/
 /src/main/resources/rebel.xml
 .mvn
 application-dev.yml
+application-pro.yml
 
 ### STS ###
 .apt_generated
