@@ -33,6 +33,10 @@ function resetWebInfo() {
   info.value.startTime = undefined
   info.value.recordInfo = undefined
 }
+
+// 是否黑夜模式
+const isDark = ref(false)
+isDark.value = useDark().value
 </script>
 
 <template>
@@ -43,7 +47,7 @@ function resetWebInfo() {
         <h2>信息管理</h2>
       </template>
       <template #default>
-        <div style="background: white">
+        <div :style="{ background: isDark ? 'none' : 'white' }">
           <div style="margin: 1rem">
             <a-segmented v-model:value="value" :options="data" />
           </div>

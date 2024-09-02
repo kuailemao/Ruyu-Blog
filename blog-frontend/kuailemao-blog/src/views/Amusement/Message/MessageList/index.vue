@@ -89,6 +89,7 @@ function mdContent(content: string) {
 
 <template>
   <div class="bg">
+    <div class="occupancyHeight"></div>
     <div>
       <div class="title">
         <div>留言板</div>
@@ -184,6 +185,13 @@ function mdContent(content: string) {
 </template>
 
 <style scoped lang="scss">
+
+.occupancyHeight{
+  margin: 2rem 0;
+  @media screen and (min-width: 910px) {
+    display: none;
+  }
+}
 
 .bg{
   background: var(--el-bg-color);

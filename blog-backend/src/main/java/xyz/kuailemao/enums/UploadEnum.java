@@ -2,6 +2,7 @@ package xyz.kuailemao.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import xyz.kuailemao.constants.ImageConst;
 
 import java.util.List;
 
@@ -16,15 +17,17 @@ import java.util.List;
 public enum UploadEnum {
 
     // 站长头像
-    WEBSITE_INFO_AVATAR("websiteInfo/avatar/", "站长头像", List.of("jpg", "jpeg", "png"),5.0),
+    WEBSITE_INFO_AVATAR("websiteInfo/avatar/", "站长头像", List.of(ImageConst.JPG, ImageConst.JPEG, ImageConst.PNG, ImageConst.WEBP), 0.3),
     // 站长背景
-    WEBSITE_INFO_BACKGROUND("websiteInfo/background/", "站长背景", List.of("jpg", "jpeg", "png"),5.0),
+    WEBSITE_INFO_BACKGROUND("websiteInfo/background/", "站长背景", List.of(ImageConst.JPG, ImageConst.JPEG, ImageConst.PNG, ImageConst.WEBP), 0.3),
     // 文章封面
-    ARTICLE_COVER("article/articleCover/", "文章封面", List.of("jpg", "jpeg", "png"),0.8),
+    ARTICLE_COVER("article/articleCover/", "文章封面", List.of(ImageConst.JPG, ImageConst.JPEG, ImageConst.PNG, ImageConst.WEBP), 0.3),
     // 文章图片
-    ARTICLE_IMAGE("article/articleImage/", "文章图片", List.of("jpg", "jpeg", "png", "gif"),5.0),
+    ARTICLE_IMAGE("article/articleImage/", "文章图片", List.of(ImageConst.JPG, ImageConst.JPEG, ImageConst.PNG, ImageConst.GIF, ImageConst.WEBP), 3.0),
     // 用户头像
-    USER_AVATAR("user/avatar/", "用户头像", List.of("jpg", "jpeg", "png"),2.0);
+    USER_AVATAR("user/avatar/", "用户头像", List.of(ImageConst.JPG, ImageConst.JPEG, ImageConst.PNG, ImageConst.WEBP), 0.3),
+    // 前台首页Banners图片
+    UI_BANNERS("banners/", "前台首页Banners图片", List.of(ImageConst.JPG, ImageConst.JPEG, ImageConst.PNG, ImageConst.WEBP), 0.3);
 
 
     // 上传目录

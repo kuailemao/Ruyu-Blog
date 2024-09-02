@@ -64,6 +64,10 @@ public class SecurityConst {
      */
     public static final String PERMISSION_CHECK = "/permission/**";
 
+    /*
+      注意：Controller方法上面添加了@PreAuthorize("hasAnyAuthority('blog:banner:delete')")后会自动进行登录权限校验
+     */
+
     /**
      * 数组常量
      */

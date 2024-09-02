@@ -65,4 +65,9 @@ public class SQLConst {
      * 查询一条
       */
     public static final String LIMIT_ONE_SQL = "LIMIT 1";
+
+    /**
+     * Banner最多数量
+     */
+    public static final Integer BANNER_MAX_COUNT = 5;
 }

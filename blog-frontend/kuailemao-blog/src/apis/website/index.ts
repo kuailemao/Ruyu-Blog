@@ -9,3 +9,12 @@ export function getWebsiteInfo():Promise<AxiosResponse<WebsiteInfo>> {
         method: 'get'
     })
 }
+
+
+// 查询banner列表
+export async function backGetBanners() {
+    return http({
+        url: '/banners/list',
+        method: 'get'
+    })
+}

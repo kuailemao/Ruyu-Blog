@@ -69,8 +69,6 @@ http.interceptors.response.use(
                 loadingShown = false;
                 const loadingStore = useLoadingStore();
                 loadingStore.hide();
-                // 延迟删除操作
-                console.log('开启路径', matchingPath)
                 pathRequestCount.clear(); // 清空整个 Map
                 NProgress.done();
             }
