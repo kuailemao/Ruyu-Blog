@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { UploadProps } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
 import dayjs from 'dayjs'
+import Banners from './banners/index.vue'
 import { updateWebInfo } from '~/api/blog/webInfo'
 
 const props = defineProps({
@@ -50,71 +50,6 @@ function getRunTime(startTime: string) {
   const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000)
 
   return `${days + 1} 天 ${hours + 1} 小时 ${minutes} 分钟 ${seconds} 秒`.replace(/-/g, '')
-}
-
-function getBase64(file: File) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result)
-    reader.onerror = error => reject(error)
-  })
-}
-
-const previewVisible = ref(false)
-const previewImage = ref('')
-const previewTitle = ref('')
-
-const fileList = ref<UploadProps['fileList']>([
-  {
-    uid: '-1',
-    name: 'image.png',
-    status: 'done',
-    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-  },
-  {
-    uid: '-2',
-    name: 'image.png',
-    status: 'done',
-    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-  },
-  {
-    uid: '-3',
-    name: 'image.png',
-    status: 'done',
-    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-  },
-  {
-    uid: '-4',
-    name: 'image.png',
-    status: 'done',
-    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-  },
-  {
-    uid: '-xxx',
-    percent: 50,
-    name: 'image.png',
-    status: 'uploading',
-    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-  },
-  {
-    uid: '-5',
-    name: 'image.png',
-    status: 'error',
-  },
-])
-
-function handleCancel() {
-  previewVisible.value = false
-  previewTitle.value = ''
-}
-async function handlePreview(file: UploadProps['fileList'][number]) {
-  if (!file.url && !file.preview)
-    file.preview = (await getBase64(file.originFileObj)) as string
-
-  previewImage.value = file.url || file.preview
-  previewVisible.value = true
-  previewTitle.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1)
 }
 
 function resetWebsiteInfo() {
@@ -183,36 +118,13 @@ function updateWebsiteInfo() {
         </a-button>
       </div>
     </a-form>
-    <!--  TODO 首页轮播图  -->
-    <!--    <a-divider>首页轮播图</a-divider> -->
-    <!--    <div class="carousel"> -->
-    <!--      <a-upload -->
-    <!--        v-model:file-list="fileList" -->
-    <!--        action="https://www.mocky.io/v2/5cc8019d300000980a055e76" -->
-    <!--        list-type="picture-card" -->
-    <!--        @preview="handlePreview" -->
-    <!--      > -->
-    <!--        <div v-if="fileList.length < 6"> -->
-    <!--          <PlusOutlined /> -->
-    <!--          <div style="margin-top: 8px"> -->
-    <!--            Upload -->
-    <!--          </div> -->
-    <!--        </div> -->
-    <!--      </a-upload> -->
-    <!--      <a-modal :open="previewVisible" :title="previewTitle" :footer="null" @cancel="handleCancel"> -->
-    <!--        <img alt="example" style="width: 100%" :src="previewImage"> -->
-    <!--      </a-modal> -->
-    <!--    </div> -->
+    <Banners/>
   </div>
 </template>
 
 <style scoped lang="scss">
 .info{
   width: 50%;
-}
-.carousel{
-  display: flex;
-  justify-content: center;
 }
 
 :deep(.ant-upload-list-picture-card){

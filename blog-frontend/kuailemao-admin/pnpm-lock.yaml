@@ -50,6 +50,9 @@ importers:
       vue:
         specifier: ^3.3.8
         version: 3.3.8(typescript@5.2.2)
+      vue-draggable-plus:
+        specifier: ^0.5.3
+        version: 0.5.3(@types/sortablejs@1.15.8)
       vue-i18n:
         specifier: ^9.6.5
         version: 9.6.5(vue@3.3.8)
@@ -3011,6 +3014,10 @@ packages:
   /@types/semver@7.5.5:
     resolution: {integrity: sha512-+d+WYC1BxJ6yVOgUgzK8gWvp5qF8ssV5r4nsDcZWKRWcDQLQ619tvWAxJQYGgBrO1MnLJC7a5GtiYsAoQ47dJg==}
     dev: true
+
+  /@types/sortablejs@1.15.8:
+    resolution: {integrity: sha512-b79830lW+RZfwaztgs1aVPgbasJ8e7AXtZYHTELNXZPsERt4ymJdjV4OccDbHQAvHrCcFpbF78jkm0R6h/pZVg==, tarball: https://registry.npmmirror.com/@types/sortablejs/-/sortablejs-1.15.8.tgz}
+    dev: false
 
   /@types/supercluster@7.1.3:
     resolution: {integrity: sha512-Z0pOY34GDFl3Q6hUFYf3HkTwKEE02e7QgtJppBt+beEAxnyOpJua+voGFvxINBHa06GwLFFym7gRPY2SiKIfIA==}
@@ -10339,6 +10346,18 @@ packages:
         optional: true
     dependencies:
       vue: 3.3.8(typescript@5.2.2)
+
+  /vue-draggable-plus@0.5.3(@types/sortablejs@1.15.8):
+    resolution: {integrity: sha512-dwKDzZ8io3y7k2iuIwVwiGrdiq5C0S7Et7nt5Gz5KjpBS9MtZGFP+L4FJPWGSLYleOT8HmVuCXTZYjGet7wC0g==, tarball: https://registry.npmmirror.com/vue-draggable-plus/-/vue-draggable-plus-0.5.3.tgz}
+    peerDependencies:
+      '@types/sortablejs': ^1.15.0
+      '@vue/composition-api': '*'
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+    dependencies:
+      '@types/sortablejs': 1.15.8
+    dev: false
 
   /vue-eslint-parser@9.3.2(eslint@8.53.0):
     resolution: {integrity: sha512-q7tWyCVaV9f8iQyIA5Mkj/S6AoJ9KBN8IeUSf3XEmBrOtxOZnfTg5s4KClbZBCK3GtnT/+RyCLZyDHuZwTuBjg==}

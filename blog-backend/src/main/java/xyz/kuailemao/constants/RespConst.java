@@ -47,4 +47,9 @@ public class RespConst {
      */
     public static final String TOKEN_HEADER = "Authorization";
 
+    /**
+     * Banner数量已达上限
+     */
+    public static final String BANNER_MAX_COUNT_MSG = "首页banner数量已达上限";
+
 }
