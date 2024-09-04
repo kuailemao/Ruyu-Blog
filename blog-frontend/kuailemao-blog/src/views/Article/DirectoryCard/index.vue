@@ -22,6 +22,37 @@ const id = 'preview-only';
 
 <style scoped lang="scss">
 
+// 目录
+:deep(.md-editor-catalog-active){
+  & > span{
+    background: var(--el-color-primary-light-9);
+    color: var(--el-color-primary-light-4);
+    border-radius: $border-radius;
+    font-weight: bold;
+    //transition: all .6s;
+    padding: 0.5rem 0 0.5rem 0.5rem;
+  }
+}
+
+:deep(.md-editor-catalog){
+  span:hover{
+    color: var(--el-color-primary-light-5);
+  }
+}
+
+:deep(.md-editor-catalog-link){
+  margin: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  span{
+    margin: 0.25rem 0.25rem;
+  }
+}
+
+:deep(.md-editor-catalog-wrapper > .md-editor-catalog-link:first-of-type) {
+  padding-top: 0;
+}
+
 .card {
   background-color: var(--el-bg-color);
   width: $card-width;
@@ -30,6 +61,7 @@ const id = 'preview-only';
   border-radius: $border-radius;
   // 添加阴影
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+
   .title {
     border-radius: $border-radius $border-radius 0 0;
     background-color: var(--el-bg-color);

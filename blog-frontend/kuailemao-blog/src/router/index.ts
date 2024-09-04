@@ -18,6 +18,7 @@ router.beforeEach((to, from, next) => {
             window.scrollTo(0, 0)
         })
     }
+    window.document.title = to.meta.title as string
     // 用户登录了，跳转到登录页，直接跳转到首页
     if (to.name?.startsWith(('welcome-')) && isLogin) {
         next('/')
