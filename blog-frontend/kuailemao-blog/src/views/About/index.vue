@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import JSConfetti from 'js-confetti'
+import useWebsiteStore from "@/store/modules/website.ts";
 
 const jsConfetti = new JSConfetti()
 
 jsConfetti.addConfetti()
+
+const websiteStore = useWebsiteStore()
 </script>
 
 <template>
@@ -11,10 +14,10 @@ jsConfetti.addConfetti()
     <div class="flex justify-center items-center max-lg:flex-col h-full w-full xl:w-[90%]">
       <div class="w-[40%] max-lg:w-full h-full flex flex-col justify-center items-center">
         <div class="h-[20rem] w-[20rem] rounded-full overflow-hidden mt-[5rem] drop-shadow-lg">
-          <div class="bg-cover bg-no-repeat bg-center w-full h-full" style="background-image: url('https://image.kuailemao.xyz/blog/websiteInfo/avatar/7fee5695-a0c9-4a39-9b05-f2940474adfb.jpg')"></div>
+          <div class="bg-cover bg-no-repeat bg-center w-full h-full" :style="{ 'background-image': 'url(' + websiteStore.webInfo?.webmasterAvatar + ')' }"></div>
         </div>
         <div>
-          <h1 data-shadow='RuYu'>RuYu</h1>
+          <h1 :data-shadow='websiteStore.webInfo?.webmasterName'>{{ websiteStore.webInfo?.webmasterName }}</h1>
         </div>
         <div class="text-gray-600 w-full font-bold dark:text-gray-300 text-center">
           人生如棋落子无悔道心稳固如箭离弦永不回头

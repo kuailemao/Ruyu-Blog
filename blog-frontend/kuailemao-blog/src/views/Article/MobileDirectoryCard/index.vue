@@ -42,17 +42,35 @@ const handleScroll = () => {
 <style scoped lang="scss">
 // 移动端目录
 .move_catalog {
-  :deep(.md-editor-catalog-link) {
-    span {
-      font-size: 2em;
+  // 目录
+  :deep(.md-editor-catalog-active){
+    & > span{
+      background: var(--el-color-primary-light-9);
+      color: var(--el-color-primary-light-4);
+      border-radius: $border-radius;
       font-weight: bold;
+      //transition: all .6s;
+      padding: 0.5rem 0 0.5rem 0.5rem;
     }
-
-    padding: 0.4rem;
   }
-}
 
-:deep(.md-editor-catalog-link){
+  :deep(.md-editor-catalog){
+    span:hover{
+      color: var(--el-color-primary-light-5);
+    }
+  }
 
+  :deep(.md-editor-catalog-link){
+    margin: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    span{
+      margin: 0.3rem 0.3rem;
+    }
+  }
+
+  :deep(.md-editor-catalog-wrapper > .md-editor-catalog-link:first-of-type) {
+    padding-top: 0;
+  }
 }
 </style>

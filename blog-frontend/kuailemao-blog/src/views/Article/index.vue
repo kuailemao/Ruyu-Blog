@@ -12,7 +12,7 @@ import DirectoryCard from "./DirectoryCard/index.vue";
 import {ElMessage} from "element-plus";
 import router from "@/router";
 import useWebsiteStore from "@/store/modules/website.ts";
-import {useColorMode} from "@vueuse/core";
+import {useColorMode, useTitle} from "@vueuse/core";
 import MobileDirectoryCard from "./MobileDirectoryCard/index.vue";
 import {throttle} from "@/utils/optimize.ts";
 
@@ -71,6 +71,8 @@ async function getArticleDetailById() {
       router.push({path: '/'})
       return
     }
+    // 设置title
+    useTitle(res.data.articleTitle)
     if (route.params.id) {
       addArticleVisit(route.params.id)
     }
@@ -272,14 +274,23 @@ function ReadingModeFunc() {
               <div class="link">
                 <svg-icon name="author_link"></svg-icon>
                 <strong>本文链接： </strong>
-                <a :href="env.VITE_FRONTEND_URL + $route.path">{{ env.VITE_FRONTEND_URL + $route.path }}</a>
+                <a class="copyright_a"
+                   :href="env.VITE_FRONTEND_URL + $route.path">{{ env.VITE_FRONTEND_URL + $route.path }}</a>
               </div>
               <div class="license">
-                <svg-icon name="author_copyright"></svg-icon>
-                <strong>版权声明： </strong>本站所有文章除特别声明外，均采用
-                <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">CC
-                  BY-NC-SA 4.0</a>
-                许可协议。转载请注明文章出处！
+                <div>
+                  <svg-icon name="author_copyright"></svg-icon>
+                  <strong>版权声明： </strong>
+                </div>
+                <div class="license_text">
+                  本站所有文章除特别声明外，均采用
+                  &nbsp;
+                  <a class="copyright_a" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh"
+                     target="_blank">
+                    CC BY-NC-SA 4.0
+                  </a> &nbsp;
+                  许可协议。转载请注明文章出处！
+                </div>
               </div>
             </div>
           </div>
@@ -382,9 +393,10 @@ function ReadingModeFunc() {
       </template>
     </Main>
   </div>
-  <div v-show="isReadingMode" class="bg-white">
+  <div v-show="isReadingMode" class="bg-white dark:bg-gray-800">
     <!-- 退出按钮 -->
-    <div @click="isReadingMode = false" class="z-10 w-[50px] h-[50px] bg-gray-200 hover:bg-gray-300 fixed top-[2em] right-[1em] lg:right-[5em] rounded flex items-center justify-center duration-300 cursor-pointer">
+    <div @click="isReadingMode = false"
+         class="z-10 w-[50px] h-[50px] bg-gray-200 hover:bg-gray-300 fixed top-[2em] right-[1em] lg:right-[5em] rounded flex items-center justify-center duration-300 cursor-pointer">
       <svg-icon name="exit_icon" style="width: 25px;height: 25px;"/>
     </div>
     <div class="sm:px-1 md:px-[5rem] lg:px-[10rem] xl:px-[15rem] py-3" style="transition: all .5s ease">
@@ -430,14 +442,23 @@ function ReadingModeFunc() {
           <div class="link">
             <svg-icon name="author_link"></svg-icon>
             <strong>本文链接： </strong>
-            <a :href="env.VITE_FRONTEND_URL + $route.path">{{ env.VITE_FRONTEND_URL + $route.path }}</a>
+            <a class="copyright_a"
+               :href="env.VITE_FRONTEND_URL + $route.path">{{ env.VITE_FRONTEND_URL + $route.path }}</a>
           </div>
           <div class="license">
-            <svg-icon name="author_copyright"></svg-icon>
-            <strong>版权声明： </strong>本站所有文章除特别声明外，均采用
-            <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">CC
-              BY-NC-SA 4.0</a>
-            许可协议。转载请注明文章出处！
+            <div>
+              <svg-icon name="author_copyright"></svg-icon>
+              <strong>版权声明： </strong>
+            </div>
+            <div class="license_text">
+              本站所有文章除特别声明外，均采用
+              &nbsp;
+              <a class="copyright_a" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh"
+                 target="_blank">
+                CC BY-NC-SA 4.0
+              </a> &nbsp;
+              许可协议。转载请注明文章出处！
+            </div>
           </div>
         </div>
       </div>
@@ -516,7 +537,8 @@ function ReadingModeFunc() {
   </div>
   <MobileDirectoryCard :id="id" :scroll-element="scrollElement" :is-show-move-catalog="isShowMoveCatalog"
                        @update:isShowMoveCatalog="(value) =>  isShowMoveCatalog = value"/>
-  <BottomRightLayout v-show="!isReadingMode" to-top scroll-percentage reading-mode to-comment @ReadingMode="ReadingModeFunc">
+  <BottomRightLayout v-show="!isReadingMode" to-top scroll-percentage reading-mode to-comment
+                     @ReadingMode="ReadingModeFunc">
     <template #scroll_percentage>
       {{ progressY }}
     </template>
@@ -586,28 +608,6 @@ function ReadingModeFunc() {
   margin-bottom: 0;
 }
 
-// 目录
-:deep(.md-editor-catalog-link .md-editor-catalog-link:hover) {
-  border-left: 2px solid grey;
-  transition: all 0.3s;
-}
-
-// 选中的
-:deep(.md-editor-catalog-link .md-editor-catalog-active) {
-  font-weight: bold;
-}
-
-:deep(.md-editor-catalog-wrapper .md-editor-catalog-link) {
-  border-left: 2px solid saddlebrown;
-  transition: all 0.3s;
-}
-
-:deep(.md-editor-catalog-link) {
-  @media screen and (max-width: 768px) {
-    font-size: 0.5em;
-  }
-}
-
 .head_title {
   border-radius: $border-radius;
   height: 20rem;
@@ -653,19 +653,55 @@ function ReadingModeFunc() {
   margin: 1rem 0;
   padding: 1rem 2rem;
   border-radius: 0.625rem;
-  //background-color: var(--el-background-color);
   border: 1px solid var(--el-border-color);
 
-  div {
+  .license {
     display: flex;
-    align-items: center;
-    margin: 1rem 0;
+
+    & > div:nth-child(1) {
+      @media screen and (max-width: 910px) {
+        width: 100%;
+      }
+      display: flex;
+    }
+
+    @media screen and (max-width: 910px) {
+      flex-direction: column;
+    }
   }
 
-  div strong {
-    margin: 0 0.5rem;
-    font-weight: bold;
+  .license_text{
+    display: flex;
+    @media screen and (max-width: 910px) {
+      // 左对齐
+      width: 100%;
+      margin-top: 0.5rem;
+    }
   }
+
+  .copyright_a {
+    color: var(--el-text-color-secondary);
+
+    &:hover {
+      color: var(--el-color-primary);
+      // 下划线
+      text-decoration: underline;
+    }
+  }
+
+  // 第一个子div
+  & > div {
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+
+    strong {
+      margin: 0 0.5rem;
+      font-weight: bold;
+    }
+
+  }
+
 }
 
 // 文章底部标签
@@ -790,10 +826,6 @@ function ReadingModeFunc() {
   @media screen and (max-width: 910px) {
     padding: 0.2rem;
   }
-}
-
-:deep(.md-editor) {
-  // 主题切换配置
 }
 
 .progress {

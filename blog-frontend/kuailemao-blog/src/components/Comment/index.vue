@@ -11,6 +11,7 @@ import {
 import {cancelLike, isLike, userLike} from '@/apis/like'
 import ChildComment from "./ChildComment.vue";
 import {ElMessage, ElMessageBox} from "element-plus";
+import {useColorMode} from "@vueuse/core";
 
 const props = defineProps({
   authorId: {
@@ -71,6 +72,8 @@ const emojiOptions = ref(['Emoji', 'Heo'])
 const showAllChildComments = ref(false)
 // 查询评论数
 const pageSize = ref(2)
+
+const mode = useColorMode()
 
 // 默认选中第一个
 onMounted(() => {
@@ -328,7 +331,7 @@ function addParentComment() {
         </div>
         <!-- 预览 -->
         <div class="preview" v-if="isPreview">
-          <MdPreview :modelValue="preview"/>
+          <MdPreview :modelValue="preview" :theme="mode"/>
         </div>
       </div>
     </div>
