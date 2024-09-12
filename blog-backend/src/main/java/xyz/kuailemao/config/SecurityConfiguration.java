@@ -1,6 +1,6 @@
 package xyz.kuailemao.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,10 +22,10 @@ import xyz.kuailemao.handler.SecurityHandler;
 @Configuration
 public class SecurityConfiguration {
 
-    @Autowired
+    @Resource
     private SecurityHandler securityHandler;
 
-    @Autowired
+    @Resource
     private JwtAuthorizeFilter jwtAuthorizeFilter;
 
     @Bean

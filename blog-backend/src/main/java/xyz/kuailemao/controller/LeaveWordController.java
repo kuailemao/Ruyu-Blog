@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.kuailemao.annotation.AccessLimit;
+import xyz.kuailemao.annotation.CheckBlacklist;
 import xyz.kuailemao.annotation.LogAnnotation;
 import xyz.kuailemao.constants.LogConst;
 import xyz.kuailemao.domain.dto.LeaveWordIsCheckDTO;
@@ -50,6 +51,7 @@ public class LeaveWordController {
         return ControllerUtils.messageHandler(() -> leaveWordService.getLeaveWordList(id));
     }
 
+    @CheckBlacklist
     @Operation(summary = "用户留言")
     @PostMapping("/auth/userLeaveWord")
     @AccessLimit(seconds = 60, maxCount = 10)

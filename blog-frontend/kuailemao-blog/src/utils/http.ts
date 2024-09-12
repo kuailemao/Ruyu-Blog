@@ -7,8 +7,6 @@ import {Jwt_Prefix} from "@/const/Jwt";
 import {GET_TOKEN} from "@/utils/auth.ts";
 import useLoadingStore from "@/store/modules/loading.ts";
 import {REQUEST_LOADING_PATH} from "@/utils/enum.ts";
-import router from "@/router";
-
 
 // 创建axios实例
 const http: AxiosInstance = axios.create({
@@ -73,6 +71,15 @@ http.interceptors.response.use(
                 NProgress.done();
             }
         } else NProgress.done();
+
+        if(response.data.code === 1012){
+            ElNotification({
+                title: '账号已被封禁',
+                message: response.data.msg,
+                type: 'warning',
+            })
+        }
+
         return response.data
     },
     (error: AxiosError) => {

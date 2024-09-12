@@ -63,7 +63,11 @@ public enum RespEnum {
     /**
      * 文件上传错误
      */
-    FILE_UPLOAD_ERROR(1011, "文件上传错误");
+    FILE_UPLOAD_ERROR(1011, "文件上传错误"),
+    /**
+     * 账号被封禁
+     */
+    BLACK_LIST_ERROR(1012, "账号被封禁");
 
 
 

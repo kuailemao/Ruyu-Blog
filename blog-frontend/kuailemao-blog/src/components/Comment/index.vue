@@ -281,8 +281,6 @@ function addParentComment() {
       getComments(props.typeId, '1', String(pageSize.value))
     } else if (res.code === 1002) {
       ElMessage.error(res.msg);
-    } else {
-      ElMessage.error("出现问题，请联系管理员");
     }
   })
 }

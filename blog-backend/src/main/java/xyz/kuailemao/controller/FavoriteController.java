@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.kuailemao.annotation.AccessLimit;
+import xyz.kuailemao.annotation.CheckBlacklist;
 import xyz.kuailemao.annotation.LogAnnotation;
 import xyz.kuailemao.constants.LogConst;
 import xyz.kuailemao.domain.dto.FavoriteIsCheckDTO;
@@ -36,6 +37,7 @@ public class FavoriteController {
     @Resource
     private FavoriteService favoriteService;
 
+    @CheckBlacklist
     @Operation(summary = "收藏")
     @Parameters({
             @Parameter(name = "type", description = "收藏类型", required = true),
@@ -50,6 +52,7 @@ public class FavoriteController {
         return favoriteService.userFavorite(type, typeId);
     }
 
+    @CheckBlacklist
     @Operation(summary = "取消收藏")
     @Parameters({
             @Parameter(name = "type", description = "收藏类型", required = true),

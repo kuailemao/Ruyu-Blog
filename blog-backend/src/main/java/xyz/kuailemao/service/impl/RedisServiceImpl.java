@@ -5,8 +5,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import xyz.kuailemao.constants.RedisConst;
+import xyz.kuailemao.constants.SQLConst;
 import xyz.kuailemao.domain.entity.*;
-import xyz.kuailemao.domain.vo.ArticleCommentVO;
 import xyz.kuailemao.domain.vo.ArticleVO;
 import xyz.kuailemao.enums.CommentEnum;
 import xyz.kuailemao.enums.FavoriteEnum;
@@ -21,7 +21,6 @@ import xyz.kuailemao.utils.RedisCache;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -90,11 +89,11 @@ public class RedisServiceImpl implements RedisService {
             // 文章点赞量
             articleVO.setLikeCount(likeMapper.selectCount(new LambdaQueryWrapper<Like>().eq(Like::getTypeId, articleVO.getId()).eq(Like::getType, LikeEnum.LIKE_TYPE_ARTICLE.getType())));
             // 文章评论量
-            articleVO.setCommentCount(commentMapper.selectCount(new LambdaQueryWrapper<Comment>().eq(Comment::getTypeId, articleVO.getId()).eq(Comment::getType, CommentEnum.COMMENT_TYPE_ARTICLE.getType())));
+            articleVO.setCommentCount(commentMapper.selectCount(new LambdaQueryWrapper<Comment>().eq(Comment::getTypeId, articleVO.getId()).eq(Comment::getType, CommentEnum.COMMENT_TYPE_ARTICLE.getType()).eq(Comment::getIsCheck, SQLConst.COMMENT_IS_CHECK)));
         });
-        Map<String, Long> favoriteCount = articleVOS.stream().collect(Collectors.toMap(favorite -> favorite.getId().toString(), ArticleVO::getFavoriteCount));
-        Map<String, Long> likeCount = articleVOS.stream().collect(Collectors.toMap(like -> like.getId().toString(), ArticleVO::getLikeCount));
-        Map<String, Long> commentCount = articleVOS.stream().collect(Collectors.toMap(comment -> comment.getId().toString(), ArticleVO::getCommentCount));
+        Map<String, Long> favoriteCount = articleVOS.stream().collect(Collectors.toMap(articleVO -> articleVO.getId().toString(), ArticleVO::getFavoriteCount));
+        Map<String, Long> likeCount = articleVOS.stream().collect(Collectors.toMap(articleVO -> articleVO.getId().toString(), ArticleVO::getLikeCount));
+        Map<String, Long> commentCount = articleVOS.stream().collect(Collectors.toMap(articleVO -> articleVO.getId().toString(), ArticleVO::getCommentCount));
         redisCache.setCacheMap(RedisConst.ARTICLE_FAVORITE_COUNT, favoriteCount);
         redisCache.setCacheMap(RedisConst.ARTICLE_LIKE_COUNT, likeCount);
         redisCache.setCacheMap(RedisConst.ARTICLE_COMMENT_COUNT, commentCount);

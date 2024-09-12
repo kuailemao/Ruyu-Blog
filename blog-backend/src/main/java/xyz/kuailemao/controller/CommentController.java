@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.kuailemao.annotation.AccessLimit;
+import xyz.kuailemao.annotation.CheckBlacklist;
 import xyz.kuailemao.annotation.LogAnnotation;
 import xyz.kuailemao.constants.LogConst;
 import xyz.kuailemao.domain.dto.CommentIsCheckDTO;
@@ -57,6 +58,7 @@ public class CommentController {
         return ControllerUtils.messageHandler((() -> commentService.getComment(type, typeId, pageNum, pageSize)));
     }
 
+    @CheckBlacklist
     @Operation(summary = "用户添加评论")
     @Parameter(name = "commentDTO", description = "评论信息", required = true)
     @AccessLimit(seconds = 60, maxCount = 10)

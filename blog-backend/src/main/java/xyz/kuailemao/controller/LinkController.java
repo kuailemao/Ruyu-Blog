@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.kuailemao.annotation.AccessLimit;
+import xyz.kuailemao.annotation.CheckBlacklist;
 import xyz.kuailemao.annotation.LogAnnotation;
 import xyz.kuailemao.constants.LogConst;
 import xyz.kuailemao.domain.dto.LinkDTO;
@@ -42,6 +43,7 @@ public class LinkController {
     @Resource
     private LinkService linkService;
 
+    @CheckBlacklist
     @Operation(summary = "申请友链")
     @Parameter(name = "linkDTO", description = "友链申请信息")
     @AccessLimit(seconds = 60, maxCount = 10)

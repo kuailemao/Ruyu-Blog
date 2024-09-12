@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.kuailemao.annotation.AccessLimit;
+import xyz.kuailemao.annotation.CheckBlacklist;
 import xyz.kuailemao.domain.entity.Like;
 import xyz.kuailemao.domain.response.ResponseResult;
 import xyz.kuailemao.service.LikeService;
@@ -22,7 +23,7 @@ import java.util.List;
  * 创建时间：2023/11/3 10:15
  */
 @RestController
-@Tag(name = "评论相关接口")
+@Tag(name = "点赞相关接口")
 @RequestMapping("/like")
 @Validated
 public class LikeController {
@@ -30,6 +31,7 @@ public class LikeController {
     @Resource
     private LikeService likeService;
 
+    @CheckBlacklist
     @Operation(summary = "点赞")
     @Parameters({
             @Parameter(name = "type", description = "点赞类型", required = true),
@@ -44,6 +46,7 @@ public class LikeController {
         return likeService.userLike(type, typeId);
     }
 
+    @CheckBlacklist
     @Operation(summary = "取消点赞")
     @Parameters({
             @Parameter(name = "type", description = "点赞类型", required = true),
