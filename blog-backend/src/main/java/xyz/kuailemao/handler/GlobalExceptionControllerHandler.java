@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import xyz.kuailemao.domain.response.ResponseResult;
 import xyz.kuailemao.enums.RespEnum;
+import xyz.kuailemao.exceptions.BlackListException;
 import xyz.kuailemao.exceptions.FileUploadException;
 
 import java.util.Objects;
@@ -45,6 +46,12 @@ public class GlobalExceptionControllerHandler {
         log.error("文件上传异常:{}({})", e.getMessage(), e.getStackTrace());
         String bindingResult = e.getMessage();
         return ResponseResult.failure(RespEnum.FILE_UPLOAD_ERROR.getCode(), bindingResult);
+    }
+
+    @ExceptionHandler(BlackListException.class)
+    public ResponseResult<Void> handlerBlackListException(BlackListException e){
+        log.error("黑名单异常:{}({})", e.getMessage(), e.getStackTrace());
+        return ResponseResult.failure(RespEnum.BLACK_LIST_ERROR.getCode(), e.getMessage());
     }
 
     // 最大的异常，防止出现其他不明异常无法处理

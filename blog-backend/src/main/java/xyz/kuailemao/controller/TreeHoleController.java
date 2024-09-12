@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.kuailemao.annotation.AccessLimit;
+import xyz.kuailemao.annotation.CheckBlacklist;
 import xyz.kuailemao.annotation.LogAnnotation;
 import xyz.kuailemao.constants.LogConst;
 import xyz.kuailemao.domain.dto.SearchTreeHoleDTO;
@@ -36,6 +37,7 @@ public class TreeHoleController {
     @Resource
     private TreeHoleService treeHoleService;
 
+    @CheckBlacklist
     @Operation(summary = "添加树洞")
     @AccessLimit(seconds = 60, maxCount = 60)
     @PostMapping("/auth/addTreeHole")

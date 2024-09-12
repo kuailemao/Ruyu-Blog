@@ -109,8 +109,6 @@ function addChildComment(comment: any) {
       prop.getComments(route.params.id, '1', prop.pageSize)
     } else if (res.code === 1002) {
       ElMessage.error(res.msg);
-    } else {
-      ElMessage.error("出现问题，请联系管理员");
     }
   })
 }

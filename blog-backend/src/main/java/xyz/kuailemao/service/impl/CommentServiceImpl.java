@@ -21,6 +21,7 @@ import xyz.kuailemao.domain.response.ResponseResult;
 import xyz.kuailemao.domain.vo.ArticleCommentVO;
 import xyz.kuailemao.domain.vo.CommentListVO;
 import xyz.kuailemao.domain.vo.PageVO;
+import xyz.kuailemao.enums.CommentEnum;
 import xyz.kuailemao.enums.LikeEnum;
 import xyz.kuailemao.enums.MailboxAlertsEnum;
 import xyz.kuailemao.mapper.*;
@@ -143,9 +144,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     /**
      * 评论邮箱提醒
+     *
      * @param commentDTO 前端DTO
-     * @param user 用户
-     * @param comment 新增评论消息
+     * @param user       用户
+     * @param comment    新增评论消息
      * @return ResponseResult
      */
     public ResponseResult<String> commentEmailReminder(UserCommentDTO commentDTO, User user, Comment comment) {
@@ -154,25 +156,27 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         // 评论
         if (StringUtils.isNull(commentDTO.getReplyId())) {
 
-            if ((commentDTO.getType() == 1 && !articleEmailNotice) || commentDTO.getType() == 2 && !messageEmailNotice) return ResponseResult.success();
+            if ((commentDTO.getType() == 1 && !articleEmailNotice) || commentDTO.getType() == 2 && !messageEmailNotice)
+                return ResponseResult.success();
 
             Map<String, Object> selectWhereMap = new HashMap<>();
             selectWhereMap.put("commentType", commentDTO.getType());
             selectWhereMap.put("commentId", comment.getId());
 
             // 留言提示对应发布留言的用户
-            if(commentDTO.getType() == 1) {
+            if (commentDTO.getType() == 1) {
                 if (Objects.equals(fromUser, user.getEmail())) return ResponseResult.success();
                 // 发邮箱给站长
                 publicService.sendEmail(MailboxAlertsEnum.COMMENT_NOTIFICATION_EMAIL.getCodeStr(), fromUser, selectWhereMap);
             }
 
             if (commentDTO.getType() == 2) {
-               // 查出回复的该留言用户的邮箱
+                // 查出回复的该留言用户的邮箱
                 LeaveWord leaveWord = leaveWordMapper.selectOne(new LambdaQueryWrapper<LeaveWord>().eq(LeaveWord::getId, commentDTO.getTypeId()));
                 User replyUser = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, leaveWord.getUserId()));
                 // 用户没绑定邮箱，或者回复的留言是自己
-                if (Objects.equals(replyUser.getEmail(), null) || Objects.equals(replyUser.getEmail(), user.getEmail())) return ResponseResult.success();
+                if (Objects.equals(replyUser.getEmail(), null) || Objects.equals(replyUser.getEmail(), user.getEmail()))
+                    return ResponseResult.success();
                 // 发送邮箱给该留言的用户
                 publicService.sendEmail(MailboxAlertsEnum.COMMENT_NOTIFICATION_EMAIL.getCodeStr(), replyUser.getEmail(), selectWhereMap);
             }
@@ -180,7 +184,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         // 回复评论
         if (Objects.nonNull(commentDTO.getReplyId())) {
             User replyUser = userMapper.selectById(commentDTO.getReplyUserId());
-            if ((commentDTO.getType() == 1 && !articleReplyNotice) || (commentDTO.getType() == 2 && !messageReplyNotice)) return ResponseResult.success();
+            if ((commentDTO.getType() == 1 && !articleReplyNotice) || (commentDTO.getType() == 2 && !messageReplyNotice))
+                return ResponseResult.success();
 
             // 如果用户回复自己并且回复人是站长就无需提醒
             if (Objects.equals(replyUser.getEmail(), user.getEmail()) && Objects.equals(fromUser, user.getEmail())) {
@@ -206,7 +211,6 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     }
 
 
-
     @Override
     public List<CommentListVO> getBackCommentList(SearchCommentDTO searchDTO) {
         LambdaQueryWrapper<Comment> wrapper = new LambdaQueryWrapper<>();
@@ -230,8 +234,24 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     public ResponseResult<Void> isCheckComment(CommentIsCheckDTO isCheckDTO) {
         LambdaUpdateWrapper<Comment> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(Comment::getId, isCheckDTO.getId()).or().eq(Comment::getParentId, isCheckDTO.getId());
-        if (commentMapper.update(Comment.builder().id(isCheckDTO.getId()).isCheck(isCheckDTO.getIsCheck()).build(), wrapper) > 0)
+        int updateCount = commentMapper.update(Comment.builder().id(isCheckDTO.getId()).isCheck(isCheckDTO.getIsCheck()).build(), wrapper);
+        if (updateCount > 0) {
+            // 同步redis评论数量
+            // 如果是文章评论，则改变redis中文章数量
+            // 1.查询评论所在的文章id
+            Integer articleId = commentMapper
+                    .selectOne(
+                            new LambdaQueryWrapper<Comment>()
+                                    .eq(Comment::getId, isCheckDTO.getId())
+                                    .eq(Comment::getType, CommentEnum.COMMENT_TYPE_ARTICLE.getType())).getTypeId();
+            // 2.修改redis数量
+            if (Objects.equals(isCheckDTO.getIsCheck(), SQLConst.COMMENT_IS_CHECK)) {
+                redisCache.incrementCacheMapValue(RedisConst.ARTICLE_COMMENT_COUNT, articleId.toString(), updateCount);
+            } else {
+                redisCache.incrementCacheMapValue(RedisConst.ARTICLE_COMMENT_COUNT, articleId.toString(), -updateCount);
+            }
             return ResponseResult.success();
+        }
 
         return ResponseResult.failure();
     }
