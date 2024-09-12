@@ -8,7 +8,6 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import xyz.kuailemao.annotation.AccessLimit;
-import xyz.kuailemao.annotation.CheckBlacklist;
 import xyz.kuailemao.annotation.LogAnnotation;
 import xyz.kuailemao.constants.LogConst;
 import xyz.kuailemao.domain.dto.AddBlackListDTO;
@@ -60,6 +59,19 @@ public class BlackListController {
     @PutMapping("/update")
     public ResponseResult<Void> updateBlackList(@RequestBody @Valid UpdateBlackListDTO updateBlackListDTO) {
         return blackListService.updateBlackList(updateBlackListDTO);
+    }
+
+    /**
+     * 是否封禁
+     */
+    @PreAuthorize("hasAnyAuthority('blog:black:update')")
+    @Operation(summary = "是否封禁")
+    @Parameter(name = "id", description = "id")
+    @LogAnnotation(module = "黑名单管理", operation = LogConst.UPDATE)
+    @AccessLimit(seconds = 60, maxCount = 30)
+    @PutMapping("/update/{id}")
+    public ResponseResult<Void> updateIsBan(@PathVariable("id") Long id) {
+        return blackListService.updateIsBan(id);
     }
 
     /**
