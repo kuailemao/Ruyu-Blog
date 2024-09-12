@@ -48,4 +48,11 @@ public interface BlackListService extends IService<BlackList> {
      * @return 是否成功
      */
     ResponseResult<Void> deleteBlackList(Long id);
+
+    /**
+     * 是否封禁
+     * @param id 黑名单id
+     * @return 是否成功
+     */
+    ResponseResult<Void> updateIsBan(Long id);
 }

@@ -8,6 +8,7 @@ import xyz.kuailemao.domain.dto.AddBlackListDTO;
 import xyz.kuailemao.domain.dto.UpdateBlackListDTO;
 import xyz.kuailemao.domain.entity.BlackList;
 import xyz.kuailemao.domain.response.ResponseResult;
+import xyz.kuailemao.enums.BlackListEnum;
 import xyz.kuailemao.mapper.BlackListMapper;
 import xyz.kuailemao.service.BlackListService;
 import xyz.kuailemao.utils.SecurityUtils;
@@ -66,6 +67,27 @@ public class BlackListServiceImpl extends ServiceImpl<BlackListMapper, BlackList
     @Override
     public ResponseResult<Void> deleteBlackList(Long id) {
         if (this.removeById(id)) {
+            return ResponseResult.success();
+        }
+        return ResponseResult.failure();
+    }
+
+    @Override
+    public ResponseResult<Void> updateIsBan(Long id) {
+        BlackList blackList = blackListMapper.selectById(id);
+        if (blackList == null) return ResponseResult.failure();
+        Integer isUnbanned = null;
+        switch (blackList.getIsUnbanned()) {
+            case 0:
+                isUnbanned = BlackListEnum.IS_NOT_BANNED.getCode();
+                break;
+            case 1:
+                isUnbanned = BlackListEnum.IS_BANNED.getCode();
+                break;
+            default:
+                break;
+        }
+        if (this.updateById(BlackList.builder().id(id).isUnbanned(isUnbanned).build())) {
             return ResponseResult.success();
         }
         return ResponseResult.failure();

@@ -2,7 +2,7 @@ server:
   port: 8088
 spring:
   profiles:
-    active: dev
+    active: "@profiles.active@"
 #  security:
 #    jwt:
 #      key: jwt-key
