@@ -214,7 +214,7 @@ function closeModalFunc() {
         label="用户名称"
         name="username"
       >
-        <a-input v-model:value="formState.username" placeholder="请输人用户名称" style="width: 250px" />
+        <a-input v-model:value="formState.username" placeholder="请输入用户名称" style="width: 250px" />
       </a-form-item>
       <a-form-item
         label="用户邮箱"

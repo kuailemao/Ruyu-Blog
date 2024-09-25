@@ -5,10 +5,18 @@ import { createVNode } from 'vue'
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
 import { getMenusApi } from '~/api/common/menu.ts'
 import { buildTree } from '~/utils/tree.ts'
-import { addTag, deleteTagByIds, searchTag, searchTagById, tagList, updateTag } from '~/api/blog/tag'
+import {
+  categoryList,
+  deleteCategoryByIds,
+  searchCategory,
+  searchCategoryById,
+  updateCategory,
+} from '~/api/blog/category'
+import { addCategory } from '~/api/blog/article'
+import {blackList} from "~/api/blog/black-list";
 
 const formState = reactive({
-  tagName: undefined,
+  categoryName: undefined,
   time: undefined,
 })
 
@@ -23,23 +31,33 @@ interface DataType {
 
 const columns: any = [
   {
-    title: '标签编号',
+    title: '名单编号',
     dataIndex: 'id',
     align: 'center',
   },
   {
-    title: '标签名称',
-    dataIndex: 'tagName',
+    title: '用户名称',
+    dataIndex: 'categoryName',
     align: 'center',
   },
   {
-    title: '文章数量',
-    dataIndex: 'articleCount',
-    align: 'center',
-  },
-  {
-    title: '创建时间',
+    title: '封禁时间',
     dataIndex: 'createTime',
+    align: 'center',
+  },
+  {
+    title: '解封时间',
+    dataIndex: 'createTime',
+    align: 'center',
+  },
+  {
+    title: '是否解封',
+    dataIndex: 'categoryName',
+    align: 'center',
+  },
+  {
+    title: '封禁理由',
+    dataIndex: 'categoryName',
     align: 'center',
   },
   {
@@ -66,18 +84,7 @@ onMounted(() => {
 
 async function refreshFunc(searchData?: object) {
   loading.value = true
-  let newData: any = []
-  if (searchData) {
-    newData = searchData
-  }
-  else {
-    const { data } = await tagList()
-    newData = data
-  }
-  newData.map((item: any) => {
-    return item.status = item.status === 0
-  })
-  tabData.value = newData
+  tabData.value = await blackList(searchData)
   loading.value = false
 }
 
@@ -94,8 +101,7 @@ async function onFinish(values: any) {
   }
 
   loading.value = true
-  const { data } = await searchTag(submitData)
-  await refreshFunc(data)
+  await refreshFunc(values)
 }
 
 const state = reactive<{
@@ -124,16 +130,16 @@ const modalInfo = reactive({
 const treeData = ref()
 const formData = ref()
 
-function deleteTag(ids: string[], type?: number) {
+function deleteCategory(ids: string[], type?: number) {
   if (type === 0) {
     Modal.confirm({
       title: '注意',
       icon: createVNode(ExclamationCircleOutlined),
-      content: `确定删除编号为 【${ids.join(',')}】 的标签吗？`,
+      content: `确定删除编号为 【${ids.join(',')}】 的分类吗？`,
       okText: '确认',
       cancelText: '取消',
       onOk: () => {
-        deleteTagByIds(ids).then((res) => {
+        deleteCategoryByIds(ids).then((res) => {
           if (res.code === 200) {
             message.success('删除成功')
             state.selectedRowKeys = []
@@ -144,7 +150,7 @@ function deleteTag(ids: string[], type?: number) {
     })
     return
   }
-  deleteTagByIds(ids).then((res) => {
+  deleteCategoryByIds(ids).then((res) => {
     if (res.code === 200) {
       message.success('删除成功')
       state.selectedRowKeys = []
@@ -153,19 +159,19 @@ function deleteTag(ids: string[], type?: number) {
   })
 }
 
-async function updateOrInsertTag(id?: string) {
+async function updateOrInsertCategory(id?: string) {
   const { data } = await getMenusApi(1) as any
   treeData.value = buildTree(data)
   if (id) {
-    const { data: tagInfo } = await searchTagById(id)
-    formData.value = tagInfo
+    const { data: categoryInfo } = await searchCategoryById(id)
+    formData.value = categoryInfo
     modalInfo.open = true
-    modalInfo.title = '修改标签'
+    modalInfo.title = '修改分类'
   }
   else {
     formData.value = {}
     modalInfo.open = true
-    modalInfo.title = '添加标签'
+    modalInfo.title = '添加分类'
   }
 }
 
@@ -173,18 +179,20 @@ async function updateOrInsertTag(id?: string) {
 async function modelOk() {
   modalInfo.loading = true
   if (formData.value.id) {
-    await updateTag(formData.value).then((res) => {
-      modalInfo.loading = false
-      if (res.code === 200)
+    await updateCategory(formData.value).then((res) => {
+      if (res.code === 200) {
+        modalInfo.loading = false
         message.success('修改成功')
-    }).catch()
+      }
+    })
   }
   else {
-    await addTag(formData.value).then((res) => {
-      modalInfo.loading = false
-      if (res.code === 200)
+    await addCategory(formData.value).then((res) => {
+      if (res.code === 200) {
+        modalInfo.loading = false
         message.success('添加成功')
-    }).catch(() => modalInfo.loading = false)
+      }
+    })
   }
   modalInfo.open = false
   await refreshFunc()
@@ -193,38 +201,57 @@ async function modelOk() {
 
 <template>
   <layout
-    :form-state="formState"
-    @update:refresh-func="refreshFunc"
-    @update:on-finish="onFinish"
+      :form-state="formState"
+      @update:refresh-func="refreshFunc"
+      @update:on-finish="onFinish"
   >
     <template #form-items>
       <a-form-item
-        label="标签名称"
-        name="tagName"
+          label="用户名称"
+          name="categoryName"
       >
-        <a-input v-model:value="formState.tagName" placeholder="请输入标签名称" style="width: 250px" />
+        <a-input v-model:value="formState.categoryName" placeholder="请输入用户名称" style="width: 150px" />
       </a-form-item>
       <a-form-item
-        label="创建时间"
-        name="time"
+          label="封禁时间"
+          name="time"
       >
         <a-range-picker v-model:value="formState.time" :placeholder="['开始时间', '结束时间']" />
       </a-form-item>
+      <a-form-item
+          label="封禁理由"
+          name="categoryName"
+      >
+        <a-input v-model:value="formState.categoryName" placeholder="请输入封禁理由" style="width: 200px" />
+      </a-form-item>
+      <a-form-item label="是否通过" name="isCheck" style="margin-right: 1rem">
+        <a-select
+            style="width: 7em"
+            placeholder="封禁状态"
+        >
+          <a-select-option :value="1">
+            是
+          </a-select-option>
+          <a-select-option :value="0">
+            否
+          </a-select-option>
+        </a-select>
+      </a-form-item>
     </template>
     <template #operate-btn>
-      <a-button type="primary" @click="updateOrInsertTag()">
+      <a-button type="primary" @click="updateOrInsertCategory()">
         <template #icon>
           <PlusOutlined />
         </template>
         新增
       </a-button>
-      <a-button class="green" :disabled="!hasSelected" @click="updateOrInsertTag(state.selectedRowKeys[0] as string)">
+      <a-button class="green" :disabled="!hasSelected" @click="updateOrInsertCategory(state.selectedRowKeys[0] as string)">
         <template #icon>
           <FileSyncOutlined />
         </template>
         修改
       </a-button>
-      <a-button type="dashed" danger ghost :disabled="!(state.selectedRowKeys.length > 0)" @click="deleteTag(state.selectedRowKeys as string[], 0)">
+      <a-button type="dashed" danger ghost :disabled="!(state.selectedRowKeys.length > 0)" @click="deleteCategory(state.selectedRowKeys as string[], 0)">
         <template #icon>
           <DeleteOutlined />
         </template>
@@ -240,24 +267,24 @@ async function modelOk() {
     <template #table-content>
       <a-modal v-model:open="modalInfo.open" :title="modalInfo.title" :confirm-loading="modalInfo.loading" width="400px" @ok="modelOk">
         <a-form-item
-          label="标签名称"
-          name="tagName"
+            label="分类名称"
+            name="categoryName"
         >
-          <a-input v-model:value="formData.tagName" placeholder="请输入标签名称" show-count :maxlength="20" />
+          <a-input v-model:value="formData.categoryName" placeholder="请输入分类名称" show-count :maxlength="20" />
         </a-form-item>
       </a-modal>
       <a-table
-        :columns="columns"
-        :data-source="tabData"
-        :loading="loading"
-        :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
-        :row-key="record => record.id"
-        size="small"
+          :columns="columns"
+          :data-source="tabData"
+          :loading="loading"
+          :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
+          :row-key="record => record.id"
+          size="small"
       >
         <template #bodyCell="{ column, record }">
-          <template v-if="column.dataIndex === 'tagName'">
-            <a-tag color="blue">
-              <TagOutlined /><span>{{ record.tagName }}</span>
+          <template v-if="column.dataIndex === 'categoryName'">
+            <a-tag color="#2db7f5">
+              {{ record.categoryName }}
             </a-tag>
           </template>
           <template v-if="column.dataIndex === 'articleCount'">
@@ -266,17 +293,17 @@ async function modelOk() {
             </a-tag>
           </template>
           <template v-if="column.key === 'operation'">
-            <a-button type="link" style="padding: 0;" @click="updateOrInsertTag(record.id)">
+            <a-button type="link" style="padding: 0;" @click="updateOrInsertCategory(record.id)">
               <template #icon>
                 <FileSyncOutlined />
               </template>
               <span style="margin-inline-start:1px">修改</span>
             </a-button>
             <a-popconfirm
-              title="是否确定删除"
-              ok-text="Yes"
-              cancel-text="No"
-              @confirm="deleteTag([record.id])"
+                title="是否确定删除"
+                ok-text="Yes"
+                cancel-text="No"
+                @confirm="deleteCategory([record.id])"
             >
               <a-button type="link" style="padding: 0;margin-left: 5px">
                 <template #icon>

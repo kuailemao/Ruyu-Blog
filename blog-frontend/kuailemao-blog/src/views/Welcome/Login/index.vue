@@ -19,7 +19,7 @@ const form = reactive({
 
 const rule = {
   username: [
-    {required: true, message: '请输人用户名'}
+    {required: true, message: '请输入用户名'}
   ],
   password: [
     {required: true, message: '请输入密码'}

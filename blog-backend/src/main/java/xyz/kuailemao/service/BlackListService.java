@@ -5,6 +5,7 @@ import xyz.kuailemao.domain.dto.AddBlackListDTO;
 import xyz.kuailemao.domain.dto.UpdateBlackListDTO;
 import xyz.kuailemao.domain.entity.BlackList;
 import xyz.kuailemao.domain.response.ResponseResult;
+import xyz.kuailemao.domain.vo.BlackListVO;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ public interface BlackListService extends IService<BlackList> {
      * 获取黑名单
      * @return 黑名单
      */
-    List<BlackList> getBlackList();
+    List<BlackListVO> getBlackList();
 
     /**
      * 用户是否存在黑名单

@@ -55,6 +55,11 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
                     // 第一次访问，设置过期时间
                     redisCache.expire(key, seconds, TimeUnit.SECONDS);
                 } else if (count > maxCount) {
+                    // 超出限制15次封禁30分钟
+                    if ((maxCount - count) > 15) {
+                        redisCache.expire(key, 30, TimeUnit.MINUTES);
+                    }
+
                     WebUtil.renderString(response, ResponseResult.failure(RespEnum.REQUEST_FREQUENTLY.getCode(), accessLimit.msg()).asJsonString());
                     // 限制
                     log.warn("用户IP[" + ip + "]访问地址[" + uri + "]超过了限定的次数[" + maxCount + "]");

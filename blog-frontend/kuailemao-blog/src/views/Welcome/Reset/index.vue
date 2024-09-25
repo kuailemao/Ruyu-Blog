@@ -38,7 +38,7 @@ const rules = {
   ],
   email: [
     {required: true, message: '请输入邮件地址', trigger: 'blur'},
-    {type: 'email', message: '请输人合法的电子邮件地址', trigger: ['blur', 'change']}
+    {type: 'email', message: '请输入合法的电子邮件地址', trigger: ['blur', 'change']}
   ],
   code: [
     {required: true, message: '请输入获取的验证码', trigger: 'blur'},
@@ -58,7 +58,7 @@ function askCode() {
       }
     })
   } else {
-    ElMessage.warning('请输人正确的电子邮件')
+    ElMessage.warning('请输入正确的电子邮件')
   }
 }
 
@@ -109,7 +109,7 @@ function doReset() {
     <div style="margin: 0 20px" v-if="active === 0">
       <div style="margin-top: 80px">
         <div style="font-size: 25px;font-weight: bold">重置密码</div>
-        <div style="font-size: 14px;color: grey;margin-top: 1rem">请输人需要重置密码的电子邮件地址</div>
+        <div style="font-size: 14px;color: grey;margin-top: 1rem">请输入需要重置密码的电子邮件地址</div>
       </div>
       <div style="margin-top: 50px">
         <el-form :model="form" :rules="rules" ref="formRef">
@@ -125,7 +125,7 @@ function doReset() {
           <el-form-item prop="code">
             <el-row :gutter="10" style="width: 100%">
               <el-col :span="17">
-                <el-input v-model="form.code" maxlength="6" placeholder="请输人验证码">
+                <el-input v-model="form.code" maxlength="6" placeholder="请输入验证码">
                   <template #prefix>
                     <el-icon>
                       <EditPen></EditPen>

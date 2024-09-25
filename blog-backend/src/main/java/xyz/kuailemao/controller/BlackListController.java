@@ -1,7 +1,5 @@
 package xyz.kuailemao.controller;
 
-
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.annotation.Resource;
@@ -12,8 +10,8 @@ import xyz.kuailemao.annotation.LogAnnotation;
 import xyz.kuailemao.constants.LogConst;
 import xyz.kuailemao.domain.dto.AddBlackListDTO;
 import xyz.kuailemao.domain.dto.UpdateBlackListDTO;
-import xyz.kuailemao.domain.entity.BlackList;
 import xyz.kuailemao.domain.response.ResponseResult;
+import xyz.kuailemao.domain.vo.BlackListVO;
 import xyz.kuailemao.service.BlackListService;
 import org.springframework.web.bind.annotation.*;
 import xyz.kuailemao.utils.ControllerUtils;
@@ -82,7 +80,7 @@ public class BlackListController {
     @LogAnnotation(module = "黑名单管理", operation = LogConst.GET)
     @AccessLimit(seconds = 60, maxCount = 30)
     @GetMapping("/getBlackListing")
-    public ResponseResult<List<BlackList>> getBlackList() {
+    public ResponseResult<List<BlackListVO>> getBlackList() {
         return ControllerUtils.messageHandler(() -> blackListService.getBlackList());
     }
 
