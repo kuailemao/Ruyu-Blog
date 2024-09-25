@@ -211,7 +211,7 @@ async function modelOk() {
         label="分类名称"
         name="categoryName"
       >
-        <a-input v-model:value="formState.categoryName" placeholder="请输人分类名称" style="width: 250px" />
+        <a-input v-model:value="formState.categoryName" placeholder="请输入分类名称" style="width: 250px" />
       </a-form-item>
       <a-form-item
         label="创建时间"
@@ -252,7 +252,7 @@ async function modelOk() {
           label="分类名称"
           name="categoryName"
         >
-          <a-input v-model:value="formData.categoryName" placeholder="请输人分类名称" show-count :maxlength="20" />
+          <a-input v-model:value="formData.categoryName" placeholder="请输入分类名称" show-count :maxlength="20" />
         </a-form-item>
       </a-modal>
       <a-table

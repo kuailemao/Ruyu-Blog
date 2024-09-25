@@ -223,7 +223,7 @@ async function updateOrInsertRole(id?: string) {
         label="角色名称"
         name="roleName"
       >
-        <a-input v-model:value="formState.roleName" placeholder="请输人角色名称" style="width: 250px" />
+        <a-input v-model:value="formState.roleName" placeholder="请输入角色名称" style="width: 250px" />
       </a-form-item>
       <a-form-item
         label="角色字符"

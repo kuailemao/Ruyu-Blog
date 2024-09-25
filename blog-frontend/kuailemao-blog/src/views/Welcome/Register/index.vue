@@ -25,7 +25,7 @@ const form = reactive({
 // 验证用户名
 const validateUsername = (rule, value, callback) => {
   if (value === '') {
-    callback(new Error('请输人用户名'))
+    callback(new Error('请输入用户名'))
   } else if (!/[a-zA-Z0-9\u4e00-\u9fa5]+$/.test(value)) {
     callback(new Error('用户名不能包含特殊字符，只能是中/英文'))
   } else {
@@ -57,7 +57,7 @@ const rules = {
   ],
   email: [
     {required: true, message: '请输入邮件地址', trigger: 'blur'},
-    {type: 'email', message: '请输人合法的电子邮件地址', trigger: ['blur', 'change']}
+    {type: 'email', message: '请输入合法的电子邮件地址', trigger: ['blur', 'change']}
   ],
   code: [
     {required: true, message: '请输入获取的验证码', trigger: 'blur'},
@@ -83,7 +83,7 @@ function askCode() {
       }
     })
   } else {
-    ElMessage.warning('请输人正确的电子邮件')
+    ElMessage.warning('请输入正确的电子邮件')
   }
 }
 
@@ -156,7 +156,7 @@ function registerBtn() {
         <el-form-item prop="code">
           <el-row :gutter="10" style="width: 100%">
             <el-col :span="17">
-              <el-input v-model="form.code" maxlength="6" placeholder="请输人验证码">
+              <el-input v-model="form.code" maxlength="6" placeholder="请输入验证码">
                 <template #prefix>
                   <el-icon>
                     <EditPen></EditPen>

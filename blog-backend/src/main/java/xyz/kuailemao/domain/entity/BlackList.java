@@ -3,10 +3,13 @@ package xyz.kuailemao.domain.entity;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import xyz.kuailemao.domain.BaseData;
+import xyz.kuailemao.domain.ip.BlackListIpInfo;
 
 
 /**
@@ -20,7 +23,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName("t_black_list")
-public class BlackList {
+public class BlackList implements BaseData{
     //表id
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -28,13 +31,16 @@ public class BlackList {
     private Long userId;
     //封禁理由
     private String reason;
-    //是否解除封禁(0：未解除 1：解除) 默认：0
-    private Integer isUnbanned;
     //封禁时间
     @TableField(fill = FieldFill.INSERT)
     private Date bannedTime;
     //到期时间
     private Date expiresTime;
+    // 类型（1：用户，2：路人/攻击者）
+    private Integer type;
+    // ip信息，如果type=2，则需要有ip信息
+    @TableField(value = "ip_info",typeHandler = JacksonTypeHandler.class)
+    private BlackListIpInfo ipInfo;
     //创建时间
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;

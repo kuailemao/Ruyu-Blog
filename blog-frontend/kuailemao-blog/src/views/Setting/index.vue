@@ -100,7 +100,7 @@ onMounted(() => {
 // 验证用户昵称
 const validateUsername = (_: any, value: any, callback: any) => {
   if (value === '') {
-    callback(new Error('请输人用户昵称'))
+    callback(new Error('请输入用户昵称'))
   } else if (!/[a-zA-Z0-9\u4e00-\u9fa5]+$/.test(value)) {
     callback(new Error('用户名不能包含特殊字符，只能是中/英文'))
   } else {
@@ -121,7 +121,7 @@ const nicknameRules = {
 const emailRules: FormRules = {
   email: [
     {required: true, message: '请输入邮件地址', trigger: 'blur'},
-    {type: 'email', message: '请输人合法的电子邮件地址', trigger: ['blur', 'change']}
+    {type: 'email', message: '请输入合法的电子邮件地址', trigger: ['blur', 'change']}
   ],
   code: [
     {required: true, message: '请输入获取的验证码', trigger: 'blur'},
