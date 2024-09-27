@@ -6,6 +6,7 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
+import xyz.kuailemao.constants.RedisConst;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -146,6 +147,20 @@ public class RedisCache {
      */
     public <T> Set<T> getCacheSet(final String key) {
         return redisTemplate.opsForSet().members(key);
+    }
+
+    /**
+     * 增加缓存set
+     */
+    public <T> Long addCacheSetValue(final String key, final T data) {
+        return redisTemplate.opsForSet().add(key, data);
+    }
+
+    /**
+     * 是否存在set值
+     */
+    public Boolean isSetValue(final String key, final String sValue) {
+        return redisTemplate.opsForSet().isMember(key, sValue);
     }
 
     /**

@@ -64,4 +64,14 @@ public class RedisConst {
      * 邮箱确认友链通过，状态码
      */
     public static final String EMAIL_VERIFICATION_LINK = "email:verification:link:";
+
+    /**
+     * 缓存黑名单--uid
+     */
+    public static final String BLACK_LIST_UID_KEY = "blackList:uid:";
+
+    /**
+     * 缓存黑名单--ip
+     */
+    public static final String BLACK_LIST_IP_KEY = "blackList:ip:";
 }

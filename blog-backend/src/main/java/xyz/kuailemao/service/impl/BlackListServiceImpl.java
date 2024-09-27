@@ -1,11 +1,14 @@
 package xyz.kuailemao.service.impl;
 
 import cn.hutool.core.thread.NamedThreadFactory;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import xyz.kuailemao.constants.BlackListConst;
+import xyz.kuailemao.constants.RedisConst;
+import xyz.kuailemao.constants.SQLConst;
 import xyz.kuailemao.domain.dto.AddBlackListDTO;
 import xyz.kuailemao.domain.dto.UpdateBlackListDTO;
 import xyz.kuailemao.domain.entity.BlackList;
@@ -18,10 +21,12 @@ import xyz.kuailemao.mapper.UserMapper;
 import xyz.kuailemao.service.BlackListService;
 import xyz.kuailemao.service.IpService;
 import xyz.kuailemao.utils.IpUtils;
+import xyz.kuailemao.utils.RedisCache;
 import xyz.kuailemao.utils.SecurityUtils;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -45,32 +50,40 @@ public class BlackListServiceImpl extends ServiceImpl<BlackListMapper, BlackList
     @Resource
     private UserMapper userMapper;
 
+    @Resource
+    private RedisCache redisCache;
+
     @Override
     public ResponseResult<Void> addBlackList(AddBlackListDTO addBlackListDTO) {
         BlackList blackList = BlackList.builder()
                 .userId(addBlackListDTO.getUserId())
                 .reason(addBlackListDTO.getReason())
-                .type(SecurityUtils.getUserId() > 0L ? BlackListConst.BLACK_LIST_TYPE_USER : BlackListConst.BLACK_LIST_TYPE_BOT)
+                // TODO
+                .type(
+                        null != addBlackListDTO.getUserId() ?
+                                BlackListConst.BLACK_LIST_TYPE_USER :
+                                BlackListConst.BLACK_LIST_TYPE_BOT
+                )
                 .expiresTime(addBlackListDTO.getExpiresTime()).build();
         // 非本地用户
         if (blackList.getType() == BlackListConst.BLACK_LIST_TYPE_BOT) {
             BlackListIpInfo blackListIpInfo = BlackListIpInfo.builder()
-//                    .ip(IpUtils.getIpAddr(SecurityUtils.getCurrentHttpRequest()))
-                    .ip("27.47.133.94")
+                    .ip(IpUtils.getIpAddr(SecurityUtils.getCurrentHttpRequest()))
                     .build();
             blackList.setIpInfo(blackListIpInfo);
         }
         if (this.save(blackList)) {
-            if (blackList.getType() == BlackListConst.BLACK_LIST_TYPE_BOT)
+            if (blackList.getType() == BlackListConst.BLACK_LIST_TYPE_BOT) {
+                // 更新redis缓存
+                redisCache.setCacheMapValue(RedisConst.BLACK_LIST_IP_KEY, blackList.getIpInfo().getIp(), blackList.getExpiresTime());
                 ipService.refreshIpDetailAsyncByBid(blackList.getId());
-            return ResponseResult.success();
+                return ResponseResult.success();
+            } else if (blackList.getType() == BlackListConst.BLACK_LIST_TYPE_USER) {
+                redisCache.addCacheSetValue(RedisConst.BLACK_LIST_UID_KEY, blackList.getUserId());
+            }
         }
         return ResponseResult.failure();
     }
-
-    private static ExecutorService executor = new ThreadPoolExecutor(1, 1,
-            0L, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>(500), new NamedThreadFactory("refresh-ipDetail", false));
 
     @Override
     public List<BlackListVO> getBlackList() {

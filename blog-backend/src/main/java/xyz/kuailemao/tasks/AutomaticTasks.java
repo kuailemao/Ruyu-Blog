@@ -26,6 +26,7 @@ public class AutomaticTasks implements ApplicationRunner {
         redisService.articleCountClear();
         redisService.articleVisitCount();
         redisService.clearLimitCache();
+        redisService.initBlackList();
         redisService.initCount();
         log.info("--------执行初始化任务结束--------");
     }

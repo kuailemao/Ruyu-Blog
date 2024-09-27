@@ -9,6 +9,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Service;
+import xyz.kuailemao.constants.ThirdPartyInterfaceConst;
 import xyz.kuailemao.domain.dto.IpResult;
 import xyz.kuailemao.domain.entity.BlackList;
 import xyz.kuailemao.domain.ip.IpDetail;
@@ -70,17 +71,18 @@ public class IpServiceImpl implements IpService, DisposableBean {
     //测试耗时结果 100次查询总耗时约100s，平均一次成功查询需要1s,可以接受
     //第99次成功,目前耗时：111281ms
     public static void main(String[] args) {
-        Date begin = new Date();
-        for (int i = 0; i < 100; i++) {
-            int finalI = i;
-            EXECUTOR.execute(() -> {
-                IpDetail ipDetail = TryGetIpDetailOrNullTreeTimes("27.47.133.94");
-                if (Objects.nonNull(ipDetail)) {
-                    Date date = new Date();
-                    System.out.printf("第%d次成功,目前耗时：%dms%n", finalI, (date.getTime() - begin.getTime()));
-                }
-            });
-        }
+//        Date begin = new Date();
+//        for (int i = 0; i < 100; i++) {
+//            int finalI = i;
+//            EXECUTOR.execute(() -> {
+//                IpDetail ipDetail = TryGetIpDetailOrNullTreeTimes("27.47.133.94");
+//                if (Objects.nonNull(ipDetail)) {
+//                    Date date = new Date();
+//                    System.out.printf("第%d次成功,目前耗时：%dms%n", finalI, (date.getTime() - begin.getTime()));
+//                }
+//            });
+//        }
+        System.out.println(StrUtil.format(ThirdPartyInterfaceConst.TAOBAO_IP_DETAIL, "1433223"));
     }
 
     private static IpDetail TryGetIpDetailOrNullTreeTimes(String ip) {
@@ -100,7 +102,7 @@ public class IpServiceImpl implements IpService, DisposableBean {
     }
 
     public static IpDetail getIpDetailOrNull(String ip) {
-        String body = HttpUtil.get("https://ip.taobao.com/outGetIpInfo?ip=" + ip + "&accessKey=alibaba-inc");
+        String body = HttpUtil.get(StrUtil.format(ThirdPartyInterfaceConst.TAOBAO_IP_DETAIL, ip));
         try {
             IpResult<IpDetail> result = JSONUtil.toBean(body, new TypeReference<IpResult<IpDetail>>() {
             }, false);
