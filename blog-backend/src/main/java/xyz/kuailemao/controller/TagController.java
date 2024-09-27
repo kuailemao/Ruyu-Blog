@@ -34,7 +34,7 @@ public class TagController {
     private TagService tagService;
 
     @Operation(summary = "获取标签列表")
-    @RequestMapping("/list")
+    @GetMapping("/list")
     @AccessLimit(seconds = 60, maxCount = 60)
     public ResponseResult<List<TagVO>> list() {
         return ControllerUtils.messageHandler(() -> tagService.listAllTag());

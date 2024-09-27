@@ -22,7 +22,7 @@ import xyz.kuailemao.domain.ip.BlackListIpInfo;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("t_black_list")
+@TableName(value = "t_black_list", autoResultMap = true)
 public class BlackList implements BaseData{
     //表id
     @TableId(type = IdType.AUTO)
