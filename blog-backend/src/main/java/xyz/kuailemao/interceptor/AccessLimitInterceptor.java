@@ -70,7 +70,7 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
                 // 固定过期时间
                 String expireTimeKey = EXPIRE_TIME_KEY_PREFIX + key;
 
-                // 从Redis中获取过期时间，保证过期时间与数据库中的一致性
+                // 从Redis中获取过期时间，保证访问时间与封禁时间一直
                 Long expireTime = redisCache.getCacheObject(expireTimeKey);
 
                 // redis 进行自增
@@ -131,7 +131,7 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
             AddBlackListDTO addBlackListDTO = AddBlackListDTO.builder().userId((SecurityUtils.getUserId() == 0L || Objects.equals(SecurityUtils.getUserId(), SQLConst.ADMIN_ID)) ? null : SecurityUtils.getUserId())
                     .reason("疑似非法DDOS攻击\nIP:" + ip + "\n地址:" + uri + "\n请求次数:" + count)
                     // 封禁到十年后
-                    .expiresTime(DateUtil.offset(new Date(), DateField.YEAR, 10))
+                    .expiresTime(DateUtil.offset(DateUtil.date(expireTime), DateField.YEAR, 10))
                     .build();
             blackListService.addBlackList(addBlackListDTO);
             WebUtil.renderString(response, ResponseResult.failure(RespEnum.BLACK_LIST_ERROR.getCode(), "非法DDOS攻击，已被封禁十年，有问题联系网站管理员").asJsonString());
@@ -143,19 +143,19 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
             AddBlackListDTO addBlackListDTO = AddBlackListDTO.builder().userId((SecurityUtils.getUserId() == 0L || Objects.equals(SecurityUtils.getUserId(), SQLConst.ADMIN_ID)) ? null : SecurityUtils.getUserId())
                     .reason("疑似非法DDOS攻击\nIP:" + ip + "\n地址:" + uri + "\n请求次数:" + count)
                     // 封禁到一个月后
-                    .expiresTime(DateUtil.offset(new Date(), DateField.MONTH, 1))
+                    .expiresTime(DateUtil.offset(DateUtil.date(expireTime), DateField.MONTH, 1))
                     .build();
             blackListService.addBlackList(addBlackListDTO);
             WebUtil.renderString(response, ResponseResult.failure(RespEnum.BLACK_LIST_ERROR.getCode(), "疑似非法DDOS攻击，已被封禁一个月，有问题联系网站管理员").asJsonString());
             return true;
         }
         // 每分钟请求超过60封禁1小时
-        if (count > 2) {
+        if (count > 60) {
             // 封禁、加入黑名单
             AddBlackListDTO addBlackListDTO = AddBlackListDTO.builder().userId((SecurityUtils.getUserId() == 0L || Objects.equals(SecurityUtils.getUserId(), SQLConst.ADMIN_ID)) ? null : SecurityUtils.getUserId())
                     .reason("疑似非法DDOS攻击\nIP:" + ip + "\n地址:" + uri + "\n请求次数:" + count)
                     // 封禁到一小时后
-                    .expiresTime(DateUtil.offset(DateUtil.date(expireTime), DateField.MINUTE, 1))
+                    .expiresTime(DateUtil.offset(DateUtil.date(expireTime), DateField.HOUR, 1))
                     .build();
             blackListService.addBlackList(addBlackListDTO);
             WebUtil.renderString(response, ResponseResult.failure(RespEnum.BLACK_LIST_ERROR.getCode(), "请求过于频繁,已被封禁一小时，有问题联系网站管理员").asJsonString());
