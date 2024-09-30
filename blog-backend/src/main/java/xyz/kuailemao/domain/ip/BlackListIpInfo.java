@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class BlackListIpInfo {
     // 黑名单的ip
-    private String ip;
+    private String createIp;
     //添加时的ip详情
     private IpDetail ipDetail;
 }

@@ -113,7 +113,7 @@ public class RedisServiceImpl implements RedisService {
                 if (blackList.getUserId() != null) {
                     redisCache.setCacheMapValue(RedisConst.BLACK_LIST_UID_KEY, blackList.getUserId().toString(), blackList.getExpiresTime());
                 } else {
-                    redisCache.setCacheMapValue(RedisConst.BLACK_LIST_IP_KEY, blackList.getIpInfo().getIp(), blackList.getExpiresTime());
+                    redisCache.setCacheMapValue(RedisConst.BLACK_LIST_IP_KEY, blackList.getIpInfo().getCreateIp(), blackList.getExpiresTime());
                 }
             });
             log.info("--------成功执行初始化黑名单缓存--------");
