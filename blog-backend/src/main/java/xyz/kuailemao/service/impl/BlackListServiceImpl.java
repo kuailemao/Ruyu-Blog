@@ -26,11 +26,6 @@ import xyz.kuailemao.utils.SecurityUtils;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * (BlackList)表服务实现类
@@ -58,28 +53,24 @@ public class BlackListServiceImpl extends ServiceImpl<BlackListMapper, BlackList
         BlackList blackList = BlackList.builder()
                 .userId(addBlackListDTO.getUserId())
                 .reason(addBlackListDTO.getReason())
-                // TODO
                 .type(
                         null != addBlackListDTO.getUserId() ?
                                 BlackListConst.BLACK_LIST_TYPE_USER :
                                 BlackListConst.BLACK_LIST_TYPE_BOT
                 )
                 .expiresTime(addBlackListDTO.getExpiresTime()).build();
-        // 非本地用户
-        if (blackList.getType() == BlackListConst.BLACK_LIST_TYPE_BOT) {
-            BlackListIpInfo blackListIpInfo = BlackListIpInfo.builder()
-                    .ip(IpUtils.getIpAddr(SecurityUtils.getCurrentHttpRequest()))
-                    .build();
-            blackList.setIpInfo(blackListIpInfo);
-        }
+        BlackListIpInfo blackListIpInfo = BlackListIpInfo.builder()
+                .createIp(IpUtils.getIpAddr(SecurityUtils.getCurrentHttpRequest()))
+                .build();
+        blackList.setIpInfo(blackListIpInfo);
         if (this.save(blackList)) {
             if (blackList.getType() == BlackListConst.BLACK_LIST_TYPE_BOT) {
                 // 更新redis缓存
-                redisCache.setCacheMapValue(RedisConst.BLACK_LIST_IP_KEY, blackList.getIpInfo().getIp(), blackList.getExpiresTime());
+                redisCache.setCacheMapValue(RedisConst.BLACK_LIST_IP_KEY, blackList.getIpInfo().getCreateIp(), blackList.getExpiresTime());
                 ipService.refreshIpDetailAsyncByBid(blackList.getId());
                 return ResponseResult.success();
             } else if (blackList.getType() == BlackListConst.BLACK_LIST_TYPE_USER) {
-                redisCache.addCacheSetValue(RedisConst.BLACK_LIST_UID_KEY, blackList.getUserId());
+                redisCache.setCacheMapValue(RedisConst.BLACK_LIST_UID_KEY, blackList.getUserId().toString(), blackList.getExpiresTime());
             }
         }
         return ResponseResult.failure();

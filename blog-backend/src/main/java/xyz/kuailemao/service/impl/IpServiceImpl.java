@@ -54,7 +54,7 @@ public class IpServiceImpl implements IpService, DisposableBean {
             if (Objects.isNull(blackList)) {
                 return;
             }
-            String ip = blackList.getIpInfo().getIp();
+            String ip = blackList.getIpInfo().getCreateIp();
             if (StrUtil.isBlank(ip)) {
                 return;
             }
