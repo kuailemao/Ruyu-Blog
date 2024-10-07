@@ -82,9 +82,13 @@ public class BlackListServiceImpl extends ServiceImpl<BlackListMapper, BlackList
                 .map(blackList ->
                         blackList.asViewObject(
                                 BlackListVO.class, (black) ->
+                                {
+                                    if (blackList.getUserId() != null) {
                                         black.setUserName(
                                                 userMapper.selectById(blackList.getUserId()).getUsername()
-                                        )
+                                        );
+                                    }
+                                }
                         )
                 )
                 .toList();

@@ -2,6 +2,7 @@ package xyz.kuailemao.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import xyz.kuailemao.domain.ip.BlackListIpInfo;
 
 import java.util.Date;
 
@@ -21,6 +22,12 @@ public class BlackListVO {
     //封禁理由
     @Schema(description = "封禁理由")
     private String reason;
+    // 自动封禁、ip信息
+    @Schema(description = "自动封禁、ip信息")
+    private BlackListIpInfo ipInfo;
+    // 封禁类型
+    @Schema(description = "封禁类型")
+    private Integer type;
     //封禁时间
     @Schema(description = "封禁时间")
     private Date bannedTime;
