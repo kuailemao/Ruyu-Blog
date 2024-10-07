@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Ref, UnwrapRef } from 'vue'
-import { Modal, message } from 'ant-design-vue'
-import { createVNode } from 'vue'
-import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
-import { getMenusApi } from '~/api/common/menu.ts'
-import { buildTree } from '~/utils/tree.ts'
+import type {Ref, UnwrapRef} from 'vue'
+import {Modal, message} from 'ant-design-vue'
+import {createVNode} from 'vue'
+import {ExclamationCircleOutlined} from '@ant-design/icons-vue'
+import {getMenusApi} from '~/api/common/menu.ts'
+import {buildTree} from '~/utils/tree.ts'
 import {
   categoryList,
   deleteCategoryByIds,
@@ -12,7 +12,7 @@ import {
   searchCategoryById,
   updateCategory,
 } from '~/api/blog/category'
-import { addCategory } from '~/api/blog/article'
+import {addCategory} from '~/api/blog/article'
 import {blackList} from "~/api/blog/black-list";
 
 const formState = reactive({
@@ -37,27 +37,27 @@ const columns: any = [
   },
   {
     title: '用户名称',
-    dataIndex: 'categoryName',
+    dataIndex: 'userName',
     align: 'center',
   },
   {
     title: '封禁时间',
-    dataIndex: 'createTime',
+    dataIndex: 'bannedTime',
     align: 'center',
   },
   {
     title: '解封时间',
-    dataIndex: 'createTime',
+    dataIndex: 'expiresTime',
     align: 'center',
   },
   {
-    title: '是否解封',
-    dataIndex: 'categoryName',
+    title: '封禁类型',
+    dataIndex: 'type',
     align: 'center',
   },
   {
     title: '封禁理由',
-    dataIndex: 'categoryName',
+    dataIndex: 'reason',
     align: 'center',
   },
   {
@@ -84,7 +84,8 @@ onMounted(() => {
 
 async function refreshFunc(searchData?: object) {
   loading.value = true
-  tabData.value = await blackList(searchData)
+  const {data} = await blackList(searchData)
+  tabData.value = data
   loading.value = false
 }
 
@@ -160,15 +161,14 @@ function deleteCategory(ids: string[], type?: number) {
 }
 
 async function updateOrInsertCategory(id?: string) {
-  const { data } = await getMenusApi(1) as any
+  const {data} = await getMenusApi(1) as any
   treeData.value = buildTree(data)
   if (id) {
-    const { data: categoryInfo } = await searchCategoryById(id)
+    const {data: categoryInfo} = await searchCategoryById(id)
     formData.value = categoryInfo
     modalInfo.open = true
     modalInfo.title = '修改分类'
-  }
-  else {
+  } else {
     formData.value = {}
     modalInfo.open = true
     modalInfo.title = '添加分类'
@@ -185,8 +185,7 @@ async function modelOk() {
         message.success('修改成功')
       }
     })
-  }
-  else {
+  } else {
     await addCategory(formData.value).then((res) => {
       if (res.code === 200) {
         modalInfo.loading = false
@@ -210,30 +209,30 @@ async function modelOk() {
           label="用户名称"
           name="categoryName"
       >
-        <a-input v-model:value="formState.categoryName" placeholder="请输入用户名称" style="width: 150px" />
+        <a-input v-model:value="formState.categoryName" placeholder="请输入用户名称" style="width: 150px"/>
       </a-form-item>
       <a-form-item
           label="封禁时间"
           name="time"
       >
-        <a-range-picker v-model:value="formState.time" :placeholder="['开始时间', '结束时间']" />
+        <a-range-picker v-model:value="formState.time" :placeholder="['开始时间', '结束时间']"/>
       </a-form-item>
       <a-form-item
           label="封禁理由"
           name="categoryName"
       >
-        <a-input v-model:value="formState.categoryName" placeholder="请输入封禁理由" style="width: 200px" />
+        <a-input v-model:value="formState.categoryName" placeholder="请输入封禁理由" style="width: 200px"/>
       </a-form-item>
-      <a-form-item label="是否通过" name="isCheck" style="margin-right: 1rem">
+      <a-form-item label="封禁类型" name="isCheck" style="margin-right: 1rem">
         <a-select
             style="width: 7em"
-            placeholder="封禁状态"
+            placeholder="封禁类型"
         >
           <a-select-option :value="1">
-            是
+            手动封禁
           </a-select-option>
           <a-select-option :value="0">
-            否
+            自动封禁
           </a-select-option>
         </a-select>
       </a-form-item>
@@ -241,36 +240,39 @@ async function modelOk() {
     <template #operate-btn>
       <a-button type="primary" @click="updateOrInsertCategory()">
         <template #icon>
-          <PlusOutlined />
+          <PlusOutlined/>
         </template>
         新增
       </a-button>
-      <a-button class="green" :disabled="!hasSelected" @click="updateOrInsertCategory(state.selectedRowKeys[0] as string)">
+      <a-button class="green" :disabled="!hasSelected"
+                @click="updateOrInsertCategory(state.selectedRowKeys[0] as string)">
         <template #icon>
-          <FileSyncOutlined />
+          <FileSyncOutlined/>
         </template>
         修改
       </a-button>
-      <a-button type="dashed" danger ghost :disabled="!(state.selectedRowKeys.length > 0)" @click="deleteCategory(state.selectedRowKeys as string[], 0)">
+      <a-button type="dashed" danger ghost :disabled="!(state.selectedRowKeys.length > 0)"
+                @click="deleteCategory(state.selectedRowKeys as string[], 0)">
         <template #icon>
-          <DeleteOutlined />
+          <DeleteOutlined/>
         </template>
         删除
       </a-button>
       <a-button class="orange" @click="message.warn('别点了，有空再写')">
         <template #icon>
-          <VerticalAlignBottomOutlined />
+          <VerticalAlignBottomOutlined/>
         </template>
         导出
       </a-button>
     </template>
     <template #table-content>
-      <a-modal v-model:open="modalInfo.open" :title="modalInfo.title" :confirm-loading="modalInfo.loading" width="400px" @ok="modelOk">
+      <a-modal v-model:open="modalInfo.open" :title="modalInfo.title" :confirm-loading="modalInfo.loading" width="400px"
+               @ok="modelOk">
         <a-form-item
             label="分类名称"
             name="categoryName"
         >
-          <a-input v-model:value="formData.categoryName" placeholder="请输入分类名称" show-count :maxlength="20" />
+          <a-input v-model:value="formData.categoryName" placeholder="请输入分类名称" show-count :maxlength="20"/>
         </a-form-item>
       </a-modal>
       <a-table
@@ -282,20 +284,34 @@ async function modelOk() {
           size="small"
       >
         <template #bodyCell="{ column, record }">
-          <template v-if="column.dataIndex === 'categoryName'">
-            <a-tag color="#2db7f5">
-              {{ record.categoryName }}
+          <template v-if="column.dataIndex === 'type'">
+            <a-tag :color="record.type == 1 ? '#87d068' : '#f50'">
+              {{ record.type == 1 ? '手动封禁' : '自动封禁' }}
             </a-tag>
           </template>
-          <template v-if="column.dataIndex === 'articleCount'">
-            <a-tag>
-              {{ record.articleCount }}
-            </a-tag>
+          <!-- 系统自动封禁，没有用户名称，显示ip信息 -->
+          <template v-if="column.dataIndex === 'userName' && record.type == 2">
+            <a-popover title="IP信息" >
+              <template #content>
+                  <div :style="{ maxWidth: '300px', wordBreak: 'break-all' }">
+                  {{ record.ipInfo }}
+                </div>
+              </template>
+              <a-button>查看IP信息</a-button>
+            </a-popover>
+          </template>
+          <template v-else-if="column.dataIndex === 'reason' && record.reason.length > 10">
+            <a-popover title="封禁理由">
+              <template #content>
+                {{ record.reason }}
+              </template>
+              {{ record.reason.slice(0, 10) }}...
+            </a-popover>
           </template>
           <template v-if="column.key === 'operation'">
             <a-button type="link" style="padding: 0;" @click="updateOrInsertCategory(record.id)">
               <template #icon>
-                <FileSyncOutlined />
+                <FileSyncOutlined/>
               </template>
               <span style="margin-inline-start:1px">修改</span>
             </a-button>
@@ -307,15 +323,15 @@ async function modelOk() {
             >
               <a-button type="link" style="padding: 0;margin-left: 5px">
                 <template #icon>
-                  <DeleteOutlined />
+                  <DeleteOutlined/>
                 </template>
-                <span style="margin-inline-start:1px">删除</span>
+                <span style="margin-inline-start:1px">解除</span>
               </a-button>
             </a-popconfirm>
           </template>
           <template v-else-if="column.key === 'icon'">
             <!-- 图标 -->
-            <component :is="record.icon" />
+            <component :is="record.icon"/>
           </template>
         </template>
       </a-table>
