@@ -9,9 +9,11 @@ import xyz.kuailemao.annotation.AccessLimit;
 import xyz.kuailemao.annotation.LogAnnotation;
 import xyz.kuailemao.constants.LogConst;
 import xyz.kuailemao.domain.dto.AddBlackListDTO;
+import xyz.kuailemao.domain.dto.SearchBlackListDTO;
 import xyz.kuailemao.domain.dto.UpdateBlackListDTO;
 import xyz.kuailemao.domain.response.ResponseResult;
 import xyz.kuailemao.domain.vo.BlackListVO;
+import xyz.kuailemao.exceptions.BlackListException;
 import xyz.kuailemao.service.BlackListService;
 import org.springframework.web.bind.annotation.*;
 import xyz.kuailemao.utils.ControllerUtils;
@@ -42,7 +44,7 @@ public class BlackListController {
     @LogAnnotation(module = "黑名单管理", operation = LogConst.INSERT)
     @AccessLimit(seconds = 60, maxCount = 30)
     @PostMapping("/add")
-    public ResponseResult<Void> addBlackList(@RequestBody @Valid AddBlackListDTO addBlackListDTO) {
+    public ResponseResult<Void> addBlackList(@RequestBody @Valid AddBlackListDTO addBlackListDTO) throws BlackListException {
         return blackListService.addBlackList(addBlackListDTO);
     }
 
@@ -73,15 +75,15 @@ public class BlackListController {
     }
 
     /**
-     * 查询黑名单 TODO 待加入搜索
+     * 查询黑名单
      */
     @PreAuthorize("hasAnyAuthority('blog:black:select')")
     @Operation(summary = "查询黑名单")
     @LogAnnotation(module = "黑名单管理", operation = LogConst.GET)
     @AccessLimit(seconds = 60, maxCount = 30)
-    @GetMapping("/getBlackListing")
-    public ResponseResult<List<BlackListVO>> getBlackList() {
-        return ControllerUtils.messageHandler(() -> blackListService.getBlackList());
+    @PostMapping("/getBlackListing")
+    public ResponseResult<List<BlackListVO>> getBlackList(@RequestBody(required = false) SearchBlackListDTO searchBlackListDTO) {
+        return ControllerUtils.messageHandler(() -> blackListService.getBlackList(searchBlackListDTO));
     }
 
     /**
@@ -92,9 +94,9 @@ public class BlackListController {
     @Parameter(name = "id", description = "id")
     @LogAnnotation(module = "黑名单管理", operation = LogConst.DELETE)
     @AccessLimit(seconds = 60, maxCount = 30)
-    @DeleteMapping("/delete/{id}")
-    public ResponseResult<Void> deleteBlackList(@PathVariable("id") Long id) {
-        return blackListService.deleteBlackList(id);
+    @DeleteMapping("/delete")
+    public ResponseResult<Void> deleteBlackList(@RequestBody List<Long> ids) {
+        return blackListService.deleteBlackList(ids);
     }
 
 }

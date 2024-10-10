@@ -29,6 +29,8 @@
     "@antv/l7": "^2.19.10",
     "@ctrl/tinycolor": "^4.0.2",
     "@v-c/utils": "^0.0.26",
+    "@volar/language-server": "2.4.0-alpha.18",
+    "@vue/language-server": "2.0.28",
     "@vueuse/core": "^10.6.0",
     "ant-design-vue": "^4.0.7",
     "axios": "^1.6.1",

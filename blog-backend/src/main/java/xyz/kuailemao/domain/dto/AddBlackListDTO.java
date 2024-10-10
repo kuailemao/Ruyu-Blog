@@ -4,12 +4,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author kuailemao
@@ -23,8 +25,8 @@ public class AddBlackListDTO {
 
     // 用户Id
     @Schema(description = "用户Id")
-    @NotNull(message = "用户Id不能为空")
-    private Long userId;
+    @Size(min = 1, message = "用户Id不能为空")
+    private List<Long> userIds;
 
     //封禁理由
     @Schema(description = "封禁理由")

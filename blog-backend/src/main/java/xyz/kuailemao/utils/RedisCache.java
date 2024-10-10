@@ -198,6 +198,16 @@ public class RedisCache {
     }
 
     /**
+     * 删除Hash中的数据
+     *
+     * @param key   Redis键
+     * @param hKey  Hash键
+     */
+    public <T> void deleteCacheMapValue(final String key,final String hKey) {
+        redisTemplate.opsForHash().delete(key, hKey);
+    }
+
+    /**
      * 获取Hash中的数据
      *
      * @param key  Redis键

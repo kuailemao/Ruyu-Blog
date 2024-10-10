@@ -105,6 +105,10 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public void initBlackList() {
+        // 清除黑名单缓存
+        redisCache.deleteObject(RedisConst.BLACK_LIST_UID_KEY);
+        redisCache.deleteObject(RedisConst.BLACK_LIST_IP_KEY);
+
         // 将所有黑名单id初始化到redis中
         log.info("--------开始执行初始化黑名单缓存--------");
         List<BlackList> blackLists = blackListMapper.selectList(null);
