@@ -25,7 +25,6 @@ import xyz.kuailemao.utils.RedisCache;
 import xyz.kuailemao.utils.SecurityUtils;
 import xyz.kuailemao.utils.StringUtils;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -136,19 +135,6 @@ public class BlackListServiceImpl extends ServiceImpl<BlackListMapper, BlackList
                 .toList();
     }
 
-    /**
-     * 用户是否存在黑名单
-     *
-     * @param userId 用户id
-     * @return true:存在 false:不存在
-     */
-    @Override
-    public Boolean isUserInBlackList(Long userId) {
-        LambdaQueryWrapper<BlackList> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(BlackList::getUserId, userId);
-        return this.count(queryWrapper) > 0;
-    }
-
     @Override
     public ResponseResult<Void> updateBlackList(UpdateBlackListDTO updateBlackListDTO) {
         BlackList blackList = BlackList.builder()
@@ -186,19 +172,6 @@ public class BlackListServiceImpl extends ServiceImpl<BlackListMapper, BlackList
             }
         });
         if (this.removeBatchByIds(ids)) {
-            return ResponseResult.success();
-        }
-        return ResponseResult.failure();
-    }
-
-    @Override
-    public ResponseResult<Void> updateIsBan(Long id) {
-        BlackList blackList = blackListMapper.selectById(id);
-        /*
-        compareTo方法返回一个整数，如果当前时间大于过期时间，则返回正数；
-        如果当前时间等于过期时间，则返回0；如果当前时间小于过期时间，则返回负数。
-         */
-        if (blackList != null && new Date().compareTo(blackList.getExpiresTime()) >= 0) {
             return ResponseResult.success();
         }
         return ResponseResult.failure();

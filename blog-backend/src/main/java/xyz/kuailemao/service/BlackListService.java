@@ -33,11 +33,6 @@ public interface BlackListService extends IService<BlackList> {
     List<BlackListVO> getBlackList(SearchBlackListDTO searchBlackListDTO);
 
     /**
-     * 用户是否存在黑名单
-     */
-    Boolean isUserInBlackList(Long userId);
-
-    /**
      * 修改数据
      * @param updateBlackListDTO 修改对象
      * @return 修改结果
@@ -46,15 +41,8 @@ public interface BlackListService extends IService<BlackList> {
 
     /**
      * 删除黑名单
-     * @param id 黑名单id
+     * @param ids 黑名单id
      * @return 是否成功
      */
     ResponseResult<Void> deleteBlackList(List<Long> ids);
-
-    /**
-     * 是否封禁
-     * @param id 黑名单id
-     * @return 是否成功
-     */
-    ResponseResult<Void> updateIsBan(Long id);
 }

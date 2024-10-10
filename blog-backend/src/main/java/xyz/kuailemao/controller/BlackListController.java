@@ -62,19 +62,6 @@ public class BlackListController {
     }
 
     /**
-     * 是否封禁
-     */
-    @PreAuthorize("hasAnyAuthority('blog:black:update')")
-    @Operation(summary = "是否封禁")
-    @Parameter(name = "id", description = "id")
-    @LogAnnotation(module = "黑名单管理", operation = LogConst.UPDATE)
-    @AccessLimit(seconds = 60, maxCount = 30)
-    @PutMapping("/update/{id}")
-    public ResponseResult<Void> updateIsBan(@PathVariable("id") Long id) {
-        return blackListService.updateIsBan(id);
-    }
-
-    /**
      * 查询黑名单
      */
     @PreAuthorize("hasAnyAuthority('blog:black:select')")
