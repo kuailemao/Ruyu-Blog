@@ -33,6 +33,6 @@ public class UpdateBlackListDTO {
     //到期时间
     @Schema(description = "封禁到期时间")
     @NotNull(message = "封禁到期时间不能为空")
-    @Future(message = "封禁到期时间必须大于当前时间")
+//    @Future(message = "封禁到期时间必须大于当前时间")
     private Date expiresTime;
 }

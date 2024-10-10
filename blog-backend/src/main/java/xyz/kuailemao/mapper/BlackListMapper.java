@@ -2,6 +2,7 @@ package xyz.kuailemao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Select;
 import xyz.kuailemao.domain.entity.BlackList;
 
 
@@ -14,5 +15,9 @@ import xyz.kuailemao.domain.entity.BlackList;
 public interface BlackListMapper extends BaseMapper<BlackList> {
 
     @Delete("DELETE FROM t_black_list WHERE ip_info -> '$.createIp' = #{ip}")
-    long deleteByIp(String ip);
+    Long deleteByIp(String ip);
+
+    // 查询是否存在ip
+    @Select("SELECT id FROM t_black_list WHERE ip_info -> '$.createIp' = #{ip}")
+    Long getIdByIp(String ip);
 }

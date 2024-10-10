@@ -8,16 +8,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import xyz.kuailemao.annotation.AccessLimit;
+import xyz.kuailemao.constants.Const;
 import xyz.kuailemao.constants.RedisConst;
 import xyz.kuailemao.constants.SQLConst;
 import xyz.kuailemao.domain.dto.AddBlackListDTO;
 import xyz.kuailemao.domain.entity.BlackList;
 import xyz.kuailemao.domain.response.ResponseResult;
+import xyz.kuailemao.enums.BlackListPolicy;
 import xyz.kuailemao.enums.RespEnum;
 import xyz.kuailemao.mapper.BlackListMapper;
 import xyz.kuailemao.service.BlackListService;
@@ -108,68 +111,13 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
         Long timestampByIP = redisCache.getCacheMapValue(RedisConst.BLACK_LIST_IP_KEY, ip);
         Long timestampByUID = redisCache.getCacheMapValue(RedisConst.BLACK_LIST_UID_KEY, String.valueOf(SecurityUtils.getUserId()));
 
-        // 每分钟请求超过200封禁十年
-        if (count == 10) {
-//            if (timestampByIP != null && DateUtil.offset(DateUtil.date(expireTime), DateField.YEAR, 1).getTime() < timestampByIP) {
-//                DateTime date = DateUtil.date(timestampByIP != null ? timestampByIP : timestampByUID);
-//                WebUtil.renderString(response, ResponseResult.failure(RespEnum.BLACK_LIST_ERROR.getCode(), StrUtil.format("已被封禁，无法访问，距解封剩余：{}", DateUtil.formatBetween(new Date(), date, BetweenFormatter.Level.SECOND))).asJsonString());
-//                return true;
-//            }
-//
-//            // 封禁、加入黑名单
-//            AddBlackListDTO addBlackListDTO = AddBlackListDTO.builder().userIds((SecurityUtils.getUserId() == 0L || Objects.equals(SecurityUtils.getUserId(), SQLConst.ADMIN_ID)) ? List.of() : List.of(SecurityUtils.getUserId()))
-//                    .reason("疑似非法DDOS攻击\nIP:" + ip + "\n地址:" + uri + "\n请求次数:" + count)
-//                    // 封禁到十年后
-//                    .expiresTime(DateUtil.offset(DateUtil.date(expireTime), DateField.YEAR, 10))
-//                    .build();
-//            blackListService.addBlackList(addBlackListDTO);
-//            WebUtil.renderString(response, ResponseResult.failure(RespEnum.BLACK_LIST_ERROR.getCode(), "非法DDOS攻击，已被封禁十年，有问题联系网站管理员").asJsonString());
-//            return true;
-            return handleBlackList(count, DateField.YEAR, 10, expireTime, timestampByIP, timestampByUID, "非法DDOS攻击，已被封禁十年，有问题联系网站管理员",
-                    "疑似非法DDOS攻击\nIP:" + ip + "\n地址:" + uri + "\n请求次数:" + count, response);
+        // 封禁策略
+        for (BlackListPolicy policy : BlackListPolicy.values()) {
+            if (count == policy.getRequestThreshold()) {
+                return handleBlackList(policy.getTimeUnit(), policy.getDuration(), expireTime, timestampByIP,
+                        policy.getMessage(), StrUtil.format(policy.getReason(), ip, uri, count), response);
+            }
         }
-        // 每分钟请求超过100封禁1个月
-        if (count == 4) {
-//            if (timestampByIP != null && DateUtil.offset(DateUtil.date(expireTime), DateField.MONTH, 1).getTime() < timestampByIP) {
-//                DateTime date = DateUtil.date(timestampByIP != null ? timestampByIP : timestampByUID);
-//                WebUtil.renderString(response, ResponseResult.failure(RespEnum.BLACK_LIST_ERROR.getCode(), StrUtil.format("已被封禁，无法访问，距解封剩余：{}", DateUtil.formatBetween(new Date(), date, BetweenFormatter.Level.SECOND))).asJsonString());
-//                return true;
-//            }
-//
-//            // 封禁、加入黑名单
-//            AddBlackListDTO addBlackListDTO = AddBlackListDTO.builder().userIds((SecurityUtils.getUserId() == 0L || Objects.equals(SecurityUtils.getUserId(), SQLConst.ADMIN_ID)) ? List.of() : List.of(SecurityUtils.getUserId()))
-//                    .reason("疑似非法DDOS攻击\nIP:" + ip + "\n地址:" + uri + "\n请求次数:" + count)
-//                    // 封禁到一个月后
-//                    .expiresTime(DateUtil.offset(DateUtil.date(expireTime), DateField.MONTH, 1))
-//                    .build();
-//            blackListService.addBlackList(addBlackListDTO);
-//            WebUtil.renderString(response, ResponseResult.failure(RespEnum.BLACK_LIST_ERROR.getCode(), "疑似非法DDOS攻击，已被封禁一个月，有问题联系网站管理员").asJsonString());
-//            return true;
-            return handleBlackList(count, DateField.MONTH, 1, expireTime, timestampByIP, timestampByUID, "疑似非法DDOS攻击，已被封禁一个月，有问题联系网站管理员",
-                    "疑似非法DDOS攻击\nIP:" + ip + "\n地址:" + uri + "\n请求次数:" + count, response);
-        }
-        // 每分钟请求超过60封禁1小时
-        if (count == 2) {
-            // 如果当前已经封禁，并且封禁的时间大于当前时间这不会再次进行封禁
-//            if (timestampByIP != null && DateUtil.offset(DateUtil.date(expireTime), DateField.HOUR, 1).getTime() < timestampByIP) {
-//                DateTime date = DateUtil.date(timestampByIP != null ? timestampByIP : timestampByUID);
-//                WebUtil.renderString(response, ResponseResult.failure(RespEnum.BLACK_LIST_ERROR.getCode(), StrUtil.format("已被封禁，无法访问，距解封剩余：{}", DateUtil.formatBetween(new Date(), date, BetweenFormatter.Level.SECOND))).asJsonString());
-//                return true;
-//            }
-//
-//            // 封禁、加入黑名单
-//            AddBlackListDTO addBlackListDTO = AddBlackListDTO.builder().userIds((SecurityUtils.getUserId() == 0L || Objects.equals(SecurityUtils.getUserId(), SQLConst.ADMIN_ID)) ? List.of() : List.of(SecurityUtils.getUserId()))
-//                    .reason("疑似非法DDOS攻击\nIP:" + ip + "\n地址:" + uri + "\n请求次数:" + count)
-//                    // 封禁到一小时后
-//                    .expiresTime(DateUtil.offset(DateUtil.date(expireTime), DateField.HOUR, 1))
-//                    .build();
-//            blackListService.addBlackList(addBlackListDTO);
-//            WebUtil.renderString(response, ResponseResult.failure(RespEnum.BLACK_LIST_ERROR.getCode(), "请求过于频繁,已被封禁一小时，有问题联系网站管理员").asJsonString());
-//            return true;
-            return handleBlackList(count, DateField.HOUR, 1, expireTime, timestampByIP, timestampByUID, "请求过于频繁,已被封禁一小时，有问题联系网站管理员",
-                    "疑似非法DDOS攻击\nIP:" + ip + "\n地址:" + uri + "\n请求次数:" + count, response);
-        }
-
 
         if (timestampByIP != null || timestampByUID != null) {
             Long timestamp = timestampByIP != null ? timestampByIP : timestampByUID;
@@ -193,9 +141,10 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
     }
 
 
-    private boolean handleBlackList(Long count, DateField dateField, int offset, Long expireTime, Long timestampByIP, Long timestampByUID, String message, String reason, HttpServletResponse response) {
+    private boolean handleBlackList(DateField dateField, int offset, Long expireTime, Long timestampByIP, String message, String reason, HttpServletResponse response) {
+        // 如果当前已经封禁，并且封禁的时间大于当前时间这不会再次进行封禁
         if (timestampByIP != null && DateUtil.offset(DateUtil.date(expireTime), dateField, offset).getTime() < timestampByIP) {
-            DateTime date = DateUtil.date(timestampByIP != null ? timestampByIP : timestampByUID);
+            DateTime date = DateUtil.date(timestampByIP);
             WebUtil.renderString(response, ResponseResult.failure(RespEnum.BLACK_LIST_ERROR.getCode(),
                     StrUtil.format("已被封禁，无法访问，距解封剩余：{}", DateUtil.formatBetween(new Date(), date, BetweenFormatter.Level.SECOND))).asJsonString());
             return true;

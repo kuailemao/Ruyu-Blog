@@ -2,6 +2,7 @@ package xyz.kuailemao.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.kuailemao.domain.dto.AddBlackListDTO;
+import xyz.kuailemao.domain.dto.SearchBlackListDTO;
 import xyz.kuailemao.domain.dto.UpdateBlackListDTO;
 import xyz.kuailemao.domain.entity.BlackList;
 import xyz.kuailemao.domain.response.ResponseResult;
@@ -29,7 +30,7 @@ public interface BlackListService extends IService<BlackList> {
      * 获取黑名单
      * @return 黑名单
      */
-    List<BlackListVO> getBlackList();
+    List<BlackListVO> getBlackList(SearchBlackListDTO searchBlackListDTO);
 
     /**
      * 用户是否存在黑名单
@@ -48,7 +49,7 @@ public interface BlackListService extends IService<BlackList> {
      * @param id 黑名单id
      * @return 是否成功
      */
-    ResponseResult<Void> deleteBlackList(Long id);
+    ResponseResult<Void> deleteBlackList(List<Long> ids);
 
     /**
      * 是否封禁

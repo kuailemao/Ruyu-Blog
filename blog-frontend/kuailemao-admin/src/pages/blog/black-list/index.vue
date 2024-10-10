@@ -1,35 +1,30 @@
 <script setup lang="ts">
 import type {Ref, UnwrapRef} from 'vue'
-import {Modal, message} from 'ant-design-vue'
 import {createVNode} from 'vue'
+import {message, Modal} from 'ant-design-vue'
 import {ExclamationCircleOutlined} from '@ant-design/icons-vue'
-import {getMenusApi} from '~/api/common/menu.ts'
-import {buildTree} from '~/utils/tree.ts'
-import {
-  categoryList,
-  deleteCategoryByIds,
-  searchCategory,
-  searchCategoryById,
-  updateCategory,
-} from '~/api/blog/category'
+import {deleteCategoryByIds,} from '~/api/blog/category'
 import {addCategory} from '~/api/blog/article'
-import {blackList} from "~/api/blog/black-list";
+import {addBlackList, blackList, deleteBlackList, updateBlackList} from "~/api/blog/black-list";
+import dayjs, {Dayjs} from "dayjs";
+import {debounce} from 'lodash-es';
+import {userSearch} from "~/api/user";
 
-const formState = reactive({
-  categoryName: undefined,
-  time: undefined,
-})
-
-interface DataType {
-  id: string
-  title: string
-  key: string
-  orderNum: number
-  status: boolean
-  createTime: string
+interface FormState {
+  userName: string,
+  time: [string, string] | [Dayjs, Dayjs],
+  reason: string,
+  type: number | undefined,
 }
 
-const columns: any = [
+const formState = ref<FormState>({
+  userName: '',
+  time: ['', ''],
+  reason: '',
+  type: undefined,
+})
+
+const columns: any[] = [
   {
     title: '名单编号',
     dataIndex: 'id',
@@ -76,7 +71,7 @@ const columns: any = [
 type Key = string | number
 
 const loading = ref(false)
-const tabData: Ref<UnwrapRef<DataType[]>> = ref([])
+const tabData: Ref<UnwrapRef<any[]>> = ref([])
 
 onMounted(() => {
   refreshFunc()
@@ -102,7 +97,7 @@ async function onFinish(values: any) {
   }
 
   loading.value = true
-  await refreshFunc(values)
+  await refreshFunc(submitData)
 }
 
 const state = reactive<{
@@ -128,10 +123,9 @@ const modalInfo = reactive({
   loading: false,
 })
 
-const treeData = ref()
 const formData = ref()
 
-function deleteCategory(ids: string[], type?: number) {
+function deleteBlackListFunc(ids: string[], type?: number) {
   if (type === 0) {
     Modal.confirm({
       title: '注意',
@@ -140,7 +134,7 @@ function deleteCategory(ids: string[], type?: number) {
       okText: '确认',
       cancelText: '取消',
       onOk: () => {
-        deleteCategoryByIds(ids).then((res) => {
+        deleteBlackList(ids).then((res) => {
           if (res.code === 200) {
             message.success('删除成功')
             state.selectedRowKeys = []
@@ -151,7 +145,7 @@ function deleteCategory(ids: string[], type?: number) {
     })
     return
   }
-  deleteCategoryByIds(ids).then((res) => {
+  deleteBlackList(ids).then((res) => {
     if (res.code === 200) {
       message.success('删除成功')
       state.selectedRowKeys = []
@@ -160,42 +154,113 @@ function deleteCategory(ids: string[], type?: number) {
   })
 }
 
-async function updateOrInsertCategory(id?: string) {
-  const {data} = await getMenusApi(1) as any
-  treeData.value = buildTree(data)
+const updateOrInsertModal = ref<{
+  id: string | undefined,
+  reason: string | undefined,
+  expiresTime: Dayjs | string | undefined
+}>({
+  id: undefined,
+  reason: undefined,
+  expiresTime: undefined
+})
+
+const userState = reactive({
+  data: [],
+  value: [],
+  fetching: false,
+  isInsert: false
+});
+
+async function updateOrInsertBlackList(id?: string) {
   if (id) {
-    const {data: categoryInfo} = await searchCategoryById(id)
-    formData.value = categoryInfo
-    modalInfo.open = true
-    modalInfo.title = '修改分类'
+    tabData.value.map((item: any) => {
+      if (id === (item.id)) {
+        updateOrInsertModal.value.id = item.id
+        updateOrInsertModal.value.reason = item.reason
+        updateOrInsertModal.value.expiresTime = dayjs(item.expiresTime)
+      }
+      return null
+    })
+    userState.isInsert = false
   } else {
-    formData.value = {}
-    modalInfo.open = true
-    modalInfo.title = '添加分类'
+    // 新增
+    updateOrInsertModal.value = {
+      id: undefined,
+      reason: undefined,
+      expiresTime: undefined
+    }
+    userState.isInsert = true
   }
+  modalInfo.title = '修改黑名单'
+  modalInfo.open = true
 }
 
 // 确定
 async function modelOk() {
   modalInfo.loading = true
-  if (formData.value.id) {
-    await updateCategory(formData.value).then((res) => {
+  if (updateOrInsertModal.value.id) {
+    let updateData = {
+      ...updateOrInsertModal.value,
+    }
+    updateData.expiresTime = dayjs(updateOrInsertModal.value.expiresTime).format('YYYY-MM-DD HH:mm:ss')
+    await updateBlackList(updateData).then((res) => {
       if (res.code === 200) {
         modalInfo.loading = false
         message.success('修改成功')
       }
+    }).catch(msg => {
+      message.warn(msg)
+      modalInfo.loading = false
     })
   } else {
-    await addCategory(formData.value).then((res) => {
+    // TODO 新增黑名单
+    let insertData = {
+      userIds: [],
+      ...updateOrInsertModal.value,
+    }
+    insertData.expiresTime = dayjs(updateOrInsertModal.value.expiresTime).format('YYYY-MM-DD HH:mm:ss')
+    userState.value.map((data: any) => {
+      insertData.userIds.push(data.value)
+    })
+    console.log('添加', insertData)
+    await addBlackList(insertData).then((res) => {
       if (res.code === 200) {
         modalInfo.loading = false
         message.success('添加成功')
       }
+    }).catch(msg => {
+      message.warn(msg)
+      modalInfo.loading = false
     })
   }
-  modalInfo.open = false
   await refreshFunc()
 }
+
+let lastFetchId = 0;
+
+const fetchUser = debounce(value => {
+  lastFetchId += 1;
+  const fetchId = lastFetchId;
+  userState.data = [];
+  userState.fetching = true;
+  userSearch({username: value}).then((res) => {
+    if (fetchId !== lastFetchId) {
+      // for fetch callback order
+      return;
+    }
+    userState.data = res.data.map((user: any) => ({
+      label: user.username,
+      value: user.id,
+    }));
+    userState.fetching = false;
+  })
+}, 300);
+
+watch(userState.value, () => {
+  userState.data = [];
+  userState.fetching = false;
+});
+
 </script>
 
 <template>
@@ -207,9 +272,9 @@ async function modelOk() {
     <template #form-items>
       <a-form-item
           label="用户名称"
-          name="categoryName"
+          name="userName"
       >
-        <a-input v-model:value="formState.categoryName" placeholder="请输入用户名称" style="width: 150px"/>
+        <a-input v-model:value="formState.userName" placeholder="请输入用户名称" style="width: 150px"/>
       </a-form-item>
       <a-form-item
           label="封禁时间"
@@ -219,40 +284,41 @@ async function modelOk() {
       </a-form-item>
       <a-form-item
           label="封禁理由"
-          name="categoryName"
+          name="reason"
       >
-        <a-input v-model:value="formState.categoryName" placeholder="请输入封禁理由" style="width: 200px"/>
+        <a-input v-model:value="formState.reason" placeholder="请输入封禁理由" style="width: 200px"/>
       </a-form-item>
-      <a-form-item label="封禁类型" name="isCheck" style="margin-right: 1rem">
+      <a-form-item label="封禁类型" name="type" style="margin-right: 1rem">
         <a-select
             style="width: 7em"
             placeholder="封禁类型"
+            v-model:value="formState.type"
         >
           <a-select-option :value="1">
             手动封禁
           </a-select-option>
-          <a-select-option :value="0">
+          <a-select-option :value="2">
             自动封禁
           </a-select-option>
         </a-select>
       </a-form-item>
     </template>
     <template #operate-btn>
-      <a-button type="primary" @click="updateOrInsertCategory()">
+      <a-button type="primary" @click="updateOrInsertBlackList()">
         <template #icon>
           <PlusOutlined/>
         </template>
         新增
       </a-button>
       <a-button class="green" :disabled="!hasSelected"
-                @click="updateOrInsertCategory(state.selectedRowKeys[0] as string)">
+                @click="updateOrInsertBlackList(state.selectedRowKeys[0] as string)">
         <template #icon>
           <FileSyncOutlined/>
         </template>
         修改
       </a-button>
       <a-button type="dashed" danger ghost :disabled="!(state.selectedRowKeys.length > 0)"
-                @click="deleteCategory(state.selectedRowKeys as string[], 0)">
+                @click="deleteBlackListFunc(state.selectedRowKeys as string[], 0)">
         <template #icon>
           <DeleteOutlined/>
         </template>
@@ -268,11 +334,30 @@ async function modelOk() {
     <template #table-content>
       <a-modal v-model:open="modalInfo.open" :title="modalInfo.title" :confirm-loading="modalInfo.loading" width="400px"
                @ok="modelOk">
-        <a-form-item
-            label="分类名称"
-            name="categoryName"
-        >
-          <a-input v-model:value="formData.categoryName" placeholder="请输入分类名称" show-count :maxlength="20"/>
+        <a-form-item label="用户名称" v-show="userState.isInsert">
+          <a-select
+              v-model:value="userState.value"
+              mode="multiple"
+              label-in-value
+              placeholder="搜索用户"
+              style="width: 100%"
+              :filter-option="false"
+              :not-found-content="userState.fetching ? undefined : null"
+              :options="userState.data"
+              @search="fetchUser"
+          >
+            <template v-if="userState.fetching" #notFoundContent>
+              <a-spin size="small"/>
+            </template>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="解封时间">
+          <a-date-picker style="width: 100%" show-time v-model:value="updateOrInsertModal.expiresTime"
+                         placeholder="解封时间"/>
+        </a-form-item>
+        <a-form-item label="封禁理由">
+          <a-textarea :showCount="true" v-model:value="updateOrInsertModal.reason" placeholder="请输入封禁理由"
+                      style="width: 100%;max-height: 100px"/>
         </a-form-item>
       </a-modal>
       <a-table
@@ -291,9 +376,9 @@ async function modelOk() {
           </template>
           <!-- 系统自动封禁，没有用户名称，显示ip信息 -->
           <template v-if="column.dataIndex === 'userName' && record.type == 2">
-            <a-popover title="IP信息" >
+            <a-popover title="IP信息">
               <template #content>
-                  <div :style="{ maxWidth: '300px', wordBreak: 'break-all' }">
+                <div :style="{ maxWidth: '300px', wordBreak: 'break-all' }">
                   {{ record.ipInfo }}
                 </div>
               </template>
@@ -309,7 +394,7 @@ async function modelOk() {
             </a-popover>
           </template>
           <template v-if="column.key === 'operation'">
-            <a-button type="link" style="padding: 0;" @click="updateOrInsertCategory(record.id)">
+            <a-button type="link" style="padding: 0;" @click="updateOrInsertBlackList(record.id)">
               <template #icon>
                 <FileSyncOutlined/>
               </template>
@@ -319,13 +404,13 @@ async function modelOk() {
                 title="是否确定删除"
                 ok-text="Yes"
                 cancel-text="No"
-                @confirm="deleteCategory([record.id])"
+                @confirm="deleteBlackListFunc([record.id])"
             >
               <a-button type="link" style="padding: 0;margin-left: 5px">
                 <template #icon>
                   <DeleteOutlined/>
                 </template>
-                <span style="margin-inline-start:1px">解除</span>
+                <span style="margin-inline-start:1px">删除</span>
               </a-button>
             </a-popconfirm>
           </template>
