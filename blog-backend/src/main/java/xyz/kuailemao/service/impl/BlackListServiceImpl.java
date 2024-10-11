@@ -25,7 +25,6 @@ import xyz.kuailemao.utils.RedisCache;
 import xyz.kuailemao.utils.SecurityUtils;
 import xyz.kuailemao.utils.StringUtils;
 
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,14 +82,14 @@ public class BlackListServiceImpl extends ServiceImpl<BlackListMapper, BlackList
                 .createIp(!addBlackListDTO.getUserIds().isEmpty() ? null : IpUtils.getIpAddr(SecurityUtils.getCurrentHttpRequest()))
                 .build();
         blackList.setIpInfo(blackListIpInfo);
-        if(addBlackListDTO.getUserIds().isEmpty()){
+        if (addBlackListDTO.getUserIds().isEmpty()) {
             Long idByIp = blackListMapper.getIdByIp(blackListIpInfo.getCreateIp());
-            if (idByIp != null){
+            if (idByIp != null) {
                 // 存在
                 blackList.setId(idByIp);
             }
         }
-        if (null != blackList.getId() ? this.updateById(blackList) :this.save(blackList)) {
+        if (null != blackList.getId() ? this.updateById(blackList) : this.save(blackList)) {
             if (blackList.getType() == BlackListConst.BLACK_LIST_TYPE_BOT) {
                 ipService.refreshIpDetailAsyncByBid(blackList.getId());
             }

@@ -39,8 +39,9 @@ public interface UserService extends IService<User>, UserDetailsService {
     /**
      * 用户登录状态
      * @param id 用户id
+     * @param type 登录类型
      */
-    void userLoginStatus(Long id);
+    void userLoginStatus(Long id, Integer type);
 
     /**
      * 用户注册

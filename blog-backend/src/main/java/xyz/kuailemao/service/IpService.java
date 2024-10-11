@@ -11,4 +11,16 @@ public interface IpService {
      * @param bid 黑名单id
      */
     void refreshIpDetailAsyncByBid(Long bid);
+
+    /**
+     * 异步刷新ip详情获取--注册
+     * @param uid 用户id
+     */
+    void refreshIpDetailAsyncByUidAndRegister(Long uid);
+
+    /**
+     * 异步刷新ip详情获取--登录
+     * @param uid 用户id
+     */
+    void refreshIpDetailAsyncByUidAndLogin(Long uid);
 }

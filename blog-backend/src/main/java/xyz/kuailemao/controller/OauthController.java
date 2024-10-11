@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import xyz.kuailemao.annotation.AccessLimit;
 import xyz.kuailemao.domain.request.oauth.GiteeBody;
 import xyz.kuailemao.domain.request.oauth.GithubBody;
-import xyz.kuailemao.enums.RegisterTypeEnum;
+import xyz.kuailemao.enums.RegisterOrLoginTypeEnum;
 import xyz.kuailemao.service.OauthService;
 
 import java.io.IOException;
@@ -61,7 +61,7 @@ public class OauthController {
     @GetMapping("/gitee/callback")
     public void giteeLogin(AuthCallback callback, HttpServletRequest request, HttpServletResponse response) throws IOException {
         AuthRequest authRequest = getGiteeAuthRequest();
-        String parameter = oauthService.handleLogin(authRequest.login(callback), request, RegisterTypeEnum.GITEE.getRegisterType());
+        String parameter = oauthService.handleLogin(authRequest.login(callback), request, RegisterOrLoginTypeEnum.GITEE.getRegisterType());
         response.sendRedirect(path+parameter);
     }
     // github登录
@@ -78,7 +78,7 @@ public class OauthController {
     @GetMapping("/github/callback")
     public void githubLogin(AuthCallback callback, HttpServletRequest request, HttpServletResponse response) throws IOException {
         AuthRequest authRequest = getGithubAuthRequest();
-        String parameter = oauthService.handleLogin(authRequest.login(callback), request,RegisterTypeEnum.GITHUB.getRegisterType());
+        String parameter = oauthService.handleLogin(authRequest.login(callback), request,RegisterOrLoginTypeEnum.GITHUB.getRegisterType());
         response.sendRedirect(path+parameter);
     }
 
