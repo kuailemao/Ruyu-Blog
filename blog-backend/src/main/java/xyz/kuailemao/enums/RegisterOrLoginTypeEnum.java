@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum RegisterTypeEnum {
+public enum RegisterOrLoginTypeEnum {
 
     /**
      * 邮箱或用户名登录

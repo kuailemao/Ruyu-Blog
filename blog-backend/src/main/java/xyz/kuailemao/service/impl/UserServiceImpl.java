@@ -26,6 +26,7 @@ import xyz.kuailemao.domain.vo.UserDetailsVO;
 import xyz.kuailemao.domain.vo.UserListVO;
 import xyz.kuailemao.enums.*;
 import xyz.kuailemao.mapper.*;
+import xyz.kuailemao.service.IpService;
 import xyz.kuailemao.service.UserService;
 import xyz.kuailemao.utils.*;
 
@@ -91,6 +92,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Resource
     private LinkMapper linkMapper;
 
+    @Resource
+    private IpService ipService;
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -108,14 +112,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 判断是否第三方登录
         if (typeHeader != null) {
             // getee
-            if (typeHeader.equals(RegisterTypeEnum.GITEE.getStrategy())) {
+            if (typeHeader.equals(RegisterOrLoginTypeEnum.GITEE.getStrategy())) {
                 String result = HttpUtils.sendGet(UrlEnum.GITEE_USER_INFO.getUrl(), "access_token=" + accessToken);
                 JSONObject jsonObject = JSON.parseObject(result);
                 Integer uuid = (Integer) jsonObject.get(SQLConst.ID);
                 user = userMapper.selectById(uuid);
             }
             // github
-            if (typeHeader.equals(RegisterTypeEnum.GITHUB.getStrategy())) {
+            if (typeHeader.equals(RegisterOrLoginTypeEnum.GITHUB.getStrategy())) {
                 OkHttpClient client = new OkHttpClient();
                 Headers headers = new Headers.Builder()
                         .add(RequestHeaderEnum.GITHUB_USER_INFO.getHeader(), RequestHeaderEnum.GITHUB_USER_INFO.getContent())
@@ -185,30 +189,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return new LoginUser(user, List.of());
     }
 
-    // 修改用户登录状态
+    // 修改用户登录或注册状态
     @Override
-    public void userLoginStatus(Long id) {
+    public void userLoginStatus(Long id, Integer type) {
         // ip地址
         String ipAddr = IpUtils.getIpAddr(SecurityUtils.getCurrentHttpRequest());
         if (IpUtils.isUnknown(ipAddr)) {
             ipAddr = IpUtils.getHostIp();
         }
-        // 位置
-        String addressByIP = AddressUtils.getRealAddressByIP(ipAddr);
         User user = User.builder()
+                .id(id)
                 .loginTime(new Date())
-                // TODO 登录类型待完善
-                .loginType(0)
+                .loginType(type)
                 .loginIp(ipAddr)
-                .loginAddress(addressByIP)
                 .build();
-        update(user, new LambdaQueryWrapper<User>().eq(User::getId, id));
+        if (updateById(user)) {
+            ipService.refreshIpDetailAsyncByUidAndLogin(user.getId());
+        }
+
     }
 
     @Override
     public User findAccountByNameOrEmail(String text) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(User::getUsername, text).or().eq(User::getEmail, text).eq(User::getRegisterType, RegisterTypeEnum.EMAIL.getRegisterType());
+        wrapper.eq(User::getUsername, text).or().eq(User::getEmail, text).eq(User::getRegisterType, RegisterOrLoginTypeEnum.EMAIL.getRegisterType());
         return userMapper.selectOne(wrapper);
     }
 
@@ -254,28 +258,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (IpUtils.isUnknown(ipAddr)) {
             ipAddr = IpUtils.getHostIp();
         }
-        // 注册位置
-        String addressByIP = AddressUtils.getRealAddressByIP(ipAddr);
-
         // 4.保存用户信息
         User user = User.builder()
                 .id(null)
                 .nickname(userRegisterDTO.getUsername())
                 .username(userRegisterDTO.getUsername())
                 .password(enPassword)
-                // TODO 用户注册类型待完善
-                .registerType(0)
+                .registerType(RegisterOrLoginTypeEnum.EMAIL.getRegisterType())
                 .registerIp(ipAddr)
-                .registerAddress(addressByIP)
                 .gender(UserConst.DEFAULT_GENDER)
                 .avatar(UserConst.DEFAULT_AVATAR)
                 .intro(UserConst.DEFAULT_INTRODUCTION)
-                .registerType(RegisterTypeEnum.EMAIL.getRegisterType())
+                .registerType(RegisterOrLoginTypeEnum.EMAIL.getRegisterType())
                 .isDeleted(UserConst.DEFAULT_STATUS)
                 .email(userRegisterDTO.getEmail())
                 .loginTime(date).build();
         if (this.save(user)) {
             // 删除验证码
+            ipService.refreshIpDetailAsyncByUidAndRegister(user.getId());
             redisCache.deleteObject(RedisConst.VERIFY_CODE + RedisConst.REGISTER + RedisConst.SEPARATOR + userRegisterDTO.getEmail());
             return ResponseResult.success();
         } else {

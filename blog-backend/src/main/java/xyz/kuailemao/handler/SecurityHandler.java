@@ -13,8 +13,12 @@ import xyz.kuailemao.constants.RespConst;
 import xyz.kuailemao.domain.entity.LoginUser;
 import xyz.kuailemao.domain.response.ResponseResult;
 import xyz.kuailemao.domain.vo.AuthorizeVO;
+import xyz.kuailemao.enums.RegisterOrLoginTypeEnum;
+import xyz.kuailemao.enums.RegisterOrLoginTypeEnum;
 import xyz.kuailemao.enums.RespEnum;
 import xyz.kuailemao.service.LoginLogService;
+import xyz.kuailemao.service.UserService;
+import xyz.kuailemao.service.impl.UserServiceImpl;
 import xyz.kuailemao.utils.JwtUtils;
 import xyz.kuailemao.utils.RedisCache;
 import xyz.kuailemao.utils.StringUtils;
@@ -40,6 +44,9 @@ public class SecurityHandler {
 
     @Resource
     private LoginLogService loginLogService;
+
+    @Resource
+    private UserService userService;
 
     public static final String USER_NAME = "username";
 
@@ -80,8 +87,8 @@ public class SecurityHandler {
             v.setToken(token);
             v.setExpire(jwtUtils.expireTime());
         });
-        // TODO 更新登录状态
-//        userService.userLoginStatus(user.getUser().getId());
+        // TODO 造成依赖循环
+        userService.userLoginStatus(user.getUser().getId(), user.getUser().getRegisterType());
         loginLogService.loginLog(request, request.getParameter(USER_NAME), 0, RespConst.SUCCESS_LOGIN_MSG);
         WebUtil.renderString(response, ResponseResult.success(authorizeVO, RespConst.SUCCESS_LOGIN_MSG).asJsonString());
     }

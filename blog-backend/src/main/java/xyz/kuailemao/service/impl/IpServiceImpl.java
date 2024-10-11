@@ -8,13 +8,16 @@ import cn.hutool.json.JSONUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xyz.kuailemao.constants.ThirdPartyInterfaceConst;
 import xyz.kuailemao.domain.dto.IpResult;
 import xyz.kuailemao.domain.entity.BlackList;
+import xyz.kuailemao.domain.entity.User;
 import xyz.kuailemao.domain.ip.IpDetail;
 import xyz.kuailemao.handler.GlobalUncaughtExceptionHandler;
 import xyz.kuailemao.mapper.BlackListMapper;
+import xyz.kuailemao.mapper.UserMapper;
 import xyz.kuailemao.service.IpService;
 
 import java.util.Date;
@@ -42,6 +45,9 @@ public class IpServiceImpl implements IpService, DisposableBean {
     @Resource
     private BlackListMapper blackListMapper;
 
+    @Resource
+    private UserMapper userMapper;
+
     /**
      * 异步刷新ip详情获取
      *
@@ -68,20 +74,76 @@ public class IpServiceImpl implements IpService, DisposableBean {
         });
     }
 
+    /**
+     * 异步刷新注册ip详情获取
+     *
+     * @param uid 用户id
+     */
+    @Override
+    public void refreshIpDetailAsyncByUidAndRegister(Long uid) {
+        EXECUTOR.execute(() -> {
+            User user = userMapper.selectById(uid);
+            if (Objects.isNull(user)) {
+                return;
+            }
+            String ip = user.getRegisterIp();
+            if (StrUtil.isBlank(ip)) {
+                return;
+            }
+            IpDetail ipDetail = TryGetIpDetailOrNullTreeTimes(ip);
+            if (Objects.nonNull(ipDetail)) {
+                user.setRegisterAddress(ipDetail.getRegion()+ " " + ipDetail.getCity());
+            } else {
+                user.setRegisterAddress("未知");
+                log.error("register get ip detail fail ip:{},uid:{}", ip, uid);
+            }
+            userMapper.updateById(user);
+        });
+    }
+
+    /**
+     * 异步刷新登录ip详情获取
+     *
+     * @param uid 用户id
+     */
+    @Override
+    public void refreshIpDetailAsyncByUidAndLogin(Long uid) {
+        EXECUTOR.execute(() -> {
+            User user = userMapper.selectById(uid);
+            if (Objects.isNull(user)) {
+                return;
+            }
+            String ip = user.getLoginIp();
+            if (StrUtil.isBlank(ip)) {
+                return;
+            }
+            IpDetail ipDetail = TryGetIpDetailOrNullTreeTimes(ip);
+            if (Objects.nonNull(ipDetail)) {
+                user.setLoginAddress(ipDetail.getRegion()+ " " + ipDetail.getCity());
+            } else {
+                user.setRegisterAddress("未知");
+                log.error("login get ip detail fail ip:{},uid:{}", ip, uid);
+            }
+            userMapper.updateById(user);
+        });
+    }
+
+
     //测试耗时结果 100次查询总耗时约100s，平均一次成功查询需要1s,可以接受
     //第99次成功,目前耗时：111281ms
     public static void main(String[] args) {
-//        Date begin = new Date();
-//        for (int i = 0; i < 100; i++) {
-//            int finalI = i;
-//            EXECUTOR.execute(() -> {
-//                IpDetail ipDetail = TryGetIpDetailOrNullTreeTimes("27.47.133.94");
-//                if (Objects.nonNull(ipDetail)) {
-//                    Date date = new Date();
-//                    System.out.printf("第%d次成功,目前耗时：%dms%n", finalI, (date.getTime() - begin.getTime()));
-//                }
-//            });
-//        }
+        Date begin = new Date();
+        for (int i = 0; i < 100; i++) {
+            int finalI = i;
+            EXECUTOR.execute(() -> {
+                IpDetail ipDetail = TryGetIpDetailOrNullTreeTimes("27.47.133.94");
+                if (Objects.nonNull(ipDetail)) {
+                    Date date = new Date();
+                    System.out.printf("第%d次成功,目前耗时：%dms%n", finalI, (date.getTime() - begin.getTime()));
+                    log.info(ipDetail.toString());
+                }
+            });
+        }
         System.out.println(StrUtil.format(ThirdPartyInterfaceConst.TAOBAO_IP_DETAIL, "1433223"));
     }
 

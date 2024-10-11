@@ -91,6 +91,8 @@ spring:
 #              URL: jdbc:mysql://[数据库IP]:[数据库端口]/blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Hong_Kong
 #              user: root
 #              password: [数据库密码]
+#  main:
+#    allow-circular-references: true
 #mail:
 #  link:
 #    apply:
