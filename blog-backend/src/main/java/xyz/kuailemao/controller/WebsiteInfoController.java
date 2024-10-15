@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -96,7 +97,7 @@ public class WebsiteInfoController {
     @Operation(summary = "修改或创建站长信息")
     @Parameter(name = "stationmasterInfoDTO", description = "站长信息")
     @PostMapping("/stationmaster")
-    public ResponseResult<Void> updateStationmasterInfo(@RequestBody StationmasterInfoDTO stationmasterInfoDTO) {
+    public ResponseResult<Void> updateStationmasterInfo(@Valid @RequestBody StationmasterInfoDTO stationmasterInfoDTO) {
         return websiteInfoService.updateStationmasterInfo(stationmasterInfoDTO);
     }
 
@@ -109,7 +110,7 @@ public class WebsiteInfoController {
     @Operation(summary = "修改或创建网站信息")
     @Parameter(name = "websiteInfoDTO", description = "网站信息")
     @PostMapping("/webInfo")
-    public ResponseResult<Void> updateWebsiteInfo(@RequestBody WebsiteInfoDTO websiteInfoDTO) {
+    public ResponseResult<Void> updateWebsiteInfo(@Valid @RequestBody WebsiteInfoDTO websiteInfoDTO) {
         return websiteInfoService.updateWebsiteInfo(websiteInfoDTO);
     }
 }

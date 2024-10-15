@@ -5,8 +5,11 @@
       <InfoCard/>
     </div>
     <div>
-      <Card title="公告" prefixIcon="announcement" suffix-icon="jt_y" :isDithering="true" :isArrow="true">
-        <p>{{ useWebsite.webInfo?.sidebarAnnouncement }}</p>
+      <Card title="公告" prefixIcon="announcement" suffix-icon="jt_y" :isDithering="true" :isArrow="true"
+            @invoke="announcement">
+        <pre class="pre-text">
+{{ useWebsite.webInfo?.sidebarAnnouncement }}
+        </pre>
       </Card>
     </div>
     <div>
@@ -41,6 +44,7 @@ import Card from '@/components/Card/index.vue'
 import {ref, onMounted} from 'vue'
 import {getSoup} from "@/apis/thirdParty";
 import useWebsiteStore from "@/store/modules/website.ts";
+import {ElMessageBox} from "element-plus";
 
 const useWebsite = useWebsiteStore()
 
@@ -78,6 +82,16 @@ function soupSub() {
   })
 }
 
+function announcement() {
+  ElMessageBox.alert(`<pre>${useWebsite.webInfo?.sidebarAnnouncement}</pre>`, '公告', {
+    // if you want to disable its autofocus
+    // autofocus: false,
+    confirmButtonText: '关闭',
+    closeOnPressEscape: true,
+    dangerouslyUseHTMLString: true,
+  })
+}
+
 onMounted(() => {
   getSoup().then((res: any) => {
     soup.value = res.hitokoto
@@ -87,7 +101,6 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-
 .statistics {
   display: flex;
   flex-direction: column;
@@ -99,6 +112,11 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
   }
+}
+
+.pre-text {
+  text-align: left;
+  overflow: auto; /* 如果内容超出了元素盒子的宽度，显示滚动条 */
 }
 
 </style>
