@@ -79,7 +79,7 @@ function updateWebsiteInfo() {
         <a-input v-model:value="formData.headerNotification" />
       </a-form-item>
       <a-form-item label="侧面公告">
-        <a-textarea v-model:value="formData.sidebarAnnouncement" show-count :maxlength="100" />
+        <a-textarea v-model:value="formData.sidebarAnnouncement" show-count :maxlength="1000" />
       </a-form-item>
       <a-divider style="margin-top: -1rem">
         网站资讯
@@ -89,7 +89,7 @@ function updateWebsiteInfo() {
       </a-form-item>
       <div style="display: flex;justify-content:space-between">
         <a-form-item label="运行时长">
-          <a-input v-model:value="runTime" disabled style="width: 15rem" />
+          <a-input v-model:value="runTime" disabled style="width: 12.2rem" />
         </a-form-item>
         <a-form-item label="最后更新" style="margin-left: 1rem">
           <a-input v-model:value="formData.lastUpdateTime" disabled />
