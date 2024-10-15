@@ -20,8 +20,8 @@
 
 <script setup lang="ts">
 
-import EasyTyper from "easy-typer-js";
 import useWebsiteStore from "@/store/modules/website.ts";
+import {getSoupTyping} from "@/apis/thirdParty";
 
 const useWebsite = useWebsiteStore()
 
@@ -30,7 +30,7 @@ const obj = reactive({
   isEnd: false,
   speed: 300,
   singleBack: false,
-  sleep: 0,
+  sleep: 3000,
   type: "rollback",
   backSpeed: 100,
   sentencePause: false,
@@ -44,28 +44,8 @@ const scrollDown = () => {
 };
 
 onMounted(() => {
-  fetchData();
+  getSoupTyping(obj)
 });
-let myYiYan = import.meta.env.VITE_YIYAN_API
-if (!myYiYan){
-  myYiYan = 'https://v1.hitokoto.cn/?c=a&encode=json'
-}
-const fetchData = () => {
-  fetch(myYiYan)
-      .then((res) => {
-        return res.json();
-      })
-      .then(({ hitokoto }) => {
-        new EasyTyper(
-            obj,
-            hitokoto,
-            () => {
-              fetchData()
-            },
-            () => { }
-        );
-      });
-};
 
 </script>
 

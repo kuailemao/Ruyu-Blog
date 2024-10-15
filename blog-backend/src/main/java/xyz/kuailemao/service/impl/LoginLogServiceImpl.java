@@ -52,7 +52,6 @@ public class LoginLogServiceImpl extends ServiceImpl<LoginLogMapper, LoginLog> i
         String browserName = BrowserUtil.browserName(request);
         String ipAddress = IpUtils.getIpAddr(request);
         String os = BrowserUtil.osName(request);
-        String realAddressByIP = AddressUtils.getRealAddressByIP(ipAddress);
         int requestType;
         String typeHeader = request.getHeader(Const.TYPE_HEADER);
         if (StringUtils.isNotEmpty(typeHeader) && typeHeader.equals(Const.FRONTEND_REQUEST)) {
@@ -68,7 +67,6 @@ public class LoginLogServiceImpl extends ServiceImpl<LoginLogMapper, LoginLog> i
         LoginLog logEntity = LoginLog.builder()
                 .userName(userName)
                 .ip(ipAddress)
-                .address(realAddressByIP)
                 .browser(browserName)
                 .os(os)
                 .type(requestType)

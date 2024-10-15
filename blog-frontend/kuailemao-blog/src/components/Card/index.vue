@@ -90,6 +90,7 @@ function invoke(){
   margin-top: 1.5em;
   // 添加阴影
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
 
   .title {
     border-radius: $border-radius $border-radius 0 0;

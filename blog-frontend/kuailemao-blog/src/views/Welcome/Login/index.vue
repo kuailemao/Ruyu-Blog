@@ -62,7 +62,7 @@ function userLogin() {
           </el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input v-model="form.password" type="password" maxlength="20" placeholder="密码">
+          <el-input v-model="form.password" type="password" maxlength="20" placeholder="密码" @keyup.enter="userLogin()">
             <template #prefix>
               <el-icon>
                 <Lock/>

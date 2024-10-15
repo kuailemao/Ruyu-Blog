@@ -51,15 +51,6 @@ function relatedRecommendBtn(categoryId: string, articleId: string) {
   })
 }
 
-onMounted(() => {
-  if (props.title == "随机文章") {
-    randomArticleBtn()
-  }
-  if (props.title == "相关推荐") {
-    relatedRecommendBtn(props.categoryId, props.articleId)
-  }
-})
-
 // 去掉时分秒
 function formatDate(date: []) {
   date.forEach((item:any) => {
@@ -68,21 +59,30 @@ function formatDate(date: []) {
   return date
 }
 
+function loadContent(){
+  if (props.title == "随机文章") {
+    randomArticleBtn()
+  }
+  if (props.title == "相关推荐") {
+    relatedRecommendBtn(props.categoryId, props.articleId)
+  }
+}
+
 </script>
 
 <template>
   <!-- 随机文章 -->
   <Card :title="title" :prefix-icon="prefixIcon" :suffix-icon="title === '相关推荐' ? '' : 'rotate'" @isRotate="true"
-        :isScale="true" @invoke="randomArticleBtn">
-    <div class="random_container" v-for="randomArticle in randomArticles">
-      <div class="random_image" @click="$router.push('/article/'+randomArticle.id)">
-        <img :data-src="randomArticle.articleCover" v-lazy="true" />
+        :isScale="true" @invoke="randomArticleBtn" v-view-request="{ callback: loadContent }">
+      <div class="random_container" v-for="randomArticle in randomArticles">
+        <div class="random_image" @click="$router.push('/article/'+randomArticle.id)">
+          <img :data-src="randomArticle.articleCover" v-lazy="true" />
+        </div>
+        <div class="random_text" :key="randomArticle.id">
+          <div>{{ randomArticle.articleTitle }}</div>
+          <div>{{ randomArticle.createTime }}</div>
+        </div>
       </div>
-      <div class="random_text" :key="randomArticle.id">
-        <div>{{ randomArticle.articleTitle }}</div>
-        <div>{{ randomArticle.createTime }}</div>
-      </div>
-    </div>
   </Card>
 </template>
 

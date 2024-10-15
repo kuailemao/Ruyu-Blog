@@ -12,6 +12,7 @@ import xyz.kuailemao.domain.entity.Log;
 import xyz.kuailemao.domain.entity.LoginLog;
 import xyz.kuailemao.mapper.LogMapper;
 import xyz.kuailemao.mapper.LoginLogMapper;
+import xyz.kuailemao.service.IpService;
 
 import java.io.IOException;
 
@@ -31,6 +32,9 @@ public class LogQueueListener {
     @Resource
     private LogMapper logMapper;
 
+    @Resource
+    private IpService ipService;
+
     /**
      * 监听登录日志队列
      */
@@ -46,7 +50,9 @@ public class LogQueueListener {
         if (loginLog.getType() == null) {
             loginLog.setType(2);
         }
-        loginLogMapper.insert(loginLog);
+        if (loginLogMapper.insert(loginLog) > 0) {
+            ipService.refreshIpDetailAsyncByLogIdAndLogin(loginLog.getId());
+        }
         log.info("登录日志标识:{}，数据库添加成功", tag);
     }
 
@@ -57,7 +63,9 @@ public class LogQueueListener {
     @RabbitListener(queues = RabbitConst.LOG_SYSTEM_QUEUE,concurrency = "5-10")
     public void handlerSystemLog(Log logEntity) {
         log.info("--------------消费系统操作日志--------------");
-        logMapper.insert(logEntity);
+        if (logMapper.insert(logEntity) > 0) {
+            ipService.refreshIpDetailAsyncByLogId(logEntity.getId());
+        }
         log.info("--------------系统操作日志插入数据库成功--------------");
     }
 }
