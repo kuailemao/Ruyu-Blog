@@ -45,7 +45,7 @@ function getTreeHole() {
       <div>树洞</div>
       <div>
         <input v-model="content" @focus="isShowSubmit = true" type="text" placeholder="在这里留下自己的足迹吧...">
-        <button v-show="isShowSubmit" @click="addTreeHoleBtn">提交</button>
+        <button v-show="isShowSubmit" @click="addTreeHoleBtn"><span style="color: grey;font-style: italic;font-weight: bold">提交</span></button>
       </div>
     </div>
     <vue-danmaku :debounce="3000"
@@ -70,7 +70,7 @@ function getTreeHole() {
 
 <style scoped lang="scss">
 .container {
-  background-image: url('https://image.kuailemao.xyz/blog/TreeHole/TreeHole-back.png');
+  background-image: url('https://image.kuailemao.xyz/blog/TreeHole/TreeHole-back_compressed.webp');
   background-size: cover;
   background-position: center;
   min-width: 100vw;

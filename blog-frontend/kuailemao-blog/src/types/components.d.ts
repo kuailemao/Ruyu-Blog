@@ -14,6 +14,7 @@ declare module 'vue' {
     Card: typeof import('./../components/Card/index.vue')['default']
     CardEssay: typeof import('./../components/CardEssay/index.vue')['default']
     CardInfo: typeof import('./../components/CardInfo/index.vue')['default']
+    ChargingList: typeof import('./../components/Layout/SideBar/ChargingList/index.vue')['default']
     ChildComment: typeof import('./../components/Comment/ChildComment.vue')['default']
     Comment: typeof import('./../components/Comment/index.vue')['default']
     Controls: typeof import('./../components/Music/controls/index.vue')['default']

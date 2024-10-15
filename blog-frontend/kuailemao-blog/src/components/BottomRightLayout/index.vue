@@ -58,6 +58,7 @@ const emit = defineEmits(['ReadingMode'])
 
 <style scoped lang="scss">
 .container_div {
+  z-index: 9999;
   position: fixed;
   bottom: 4rem;
   right: 2rem;
