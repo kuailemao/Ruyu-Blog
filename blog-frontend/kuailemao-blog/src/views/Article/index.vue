@@ -9,7 +9,7 @@ import {
 import {cancelFavorite, userFavorite, isFavorite} from '@/apis/favorite'
 import {cancelLike, isLike, userLike} from '@/apis/like';
 import DirectoryCard from "./DirectoryCard/index.vue";
-import {ElMessage} from "element-plus";
+import {ElMessage, ElMessageBox} from "element-plus";
 import router from "@/router";
 import useWebsiteStore from "@/store/modules/website.ts";
 import {useColorMode, useTitle} from "@vueuse/core";
@@ -110,13 +110,24 @@ function countWords(count: number) {
 // 分享
 const copyToClipboard = async () => {
   try {
-    const content = `欢迎访问博客文章：${articleDetail.value.articleTitle} \n通往地址：http://kuailemao.xyz/blog${route.path}`;
+    const content = `欢迎访问博客文章：${articleDetail.value.articleTitle} \n通往地址：${env.VITE_FRONTEND_URL}${route.path}`;
     // 替换为你要分享的实际内容
     await navigator.clipboard.writeText(content);
     ElMessage.success("已复制分享链接");
   } catch (error) {
-    ElMessage.error("复制失败，请类型网站管理员");
+    ElMessage.error("复制失败，请联系网站管理员");
   }
+}
+
+// 公告
+function announcement() {
+  ElMessageBox.alert(`<pre>${websiteStore.webInfo?.sidebarAnnouncement}</pre>`, '公告', {
+    // if you want to disable its autofocus
+    // autofocus: false,
+    confirmButtonText: '关闭',
+    closeOnPressEscape: true,
+    dangerouslyUseHTMLString: true,
+  })
 }
 
 // 收藏标记
@@ -372,8 +383,11 @@ function ReadingModeFunc() {
       </template>
       <template #information>
         <CardInfo/>
-        <Card title="公告" prefixIcon="announcement" suffix-icon="jt_y" :isDithering="true" :isArrow="true">
-          <p>{{ websiteStore.webInfo?.sidebarAnnouncement }}</p>
+        <Card title="公告" prefixIcon="announcement" suffix-icon="jt_y" :isDithering="true" :isArrow="true"
+              @invoke="announcement">
+        <pre class="pre-text">
+{{ websiteStore.webInfo?.sidebarAnnouncement }}
+        </pre>
         </Card>
         <ElectronicClocks/>
         <div class="sticky_layout">
@@ -837,5 +851,10 @@ function ReadingModeFunc() {
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
   z-index: 9999;
+}
+
+.pre-text {
+  text-align: left;
+  overflow: auto; /* 如果内容超出了元素盒子的宽度，显示滚动条 */
 }
 </style>

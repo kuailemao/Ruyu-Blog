@@ -8,18 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.kuailemao.domain.dto.MenuDTO;
-import xyz.kuailemao.domain.entity.Menu;
-import xyz.kuailemao.domain.entity.Role;
-import xyz.kuailemao.domain.entity.RoleMenu;
-import xyz.kuailemao.domain.entity.UserRole;
+import xyz.kuailemao.domain.entity.*;
 import xyz.kuailemao.domain.response.ResponseResult;
 import xyz.kuailemao.domain.vo.MenuByIdVO;
 import xyz.kuailemao.domain.vo.MenuVO;
 import xyz.kuailemao.enums.RespEnum;
-import xyz.kuailemao.mapper.MenuMapper;
-import xyz.kuailemao.mapper.RoleMapper;
-import xyz.kuailemao.mapper.RoleMenuMapper;
-import xyz.kuailemao.mapper.UserRoleMapper;
+import xyz.kuailemao.mapper.*;
 import xyz.kuailemao.service.MenuService;
 import xyz.kuailemao.service.RoleMenuService;
 import xyz.kuailemao.utils.SecurityUtils;
@@ -52,6 +46,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
     @Resource
     private UserRoleMapper userRoleMapper;
+
+    @Resource
+    private PermissionMapper permissionMapper;
 
     @Override
     public ResponseResult<List<MenuVO>> getMenuList(Integer typeId, String username, Integer status) {
@@ -198,6 +195,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         if (this.removeById(id)) {
             // 删除相关菜单角色关系
             roleMenuMapper.delete(new LambdaQueryWrapper<RoleMenu>().eq(RoleMenu::getMenuId, id));
+            // 删除菜单对应权限
+            permissionMapper.delete(new LambdaQueryWrapper<Permission>().eq(Permission::getMenuId, id));
             return ResponseResult.success();
         }
         return ResponseResult.failure();
