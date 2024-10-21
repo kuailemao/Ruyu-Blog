@@ -211,6 +211,10 @@ public class IpServiceImpl implements IpService, DisposableBean {
             return city;
         }
 
+        if ("XX".equals(city)){
+            return region;
+        }
+
         if (region.equals(city)) {
             return region;
         }
@@ -226,7 +230,7 @@ public class IpServiceImpl implements IpService, DisposableBean {
         for (int i = 0; i < 100; i++) {
             int finalI = i;
             EXECUTOR.execute(() -> {
-                IpDetail ipDetail = TryGetIpDetailOrNullTreeTimes("27.47.133.94");
+                IpDetail ipDetail = TryGetIpDetailOrNullTreeTimes("");
                 if (Objects.nonNull(ipDetail)) {
                     Date date = new Date();
                     System.out.printf("第%d次成功,目前耗时：%dms%n", finalI, (date.getTime() - begin.getTime()));
