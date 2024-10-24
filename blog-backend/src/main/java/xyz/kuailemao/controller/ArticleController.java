@@ -37,6 +37,18 @@ public class ArticleController {
     @Resource
     private ArticleService articleService;
 
+    /**
+     * 初始化标题搜索文章数据
+     * @return List<InitSearchTitleVO>
+     */
+    @Operation(summary = "初始化通过标题搜索文章")
+    @AccessLimit(seconds = 60, maxCount = 5)
+    @GetMapping("/search/init/title")
+    public ResponseResult<List<InitSearchTitleVO>> initSearchByTitle() {
+        return ControllerUtils.messageHandler(() -> articleService.initSearchByTitle());
+    }
+
+
     @Operation(summary = "获取所有的文章列表")
     @AccessLimit(seconds = 60, maxCount = 10)
     @Parameters({

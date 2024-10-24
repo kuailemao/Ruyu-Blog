@@ -380,4 +380,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
         return ResponseResult.failure();
     }
+
+    @Override
+    public List<InitSearchTitleVO> initSearchByTitle() {
+        List<Article> articles = this.list(new LambdaQueryWrapper<Article>().eq(Article::getStatus, SQLConst.PUBLIC_ARTICLE));
+        Map<Long, String> categoryMap = categoryMapper.selectList(null).stream().collect(Collectors.toMap(Category::getId, Category::getCategoryName));
+        if (articles.isEmpty()) {
+            return List.of();
+        }
+        return articles.stream().map(article -> article.asViewObject(InitSearchTitleVO.class, item -> item.setCategoryName(categoryMap.get(article.getCategoryId())))).toList();
+    }
 }

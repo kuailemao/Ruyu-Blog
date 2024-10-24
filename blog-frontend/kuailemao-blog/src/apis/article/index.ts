@@ -55,3 +55,10 @@ export function addArticleVisit(id: String) {
         method: "get"
     });
 }
+
+// 获取初始化时标题搜索数据
+export function getSearchTitleList() {
+    return http.get(`/article/search/init/title`, {
+        method: "get"
+    });
+}

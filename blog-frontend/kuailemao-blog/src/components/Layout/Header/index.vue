@@ -13,7 +13,7 @@ import {
   Setting, ChatLineSquare, Promotion, Clock, DocumentCopy, PriceTag, Fries, Close
 } from '@element-plus/icons-vue'
 import SvgIcon from '@/components/SvgIcon/index.vue'
-import { useColorMode } from '@vueuse/core'
+import {useColorMode} from '@vueuse/core'
 import DayNightToggleButton from "@/components/DayNightToggle"
 import useUserStore from "@/store/modules/user.ts"
 import {logout, oauthLogin} from "@/apis/user"
@@ -100,15 +100,13 @@ function changeToggle({detail}) {
 const env = import.meta.env
 </script>
 <template>
-  <div>
+  <div class="search_dialog_container">
     <!-- 搜索内容 -->
     <el-dialog
         v-model="dialogVisible"
-        width="35%"
         :show-close="false"
-        style="border-radius: 15px"
         :close-on-click-modal="false"
-        :lock-scroll="false"
+        :lock-scroll="true"
     >
       <template #header>
         <div style="display: flex;justify-content: space-between;align-items: center">
@@ -205,12 +203,12 @@ const env = import.meta.env
             友链
           </el-menu-item>
           <template v-if="env.VITE_MUSIC_FRONTEND_URL">
-          <el-menu-item index="/music">
-            <el-icon>
-              <Headset/>
-            </el-icon>
-            音乐
-          </el-menu-item>
+            <el-menu-item index="/music">
+              <el-icon>
+                <Headset/>
+              </el-icon>
+              音乐
+            </el-menu-item>
           </template>
           <el-menu-item index="/about">
             <el-icon>
@@ -221,7 +219,7 @@ const env = import.meta.env
           <div class="flex-grow"/>
           <!-- 日夜切换 -->
           <div style="margin-right: 4.5rem;margin-top: -0.2rem">
-            <toggle-button @change="changeToggle" size="1" ></toggle-button>
+            <toggle-button @change="changeToggle" size="1"></toggle-button>
           </div>
           <!-- 搜索按钮 -->
           <div class="search" @click="dialogVisible = true">
@@ -260,14 +258,14 @@ const env = import.meta.env
                       个人设置
                     </template>
                   </el-dropdown-item>
-<!--                  <el-dropdown-item>-->
-<!--                    <template #default>-->
-<!--                      <el-icon>-->
-<!--                        <Collection/>-->
-<!--                      </el-icon>-->
-<!--                      我的收藏-->
-<!--                    </template>-->
-<!--                  </el-dropdown-item>-->
+                  <!--                  <el-dropdown-item>-->
+                  <!--                    <template #default>-->
+                  <!--                      <el-icon>-->
+                  <!--                        <Collection/>-->
+                  <!--                      </el-icon>-->
+                  <!--                      我的收藏-->
+                  <!--                    </template>-->
+                  <!--                  </el-dropdown-item>-->
                   <el-dropdown-item @click="logoutSub">
                     <template #default>
                       <el-icon>
@@ -289,7 +287,7 @@ const env = import.meta.env
             </div>
             <!-- 移动端日夜切换 -->
             <div style="margin-left: 5rem">
-              <toggle-button @change="changeToggle" size="1" ></toggle-button>
+              <toggle-button @change="changeToggle" size="1"></toggle-button>
             </div>
           </div>
 
@@ -383,6 +381,23 @@ const env = import.meta.env
 
 <style lang="scss" scoped>
 
+.search_dialog_container {
+  :deep(.el-dialog) {
+    border-radius: 10px;
+    height: 70vh;
+  }
+
+  @media screen and (max-width: 650px) {
+    :deep(.el-dialog) {
+      border-radius: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+  }
+}
+
 .move_nav {
   display: flex;
   justify-content: space-between;
@@ -441,7 +456,7 @@ const env = import.meta.env
   }
 
   // 更改element-ui默认样式
-  .menu :deep(.el-menu-item:hover)  {
+  .menu :deep(.el-menu-item:hover) {
     //background-color: rgba(248, 249, 250, 0.2);
     color: #409EFF;
   }
