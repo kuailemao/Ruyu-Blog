@@ -140,4 +140,10 @@ public interface ArticleService extends IService<Article> {
      * @return 是否成功
      */
     ResponseResult<Void> deleteArticle(List<Long> id);
+
+    /**
+     * 初始化搜索文章标题
+     * @return 文章数据
+     */
+    List<InitSearchTitleVO> initSearchByTitle();
 }
