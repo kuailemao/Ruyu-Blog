@@ -115,7 +115,7 @@ function addTagFunc(e: MouseEvent) {
 }
 
 function beforeUpload(file: UploadProps['fileList'][number]) {
-  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
+  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp'
   if (!isJpgOrPng) {
     message.error('文件格式必须是jpg或png或gif或webp')
     return false
