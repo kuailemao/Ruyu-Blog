@@ -101,7 +101,7 @@ public class IpServiceImpl implements IpService, DisposableBean {
             }
             IpDetail ipDetail = TryGetIpDetailOrNullTreeTimes(ip);
             if (Objects.nonNull(ipDetail)) {
-                user.setRegisterAddress(buildAddr(ipDetail.getRegion(), ipDetail.getCity()));
+                user.setRegisterAddress(buildAddr(ipDetail.getRegion(), ipDetail.getCity(), ipDetail.getCountry()));
             } else {
                 user.setRegisterAddress("未知");
                 log.error("register get ip detail fail ip:{},uid:{}", ip, uid);
@@ -128,7 +128,7 @@ public class IpServiceImpl implements IpService, DisposableBean {
             }
             IpDetail ipDetail = TryGetIpDetailOrNullTreeTimes(ip);
             if (Objects.nonNull(ipDetail)) {
-                user.setLoginAddress(buildAddr(ipDetail.getRegion(), ipDetail.getCity()));
+                user.setLoginAddress(buildAddr(ipDetail.getRegion(), ipDetail.getCity(), ipDetail.getCountry()));
             } else {
                 user.setRegisterAddress("未知");
                 log.error("login get ip detail fail ip:{},uid:{}", ip, uid);
@@ -155,7 +155,7 @@ public class IpServiceImpl implements IpService, DisposableBean {
             }
             IpDetail ipDetail = TryGetIpDetailOrNullTreeTimes(ip);
             if (Objects.nonNull(ipDetail)) {
-                loginLog.setAddress(buildAddr(ipDetail.getRegion(), ipDetail.getCity()));
+                loginLog.setAddress(buildAddr(ipDetail.getRegion(), ipDetail.getCity(), ipDetail.getCountry()));
             } else {
                 loginLog.setAddress("未知");
                 log.error("loginLog get ip detail fail ip:{},loginLogId:{}", ip, loginLogId);
@@ -182,7 +182,7 @@ public class IpServiceImpl implements IpService, DisposableBean {
             }
             IpDetail ipDetail = TryGetIpDetailOrNullTreeTimes(ip);
             if (Objects.nonNull(ipDetail)) {
-                log.setAddress(buildAddr(ipDetail.getRegion(), ipDetail.getCity()));
+                log.setAddress(buildAddr(ipDetail.getRegion(), ipDetail.getCity(), ipDetail.getCountry()));
             } else {
                 log.setAddress("未知");
                 IpServiceImpl.log.error("log get ip detail fail ip:{},log:{}", ip, log);
@@ -195,12 +195,17 @@ public class IpServiceImpl implements IpService, DisposableBean {
      * 构建地址
      * @param region 区域
      * @param city 城市
+     * @param country 国家
      * @return 地址
      */
-    private String buildAddr(String region, String city) {
+    private String buildAddr(String region, String city, String country) {
 
         if ("内网IP".equals(city)) {
             return "内网IP";
+        }
+
+        if (!"中国".equals(country)) {
+            return country;
         }
 
         if ("XX".equals(region) && "XX".equals(city)) {
