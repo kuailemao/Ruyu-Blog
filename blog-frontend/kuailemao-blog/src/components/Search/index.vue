@@ -2,8 +2,10 @@
 import {ref} from 'vue'
 import {Delete, Loading} from '@element-plus/icons-vue'
 import useWebsiteStore from "@/store/modules/website.ts";
-import {ArticleSearchByTitle} from "@/apis/article/type.ts";
+import {ArticleHotRecommend, ArticleSearchByTitle} from "@/apis/article/type.ts";
 import router from "@/router";
+import {useLocalStorage} from "@vueuse/core";
+import {getHotRecommend} from "@/apis/article";
 
 const emit = defineEmits(['isShowSearch'])
 
@@ -12,13 +14,7 @@ const websiteStore = useWebsiteStore()
 const searchValue = ref('')
 
 function handleSearch() {
-  ElNotification({
-    title: '搜索功能敬请期待',
-    showClose: false,
-    duration: 6000,
-    message: '该模块未开放，作者没有空',
-    type: 'success',
-  })
+  historyList.value.push(searchValue.value)
 }
 
 const optionsValue = ref('标题')
@@ -29,17 +25,30 @@ const showSearch = ref(true)
 
 const articleSearchList = ref<Array<ArticleSearchByTitle>>()
 
+const historyList = useLocalStorage<string[]>('searchHistoryList', []);
+
+const inputRef: Ref<HTMLInputElement | null> = ref(null);
+
+const hotList = ref<Array<ArticleHotRecommend>>()
+
+onMounted(() => {
+  getHot()
+})
+
 // 搜索框获得焦点
 async function handleFocus() {
-  // TODO 搜索策略
   if (!websiteStore.searchTitle) {
     await websiteStore.getArticleTitleList();
   }
   showSearch.value = false
 }
 
-watchEffect(() => {
+watch(optionsValue, () => {
+  articleSearchList.value = []
+  searchValue.value = ''
+})
 
+watchEffect(() => {
   if (!searchValue.value) {
     articleSearchList.value = []
   }
@@ -54,8 +63,26 @@ function handleBlur() {
 }
 
 function clickSearchResult(articleId: number) {
+  historyList.value.push(searchValue.value)
+  searchValue.value = ''
   router.push('/article/' + articleId)
   emit('isShowSearch')
+}
+
+function delAllHistory() {
+  historyList.value = []
+}
+
+function historySearch(value: string) {
+  searchValue.value = value
+  inputRef.value?.focus();
+  handleFocus()
+}
+
+function getHot() {
+  getHotRecommend().then((res: any) => {
+    hotList.value = res.data
+  })
 }
 
 </script>
@@ -65,6 +92,7 @@ function clickSearchResult(articleId: number) {
   <div class="content_container">
     <div class="search">
       <el-input
+          ref="inputRef"
           placeholder="回车或点击搜索按钮"
           v-model="searchValue"
           prefix-icon="el-icon-search"
@@ -91,7 +119,7 @@ function clickSearchResult(articleId: number) {
           <div>
             搜索历史
           </div>
-          <div class="event_history">
+          <div class="event_history" @click="delAllHistory">
             <el-icon>
               <Delete/>
             </el-icon>
@@ -100,54 +128,16 @@ function clickSearchResult(articleId: number) {
         </div>
         <!-- 历史记录 -->
         <div>
-          <el-tag
-              closable
-              size="small"
-              effect="plain"
+          <el-check-tag
+              type="primary"
               style="margin: 5px"
+              v-for="(item) in historyList"
+              :key="item"
+              checked
+              @click="historySearch(item)"
           >
-            vue
-          </el-tag>
-          <el-tag
-              closable
-              size="small"
-              effect="plain"
-              style="margin: 5px"
-          >
-            react
-          </el-tag>
-          <el-tag
-              closable
-              size="small"
-              effect="plain"
-              style="margin: 5px"
-          >
-            Java语言基础
-          </el-tag>
-          <el-tag
-              closable
-              size="small"
-              effect="plain"
-              style="margin: 5px"
-          >
-            站🐖长得多帅
-          </el-tag>
-          <el-tag
-              closable
-              size="small"
-              effect="plain"
-              style="margin: 5px"
-          >
-            宇宙无敌帅
-          </el-tag>
-          <el-tag
-              closable
-              size="small"
-              effect="plain"
-              style="margin: 5px"
-          >
-            哈哈哈
-          </el-tag>
+            {{ item }}
+          </el-check-tag>
         </div>
         <!-- 热门推荐 -->
         <div class="header_history">
@@ -162,35 +152,14 @@ function clickSearchResult(articleId: number) {
           </div>
         </div>
         <div class="recommend_container">
-          <div class="item">
-            Lambda+Stream函数式编程
+          <div class="item" v-for="hot in hotList" :key="hot.id" @click="() => {
+            emit('isShowSearch')
+            $router.push('/article/' + hot.id)
+          }">
+            {{ hot.articleTitle }}
             <div>
               <SvgIcon name="heat"/>
-              <span>1312</span></div>
-          </div>
-          <div class="item">
-            Java8-17新特性
-            <div>
-              <SvgIcon name="heat"/>
-              <span>1242</span></div>
-          </div>
-          <div class="item">
-            MybatisPlus
-            <div>
-              <SvgIcon name="heat"/>
-              <span>1242</span></div>
-          </div>
-          <div class="item">
-            分布式理论
-            <div>
-              <SvgIcon name="heat"/>
-              <span>606</span></div>
-          </div>
-          <div class="item">
-            MQ消息队列
-            <div>
-              <SvgIcon name="heat"/>
-              <span>417</span></div>
+              <span>{{ hot.visitCount }}</span></div>
           </div>
         </div>
       </div>

@@ -390,4 +390,13 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
         return articles.stream().map(article -> article.asViewObject(InitSearchTitleVO.class, item -> item.setCategoryName(categoryMap.get(article.getCategoryId())))).toList();
     }
+
+    @Override
+    public List<HotArticleVO> listHotArticle() {
+        List<Article> articles = articleMapper.selectList(new LambdaQueryWrapper<Article>().eq(Article::getStatus, SQLConst.PUBLIC_ARTICLE).orderByDesc(Article::getVisitCount).last("LIMIT 5"));
+        if (!articles.isEmpty()) {
+            return articles.stream().map(article -> article.asViewObject(HotArticleVO.class)).toList();
+        }
+        return List.of();
+    }
 }
