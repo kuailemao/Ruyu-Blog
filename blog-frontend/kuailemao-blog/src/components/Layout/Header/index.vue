@@ -115,7 +115,7 @@ const env = import.meta.env
                      @click="dialogVisible = false"/>
         </div>
       </template>
-      <Search/>
+      <Search @isShowSearch="dialogVisible = false"/>
     </el-dialog>
   </div>
   <div>

@@ -10,8 +10,6 @@ const useWebsiteStore = defineStore('website', () => {
     const webInfo = shallowRef<WebsiteInfo>()
     // 标题搜索数据
     const searchTitle = shallowRef<Array<ArticleSearchByTitle>>()
-    // 标题搜索次数
-    const searchCountByTitle = shallowRef<number>(0)
 
     // 获取网站信息
     const getInfo = async () => {
@@ -32,7 +30,6 @@ const useWebsiteStore = defineStore('website', () => {
         getInfo,
         searchTitle,
         getArticleTitleList,
-        searchCountByTitle
     }
 })
 
