@@ -48,6 +48,14 @@ public class ArticleController {
         return ControllerUtils.messageHandler(() -> articleService.initSearchByTitle());
     }
 
+    // 热门推荐
+    @Operation(summary = "获取热门推荐文章")
+    @AccessLimit(seconds = 60, maxCount = 60)
+    @GetMapping("/hot")
+    public ResponseResult<List<HotArticleVO>> hot() {
+        return ControllerUtils.messageHandler(() -> articleService.listHotArticle());
+    }
+
 
     @Operation(summary = "获取所有的文章列表")
     @AccessLimit(seconds = 60, maxCount = 10)

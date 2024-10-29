@@ -146,4 +146,10 @@ public interface ArticleService extends IService<Article> {
      * @return 文章数据
      */
     List<InitSearchTitleVO> initSearchByTitle();
+
+    /**
+     * 热门推荐
+     * @return 热门推荐前5
+     */
+    List<HotArticleVO> listHotArticle();
 }

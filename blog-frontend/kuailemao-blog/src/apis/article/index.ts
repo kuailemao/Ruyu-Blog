@@ -62,3 +62,10 @@ export function getSearchTitleList() {
         method: "get"
     });
 }
+
+// 搜索热门推荐
+export function getHotRecommend() {
+    return http.get(`/article/hot`, {
+        method: "get"
+    });
+}
