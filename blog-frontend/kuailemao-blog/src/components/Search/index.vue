@@ -2,6 +2,10 @@
 import {ref} from 'vue'
 import {Delete, Loading} from '@element-plus/icons-vue'
 import useWebsiteStore from "@/store/modules/website.ts";
+import {ArticleSearchByTitle} from "@/apis/article/type.ts";
+import router from "@/router";
+
+const emit = defineEmits(['isShowSearch'])
 
 const websiteStore = useWebsiteStore()
 
@@ -17,22 +21,41 @@ function handleSearch() {
   })
 }
 
-const value = ref('标题')
+const optionsValue = ref('标题')
 
 const options = ['标题', '内容']
 
 const showSearch = ref(true)
 
+const articleSearchList = ref<Array<ArticleSearchByTitle>>()
+
 // 搜索框获得焦点
-function handleFocus() {
+async function handleFocus() {
   // TODO 搜索策略
-  console.log('搜索次数：{}',websiteStore.searchCountByTitle)
+  if (!websiteStore.searchTitle) {
+    await websiteStore.getArticleTitleList();
+  }
   showSearch.value = false
 }
+
+watchEffect(() => {
+
+  if (!searchValue.value) {
+    articleSearchList.value = []
+  }
+  if (searchValue.value && optionsValue.value === '标题') {
+    articleSearchList.value = websiteStore.searchTitle?.filter(item => item.articleTitle.toLowerCase().includes(searchValue.value.toLowerCase()))
+  }
+})
 
 // 搜索框失去焦点
 function handleBlur() {
   showSearch.value = true
+}
+
+function clickSearchResult(articleId: number) {
+  router.push('/article/' + articleId)
+  emit('isShowSearch')
 }
 
 </script>
@@ -56,7 +79,7 @@ function handleBlur() {
         </template>
         <template #suffix>
           <div class="custom-style">
-            <el-segmented v-model="value" :options="options" size="small" />
+            <el-segmented v-model="optionsValue" :options="options" size="small"/>
           </div>
         </template>
       </el-input>
@@ -173,8 +196,26 @@ function handleBlur() {
       </div>
     </template>
     <template v-else>
-      <div style="text-align: center;padding-top: 2rem">
+      <div v-if="articleSearchList?.length === 0" style="text-align: center;padding-top: 2rem">
         <span style="font-size: 12px;color: grey;">请输入要搜索的内容</span>
+      </div>
+      <div class="search_result">
+        <div v-for="item in articleSearchList" :key="item.id" @mousedown="clickSearchResult(item.id)">
+          <div class="search_result_item">
+            <div>
+              {{ item.articleTitle }}
+              <div class="text-xs mt-1 dark:text-[#A3A3A3] p-1">
+                <el-tag size="small" class="mr-2">
+                  {{ item.categoryName }}
+                </el-tag>
+              </div>
+            </div>
+            <div class="flex space-x-2 text-xs text-[#475569] items-center justify-center">
+              <SvgIcon name="heat"/>
+              <span>{{ item.visitCount }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </template>
   </div>
@@ -185,6 +226,30 @@ function handleBlur() {
 
 .content_container {
   height: 100%;
+
+  .search_result {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    margin-top: 1rem;
+
+    .search_result_item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    & > div {
+      padding: 5px;
+      cursor: pointer;
+    }
+
+    & > div:hover {
+      background-color: #e0e2e5;
+      transition: background-color 0.3s linear;
+    }
+  }
 
   // 搜索框
   .search_input {
@@ -268,7 +333,7 @@ function handleBlur() {
   color: grey;
 }
 
-:deep(.search .el-input__wrapper){
+:deep(.search .el-input__wrapper) {
   padding: 0.5px 5px 0.5px 5px;
 }
 
@@ -279,7 +344,7 @@ function handleBlur() {
   background-color: #e0e2e5;
 }
 
-:deep(.el-input-group__append){
+:deep(.el-input-group__append) {
   padding: 0 10px;
 }
 </style>
