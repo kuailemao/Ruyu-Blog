@@ -15,7 +15,7 @@
     "axios": "^1.5.1",
     "easy-typer-js": "^2.1.0",
     "echarts": "^5.4.3",
-    "element-plus": "^2.3.14",
+    "element-plus": "^2.8.6",
     "gsap": "^3.12.5",
     "jquery": "^3.7.1",
     "js-confetti": "^0.12.0",
