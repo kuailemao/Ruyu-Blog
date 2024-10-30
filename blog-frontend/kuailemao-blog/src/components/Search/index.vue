@@ -6,6 +6,7 @@ import {ArticleHotRecommend, ArticleSearchByTitle} from "@/apis/article/type.ts"
 import router from "@/router";
 import {useLocalStorage} from "@vueuse/core";
 import {getHotRecommend} from "@/apis/article";
+import {getRandomArticle} from "@/apis/home";
 
 const emit = defineEmits(['isShowSearch'])
 
@@ -53,7 +54,17 @@ watchEffect(() => {
     articleSearchList.value = []
   }
   if (searchValue.value && optionsValue.value === '标题') {
-    articleSearchList.value = websiteStore.searchTitle?.filter(item => item.articleTitle.toLowerCase().includes(searchValue.value.toLowerCase()))
+    const query = searchValue.value.toLowerCase();
+    articleSearchList.value = websiteStore.searchTitle?.filter(item =>
+        item.articleTitle.toLowerCase().includes(query)
+    ).map(item => {
+      const regex = new RegExp(`(${query})`, 'gi');
+      const highlightedTitle = item.articleTitle.replace(regex, '<span class="highlight">$1</span>');
+      return {
+        ...item,
+        highlightedTitle
+      };
+    });
   }
 })
 
@@ -81,6 +92,12 @@ function historySearch(value: string) {
 
 function getHot() {
   getHotRecommend().then((res: any) => {
+    hotList.value = res.data
+  })
+}
+
+function changeToggle(){
+  getRandomArticle().then(res => {
     hotList.value = res.data
   })
 }
@@ -144,7 +161,7 @@ function getHot() {
           <div>
             热门推荐
           </div>
-          <div class="event_history">
+          <div class="event_history" @click="changeToggle">
             <el-icon>
               <Loading/>
             </el-icon>
@@ -172,7 +189,7 @@ function getHot() {
         <div v-for="item in articleSearchList" :key="item.id" @mousedown="clickSearchResult(item.id)">
           <div class="search_result_item">
             <div>
-              {{ item.articleTitle }}
+              <div v-html="item.highlightedTitle"></div>
               <div class="text-xs mt-1 dark:text-[#A3A3A3] p-1">
                 <el-tag size="small" class="mr-2">
                   {{ item.categoryName }}
@@ -192,6 +209,12 @@ function getHot() {
 
 <style scoped lang="scss">
 @import "@/styles/mixin.scss";
+
+// 搜索关键字高亮
+:deep(.highlight) {
+  background-color: yellow;
+  border-radius: 5px;
+}
 
 .content_container {
   height: 100%;
