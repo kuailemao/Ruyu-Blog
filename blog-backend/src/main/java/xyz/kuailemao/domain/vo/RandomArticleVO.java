@@ -23,6 +23,9 @@ public class RandomArticleVO {
     //文章标题
     @Schema(description = "文章标题")
     private String articleTitle;
+    // 文章热度
+    @Schema(description = "文章访问量")
+    private Long visitCount;
     //文章创建时间
     @Schema(description = "文章创建时间")
     private Date createTime;

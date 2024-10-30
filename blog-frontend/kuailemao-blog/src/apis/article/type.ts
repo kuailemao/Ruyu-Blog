@@ -4,6 +4,7 @@ export interface ArticleSearchByTitle {
     categoryName: string;
     visitCount: number;
     articleTitle: string;
+    highlightedTitle: string;
 }
 // 文章热门推荐
 export interface ArticleHotRecommend {
