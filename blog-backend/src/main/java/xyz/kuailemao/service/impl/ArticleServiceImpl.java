@@ -26,7 +26,6 @@ import xyz.kuailemao.utils.RedisCache;
 import xyz.kuailemao.utils.SecurityUtils;
 import xyz.kuailemao.utils.StringUtils;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -398,5 +397,50 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             return articles.stream().map(article -> article.asViewObject(HotArticleVO.class)).toList();
         }
         return List.of();
+    }
+
+    @Override
+    public List<SearchArticleByContentVO> searchArticleByContent(String keyword) {
+        List<Article> articles = articleMapper.selectList(new LambdaQueryWrapper<Article>().like(Article::getArticleContent, keyword).eq(Article::getStatus, SQLConst.PUBLIC_ARTICLE));
+        Map<Long, String> categoryMap = categoryMapper.selectList(null).stream().collect(Collectors.toMap(Category::getId, Category::getCategoryName));
+        if (!articles.isEmpty()) {
+            List<SearchArticleByContentVO> listVos = articles.stream().map(article -> article.asViewObject(SearchArticleByContentVO.class, vo -> {
+                vo.setCategoryName(categoryMap.get(article.getCategoryId()));
+            })).toList();
+            int index = -1;
+            for (SearchArticleByContentVO articleVo : listVos) {
+                String content = articleVo.getArticleContent();
+                index = content.toLowerCase().indexOf(keyword.toLowerCase());
+                if (index != -1) {
+                    int end = Math.min(content.length(), index + keyword.length() + 20);
+                    String highlighted = keyword + content.substring(index + keyword.length(), end);
+                    articleVo.setArticleContent(stripMarkdown(highlighted));
+                }
+            }
+            if (index != -1) {
+                return listVos;
+            }
+        }
+        return List.of();
+    }
+
+    /**
+     * 去掉markdown格式
+     *
+     * @param markdown markdown
+     * @return txt
+     */
+    private String stripMarkdown(String markdown) {
+        return markdown.replaceAll("(?m)^\\s*#.*$", "") // 去掉标题
+                .replaceAll("\\*\\*(.*?)\\*\\*", "$1") // 去掉加粗
+                .replaceAll("\\*(.*?)\\*", "$1") // 去掉斜体
+                .replaceAll("`([^`]*)`", "$1") // 去掉行内代码
+                .replaceAll("~~(.*?)~~", "$1") // 去掉删除线
+                .replaceAll("\\[(.*?)\\]\\(.*?\\)", "$1") // 去掉链接
+                .replaceAll("!\\[.*?\\]\\(.*?\\)", "") // 去掉图片
+                .replaceAll(">\\s?", "") // 去掉引用
+                .replaceAll("(?m)^\\s*[-*+]\\s+", "") // 去掉无序列表
+                .replaceAll("(?m)^\\s*\\d+\\.\\s+", "") // 去掉有序列表
+                .replaceAll("\\n", " "); // 去掉换行符
     }
 }

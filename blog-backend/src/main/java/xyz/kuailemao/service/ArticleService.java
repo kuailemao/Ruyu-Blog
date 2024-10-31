@@ -1,6 +1,7 @@
 package xyz.kuailemao.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.kuailemao.domain.dto.ArticleDTO;
 import xyz.kuailemao.domain.dto.SearchArticleDTO;
@@ -152,4 +153,11 @@ public interface ArticleService extends IService<Article> {
      * @return 热门推荐前5
      */
     List<HotArticleVO> listHotArticle();
+
+    /**
+     * 根据内容搜索文章
+     * @param content 文章内容
+     * @return 文章
+     */
+    List<SearchArticleByContentVO> searchArticleByContent(String content);
 }
