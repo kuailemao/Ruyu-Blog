@@ -70,11 +70,14 @@ watch(optionsValue, () => {
   searchValue.value = ''
 })
 
-watchEffect(() => {
+watchEffect(async () => {
   if (!searchValue.value) {
     articleSearchList.value = []
   }
   if (searchValue.value && optionsValue.value === '标题') {
+    if (!websiteStore.searchTitle) {
+      await websiteStore.getArticleTitleList();
+    }
     const query = searchValue.value.toLowerCase();
     articleSearchList.value = websiteStore.searchTitle?.filter(item =>
         item.articleTitle.toLowerCase().includes(query)
