@@ -9,7 +9,7 @@ export const getArticleDetail = (id: string | string[]) => {
 }
 
 // 获取评论
-export const getComment = (type: number,typeId: number, pageNum: string, pageSize: string) => {
+export const getComment = (type: number, typeId: number, pageNum: string, pageSize: string) => {
     return http.request({
         url: '/comment/getComment',
         method: "get",
@@ -59,6 +59,16 @@ export function addArticleVisit(id: String) {
 // 获取初始化时标题搜索数据
 export function getSearchTitleList() {
     return http.get(`/article/search/init/title`, {
+        method: "get"
+    });
+}
+
+// 对内容进行文章搜索
+export function searchArticleContent(content: String) {
+    return http.get('/article/search/by/content', {
+        params: {
+            content
+        },
         method: "get"
     });
 }

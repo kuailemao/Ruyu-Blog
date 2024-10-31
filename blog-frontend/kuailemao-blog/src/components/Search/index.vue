@@ -2,11 +2,12 @@
 import {ref} from 'vue'
 import {Delete, Loading} from '@element-plus/icons-vue'
 import useWebsiteStore from "@/store/modules/website.ts";
-import {ArticleHotRecommend, ArticleSearchByTitle} from "@/apis/article/type.ts";
+import {ArticleHotRecommend, ArticleSearch} from "@/apis/article/type.ts";
 import router from "@/router";
 import {useLocalStorage} from "@vueuse/core";
-import {getHotRecommend} from "@/apis/article";
+import {getHotRecommend, searchArticleContent} from "@/apis/article";
 import {getRandomArticle} from "@/apis/home";
+import {ElMessage} from "element-plus";
 
 const emit = defineEmits(['isShowSearch'])
 
@@ -14,8 +15,28 @@ const websiteStore = useWebsiteStore()
 
 const searchValue = ref('')
 
-function handleSearch() {
-  historyList.value.push(searchValue.value)
+function handleSearch(_: any,isAutoFocus: boolean = false) {
+  if (searchValue.value && optionsValue.value === '内容') {
+    console.log(isAutoFocus)
+    if (!isAutoFocus){
+      historyList.value.push(searchValue.value)
+    }
+    searchArticleContent(searchValue.value).then((res: any) => {
+      if (res.code === 1004){
+        ElMessage.error(res.msg);
+        return;
+      }
+      articleSearchList.value = res.data
+      articleSearchList.value = articleSearchList.value?.map(item => {
+        const regex = new RegExp(`(${searchValue.value})`, 'gi');
+        const articleContent = item.articleContent.replace(regex, '<span class="highlight">$1</span>');
+        return {
+          ...item,
+          articleContent
+        };
+      });
+    })
+  }
 }
 
 const optionsValue = ref('标题')
@@ -24,7 +45,7 @@ const options = ['标题', '内容']
 
 const showSearch = ref(true)
 
-const articleSearchList = ref<Array<ArticleSearchByTitle>>()
+const articleSearchList = ref<Array<ArticleSearch>>()
 
 const historyList = useLocalStorage<string[]>('searchHistoryList', []);
 
@@ -38,7 +59,7 @@ onMounted(() => {
 
 // 搜索框获得焦点
 async function handleFocus() {
-  if (!websiteStore.searchTitle) {
+  if ((searchValue.value && optionsValue.value === '标题') && !websiteStore.searchTitle) {
     await websiteStore.getArticleTitleList();
   }
   showSearch.value = false
@@ -74,7 +95,9 @@ function handleBlur() {
 }
 
 function clickSearchResult(articleId: number) {
-  historyList.value.push(searchValue.value)
+  if (searchValue.value && optionsValue.value === '标题') {
+    historyList.value.push(searchValue.value)
+  }
   searchValue.value = ''
   router.push('/article/' + articleId)
   emit('isShowSearch')
@@ -88,6 +111,9 @@ function historySearch(value: string) {
   searchValue.value = value
   inputRef.value?.focus();
   handleFocus()
+  if (searchValue.value && optionsValue.value === '内容') {
+    handleSearch('',true)
+  }
 }
 
 function getHot() {
@@ -96,7 +122,7 @@ function getHot() {
   })
 }
 
-function changeToggle(){
+function changeToggle() {
   getRandomArticle().then(res => {
     hotList.value = res.data
   })
@@ -110,7 +136,7 @@ function changeToggle(){
     <div class="search">
       <el-input
           ref="inputRef"
-          placeholder="回车或点击搜索按钮"
+          :placeholder="optionsValue === '标题' ? '请输入搜索内容' : '回车进行内容搜索'"
           v-model="searchValue"
           prefix-icon="el-icon-search"
           @keyup.enter.native="handleSearch"
@@ -183,25 +209,49 @@ function changeToggle(){
     </template>
     <template v-else>
       <div v-if="articleSearchList?.length === 0" style="text-align: center;padding-top: 2rem">
-        <span style="font-size: 12px;color: grey;">请输入要搜索的内容</span>
+        <span style="font-size: 12px;color: grey;">{{ optionsValue === '标题' ? '请输入要搜索的内容' : '内容搜索每分钟只能搜索5次' }}</span>
       </div>
       <div class="search_result">
-        <div v-for="item in articleSearchList" :key="item.id" @mousedown="clickSearchResult(item.id)">
-          <div class="search_result_item">
-            <div>
-              <div v-html="item.highlightedTitle"></div>
-              <div class="text-xs mt-1 dark:text-[#A3A3A3] p-1">
-                <el-tag size="small" class="mr-2">
-                  {{ item.categoryName }}
-                </el-tag>
+        <template v-if="searchValue && optionsValue === '标题'">
+          <div v-for="item in articleSearchList" :key="item.id" @mousedown="clickSearchResult(item.id)">
+            <div class="search_result_item">
+              <div>
+                <div v-html="item.highlightedTitle"></div>
+                <div class="text-xs mt-1 dark:text-[#A3A3A3] p-1">
+                  <el-tag size="small" class="mr-2">
+                    {{ item.categoryName }}
+                  </el-tag>
+                </div>
+              </div>
+              <div class="flex space-x-2 text-xs text-[#475569] items-center justify-center">
+                <SvgIcon name="heat"/>
+                <span>{{ item.visitCount }}</span>
               </div>
             </div>
-            <div class="flex space-x-2 text-xs text-[#475569] items-center justify-center">
-              <SvgIcon name="heat"/>
-              <span>{{ item.visitCount }}</span>
+          </div>
+        </template>
+        <template v-if="searchValue && optionsValue === '内容'">
+          <div v-for="item in articleSearchList" :key="item.id" @mousedown="clickSearchResult(item.id)">
+            <div class="search_result_item">
+              <div>
+                <div v-html="item.articleTitle"></div>
+                <div class="text-xs mt-1 dark:text-[#A3A3A3] p-1 flex">
+                  <div>
+                    <el-tag size="small" class="mr-2">
+                      {{ item.categoryName }}
+                    </el-tag>
+                  </div>
+                  <div v-html="item.articleContent">
+                  </div>
+                </div>
+              </div>
+              <div class="flex space-x-2 text-xs text-[#475569] items-center justify-center">
+                <SvgIcon name="heat"/>
+                <span>{{ item.visitCount }}</span>
+              </div>
             </div>
           </div>
-        </div>
+        </template>
       </div>
     </template>
   </div>
