@@ -6,7 +6,9 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +41,7 @@ public class ArticleController {
 
     /**
      * 初始化标题搜索文章数据
+     *
      * @return List<InitSearchTitleVO>
      */
     @Operation(summary = "初始化通过标题搜索文章")
@@ -46,6 +49,26 @@ public class ArticleController {
     @GetMapping("/search/init/title")
     public ResponseResult<List<InitSearchTitleVO>> initSearchByTitle() {
         return ControllerUtils.messageHandler(() -> articleService.initSearchByTitle());
+    }
+
+    /**
+     * 内容搜索接口
+     *
+     * @param content 文章内容
+     * @return List<ArticleListVO>
+     */
+    @Operation(summary = "内容搜索文章")
+    @Parameters({
+            @Parameter(name = "content", description = "搜索文章内容", required = true)
+    })
+    @AccessLimit(seconds = 60, maxCount = 5)
+    @GetMapping("/search/by/content")
+    public ResponseResult<List<SearchArticleByContentVO>> searchByContent(
+            @NotEmpty(message = "文章内容不能为空")
+            @Length(min = 1, max = 15, message = "文章搜索长度应在1-15之间")
+            @RequestParam("content") String content
+    ) {
+        return ControllerUtils.messageHandler(() -> articleService.searchArticleByContent(content));
     }
 
     // 热门推荐
@@ -243,7 +266,7 @@ public class ArticleController {
     @LogAnnotation(module = "文章管理", operation = LogConst.GET)
     @AccessLimit(seconds = 60, maxCount = 30)
     @GetMapping("/back/echo/{id}")
-    public ResponseResult<ArticleDTO> getArticleEcho(@PathVariable("id") Long id){
+    public ResponseResult<ArticleDTO> getArticleEcho(@PathVariable("id") Long id) {
         return ControllerUtils.messageHandler(() -> articleService.getArticleDTO(id));
     }
 
