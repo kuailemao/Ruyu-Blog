@@ -4,12 +4,12 @@ import WebsiteInfo from "@/apis/website/type.ts";
 import {getWebsiteInfo} from "@/apis/website";
 import {returnTime} from "@/utils/tool.ts";
 import {getSearchTitleList} from "@/apis/article";
-import {ArticleSearchByTitle} from "@/apis/article/type.ts";
+import {ArticleSearch} from "@/apis/article/type.ts";
 
 const useWebsiteStore = defineStore('website', () => {
     const webInfo = shallowRef<WebsiteInfo>()
     // 标题搜索数据
-    const searchTitle = shallowRef<Array<ArticleSearchByTitle>>()
+    const searchTitle = shallowRef<Array<ArticleSearch>>()
 
     // 获取网站信息
     const getInfo = async () => {
