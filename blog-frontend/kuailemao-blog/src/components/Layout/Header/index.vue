@@ -383,8 +383,9 @@ const env = import.meta.env
 
 .search_dialog_container {
   :deep(.el-dialog) {
+    overflow: auto;
     border-radius: 10px;
-    height: 70vh;
+    height: 70%;
   }
 
   @media screen and (max-width: 650px) {
@@ -393,7 +394,7 @@ const env = import.meta.env
       margin-top: 0;
       margin-bottom: 0;
       width: 100vw;
-      height: 100vh;
+      height: 100%;
     }
   }
 }

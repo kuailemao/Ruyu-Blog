@@ -15,14 +15,14 @@ const websiteStore = useWebsiteStore()
 
 const searchValue = ref('')
 
-function handleSearch(_: any,isAutoFocus: boolean = false) {
+function handleSearch(_: any, isAutoFocus: boolean = false) {
   if (searchValue.value && optionsValue.value === '内容') {
     console.log(isAutoFocus)
-    if (!isAutoFocus){
+    if (!isAutoFocus) {
       historyList.value.push(searchValue.value)
     }
     searchArticleContent(searchValue.value).then((res: any) => {
-      if (res.code === 1004){
+      if (res.code === 1004) {
         ElMessage.error(res.msg);
         return;
       }
@@ -115,7 +115,7 @@ function historySearch(value: string) {
   inputRef.value?.focus();
   handleFocus()
   if (searchValue.value && optionsValue.value === '内容') {
-    handleSearch('',true)
+    handleSearch('', true)
   }
 }
 
@@ -137,26 +137,28 @@ function changeToggle() {
   <!-- 搜索 -->
   <div class="content_container">
     <div class="search">
-      <el-input
-          ref="inputRef"
-          :placeholder="optionsValue === '标题' ? '请输入搜索内容' : '回车进行内容搜索'"
-          v-model="searchValue"
-          prefix-icon="el-icon-search"
-          @keyup.enter.native="handleSearch"
-          @focus="handleFocus"
-          @blur="handleBlur"
-      >
-        <template #prefix>
-          <div style="width: 0;">
-            <SvgIcon name="search" width="20" height="20"/>
-          </div>
-        </template>
-        <template #suffix>
-          <div class="custom-style">
-            <el-segmented v-model="optionsValue" :options="options" size="small"/>
-          </div>
-        </template>
-      </el-input>
+      <el-form @submit.native.prevent>
+        <el-input
+            ref="inputRef"
+            :placeholder="optionsValue === '标题' ? '请输入搜索内容' : '回车进行内容搜索'"
+            v-model="searchValue"
+            prefix-icon="el-icon-search"
+            @keyup.enter.native="handleSearch"
+            @focus="handleFocus"
+            @blur="handleBlur"
+        >
+          <template #prefix>
+            <div style="width: 0;">
+              <SvgIcon name="search" width="20" height="20"/>
+            </div>
+          </template>
+          <template #suffix>
+            <div class="custom-style">
+              <el-segmented v-model="optionsValue" :options="options" size="small"/>
+            </div>
+          </template>
+        </el-input>
+      </el-form>
     </div>
     <template v-if="showSearch">
       <div class="search_history">
@@ -212,7 +214,9 @@ function changeToggle() {
     </template>
     <template v-else>
       <div v-if="articleSearchList?.length === 0" style="text-align: center;padding-top: 2rem">
-        <span style="font-size: 12px;color: grey;">{{ optionsValue === '标题' ? '请输入要搜索的内容' : '内容搜索每分钟只能搜索5次' }}</span>
+        <span style="font-size: 12px;color: grey;">{{
+            optionsValue === '标题' ? '请输入要搜索的内容' : '内容搜索每分钟只能搜索5次'
+          }}</span>
       </div>
       <div class="search_result">
         <template v-if="searchValue && optionsValue === '标题'">
