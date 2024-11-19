@@ -64,7 +64,7 @@ p {
   bottom: 0;
   width: 100%;
   height: 0;
-  min-height: 110px;
+  min-height: 100px;
   max-height: 9.375rem;
   z-index: -1;
   // 波浪背景
