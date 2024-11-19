@@ -63,10 +63,10 @@ p {
   left: 0;
   bottom: 0;
   width: 100%;
-  height: 15vh;
-  min-height: 100px;
+  height: 0;
+  min-height: 110px;
   max-height: 9.375rem;
-  z-index: 1;
+  z-index: -1;
   // 波浪背景
   //background: linear-gradient(60deg, rgba(84, 58, 183, 1) 0%, rgba(0, 172, 193, 1) 100%);
 }
@@ -138,15 +138,15 @@ p {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 910px) {
   .waves {
-    margin-bottom: -115px;
-    height: 60px;
+    height: 70px;
     min-height: 70px;
+    max-height: 150px;
   }
 
-  .header{
-    bottom: -55px;
+  .header {
+    bottom: -40px;
   }
 
 }
