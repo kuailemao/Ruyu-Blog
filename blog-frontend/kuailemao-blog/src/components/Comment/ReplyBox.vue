@@ -118,7 +118,7 @@ function addChildComment(comment: any) {
 <template>
   <transition name="el-zoom-in-top">
     <div class="reply" v-show="comment.showReplyBox">
-      <textarea ref="myInput" v-model="comment.replyText" :placeholder="'@'+comment.commentUserNickname"/>
+      <textarea style="color: #7B5F69;" ref="myInput" v-model="comment.replyText" :placeholder="'@'+comment.commentUserNickname"/>
       <div>
         <div ref="emojiBtn">
           <el-popover
