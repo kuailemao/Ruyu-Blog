@@ -19,16 +19,14 @@ const mode = useColorMode()
 const dialogVisible = ref(false)
 
 onMounted(async () => {
-  onMounted(async () => {
-    try {
-      if (!customElements.get("toggle-button")) {
-        customElements.define("toggle-button", DayNightToggleButton);
-      }
-      await userStore.getInfo();
-    } catch (error) {
-      console.error("Error defining custom element or getting user info:", error);
+  try {
+    if (!customElements.get("toggle-button")) {
+      customElements.define("toggle-button", DayNightToggleButton);
     }
-  });
+    await userStore.getInfo();
+  } catch (error) {
+    console.error("Error defining custom element or getting user info:", error);
+  }
 })
 
 thirdLogin()
