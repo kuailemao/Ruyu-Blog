@@ -52,6 +52,8 @@
   --scroll-bar-color: linear-gradient(135deg,#17ead9,#6078ea);
   // 充电榜列表亮色背景
   --mao-charging-bg-color: #f5f5f5;
+  // Header-Menu阴影
+  --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
 // 暗色模式下的主题色
@@ -80,6 +82,8 @@ html.dark {
   --scroll-bar-color: linear-gradient(135deg,#43cbff,#9708cc);
   // 充电榜列表暗色背景
   --mao-charging-bg-color: #212121;
+  // Header-Menu阴影
+  --shadow-color: rgba(255, 255, 255, 0.1);
 }
 
 // 全局字体
