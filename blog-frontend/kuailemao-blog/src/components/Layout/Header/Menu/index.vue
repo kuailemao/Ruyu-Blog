@@ -387,7 +387,9 @@ nav {
           display: none;
           position: absolute;
           top: 50px;
-          background: white;
+          background: var(--el-bg-color);
+          // 阴影
+          box-shadow: 0 2px 12px 0 var(--shadow-color);
           border-radius: 5px;
 
           li {
