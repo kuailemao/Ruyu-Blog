@@ -3,8 +3,8 @@
     <!-- 内容区 -->
     <template #content>
       <div class="announcement">
-        <SvgIcon name="notice" color="#409EFF"/>
-        <span style="margin-left: 15px">{{ useWebsite?.webInfo?.headerNotification }}</span>
+        <SvgIcon style="min-width: 30px" name="notice" color="#409EFF"/>
+        <span>{{ useWebsite?.webInfo?.headerNotification }}</span>
       </div>
       <RecommendArticle/>
       <div class="essay_title">
@@ -45,10 +45,9 @@ const useWebsite = useWebsiteStore()
 <style scoped lang="scss">
 
 .announcement {
-  height: 50px;
+  min-height: 50px;
   margin-top: 10px;
-  // 文字上下居中
-  line-height: 50px;
+  padding: 5px;
   text-align: center;
   border: 1px dotted #ccc;
   border-radius: 15px;
