@@ -7,9 +7,10 @@ import {
   Fries, Headset,
   HomeFilled,
   IceCreamRound,
-  Link,
+  Link, PictureFilled,
   Postcard, PriceTag, UserFilled
 } from "@element-plus/icons-vue";
+import router from "@/router";
 
 const emit = defineEmits("update:closeDrawer")
 
@@ -98,6 +99,12 @@ const env = import.meta.env
         <UserFilled/>
       </el-icon>
       关于
+    </el-menu-item>
+    <el-menu-item index="/photo" @click="isClose">
+      <el-icon>
+        <PictureFilled/>
+      </el-icon>
+      相册
     </el-menu-item>
   </el-menu>
 </div>

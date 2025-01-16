@@ -99,7 +99,16 @@ export const constantRouter = [
                 meta: {
                     title: '关于网站',
                 }
-            }
+            },
+            // 相册
+            {
+                path: '/photo',
+                component: () => import('@/views/Photo/index.vue'),
+                name: 'photo',
+                meta: {
+                    title: '相册',
+                }
+            },
         ]
     },
     // 文章

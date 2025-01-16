@@ -10,7 +10,7 @@ import {
   Postcard,
   PriceTag,
   UserFilled,
-  Link, Setting, Promotion, ArrowDownBold, IceCreamRound, Close
+  Link, Setting, Promotion, ArrowDownBold, IceCreamRound, Close, PictureFilled
 } from "@element-plus/icons-vue";
 import {logout} from "@/apis/user"
 import {REMOVE_TOKEN} from "@/utils/auth.ts";
@@ -207,10 +207,10 @@ onUnmounted(() => {
              <span>音乐</span>
             </span>
           </div>
-          <div class="menus_item">
+          <div class="menus_item" @click="router.push('/photo')">
             <span>
               <el-icon>
-                <UserFilled/>
+                <PictureFilled/>
               </el-icon>
               <span>相册</span>
             </span>
