@@ -235,4 +235,13 @@ public class FileUploadUtils {
     public String getFileName(String path) {
         return path.substring(path.lastIndexOf("/") + 1);
     }
+
+    /**
+     * 文件大小转换(kb)
+     * @param fileSize 文件大小
+     * @return 文件大小(kb)
+     */
+    public Double convertFileSizeToKB(Long fileSize) {
+        return fileSize / 1024.0;
+    }
 }
