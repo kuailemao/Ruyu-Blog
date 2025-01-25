@@ -4,6 +4,7 @@ package xyz.kuailemao.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.kuailemao.annotation.AccessLimit;
@@ -48,7 +49,7 @@ public class PhotoController {
     @AccessLimit(seconds = 60, maxCount = 30)
     @LogAnnotation(module = "相册管理", operation = LogConst.INSERT)
     @PostMapping("/album/create")
-    public ResponseResult<Void> createAlbum(@RequestBody PhotoAlbumDTO albumDTO) {
+    public ResponseResult<Void> createAlbum(@RequestBody @Validated PhotoAlbumDTO albumDTO) {
         return photoService.createAlbum(albumDTO);
     }
 
