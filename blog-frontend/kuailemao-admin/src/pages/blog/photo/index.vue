@@ -3,7 +3,7 @@ import {ref, onMounted, computed} from 'vue'
 import {Image, Modal, Form, Input, Upload, message, Pagination} from 'ant-design-vue'
 import type {UploadProps, FormInstance} from 'ant-design-vue'
 import type {Rule} from 'ant-design-vue/es/form'
-import {photoAndAlbumList} from "~/api/blog/photo";
+import {createAlbum, photoAndAlbumList, uploadPhoto} from "~/api/blog/photo";
 
 // 统一的数据接口
 interface BaseItem {
@@ -30,14 +30,6 @@ interface Photo extends BaseItem {
 onMounted(() => {
   refreshFunc()
 })
-
-interface MenuDataItem{
-  id: number | null
-  name: string
-  parentId: number | null
-  children?: BaseItem[]  // 子数据字段
-}
-
 // 数据管理
 const allItems = ref<(Album | Photo)[]>([])
 
@@ -181,10 +173,11 @@ const goBack = (index: number) => {
 // 打开模态框
 const openModal = (type: 1 | 2) => {
   modalType.value = type
+  // 重置表单状态，并设置当前所在相册的ID作为父ID
   formState.value = {
     name: '',
     description: '',
-    parentId: currentAlbumId.value,
+    parentId: currentAlbumId.value,  // 使用当前相册ID作为父ID
     file: null
   }
   showModal.value = true
@@ -215,25 +208,17 @@ const handleDelete = async (item: Album | Photo) => {
     cancelText: '取消',
     okType: 'danger',
     async onOk() {
-      // 从数据结构中删除项目
-      const removeItem = (items: (Album | Photo)[]): boolean => {
-        const index = items.findIndex(i => i.id === item.id)
-        if (index !== -1) {
-          items.splice(index, 1)
-          return true
+      try {
+        // const res = await deletePhotoOrAlbum(item.id, item.type)
+        const res = null;
+        if (res.code === 200) {
+          message.success('删除成功')
+          refreshFunc()
         }
-        for (const i of items) {
-          if (i.type === 1 && i.children) {
-            if (removeItem(i.children)) {
-              return true
-            }
-          }
-        }
-        return false
+      } catch (error) {
+        console.error('Delete failed:', error)
+        message.error('删除失败')
       }
-
-      removeItem(allItems.value)
-      message.success('删除成功')
     }
   })
 }
@@ -280,51 +265,37 @@ const handleFileChange = (file: File) => {
 const handleSubmit = async () => {
   try {
     await formRef.value?.validateFields()
-    const newItem = {
-      id: Date.now(),
-      name: formState.value.name,
-      parentId: currentAlbumId.value,
-      createTime: new Date().toISOString().split('T')[0],
-      type: modalType.value
-    } as Album | Photo
-
+    
     if (modalType.value === 1) {
-      Object.assign(newItem, {
+      // 创建相册
+      const res = await createAlbum({
+        name: formState.value.name,
         description: formState.value.description,
-        children: []
+        parentId: formState.value.parentId
       })
-    } else {
-      Object.assign(newItem, {
-        url: previewUrl.value,
-        size: formState.value.file ? `${(formState.value.file.size / (1024 * 1024)).toFixed(1)}MB` : '0MB'
-      })
-    }
-
-    // 添加到当前位置
-    if (currentAlbumId.value === null) {
-      allItems.value.push(newItem)
-    } else {
-      const findAndAddToAlbum = (items: (Album | Photo)[]) => {
-        for (const item of items) {
-          if (item.type === 1 && item.id === currentAlbumId.value) {
-            item.children = item.children || []
-            item.children.push(newItem)
-            return true
-          }
-          if (item.type === 1 && item.children) {
-            if (findAndAddToAlbum(item.children)) {
-              return true
-            }
-          }
-        }
-        return false
+      if (res.code === 200) {
+        message.success('创建相册成功')
+        await refreshFunc()
       }
-
-      findAndAddToAlbum(allItems.value)
+    } else {
+      // 上传照片
+      if (!formState.value.file) {
+        message.error('请选择要上传的照片')
+        return
+      }
+      const formData = new FormData()
+      formData.append('file', formState.value.file)
+      formData.append('name', formState.value.name)
+      formData.append('parentId', String(formState.value.parentId))
+      
+      const res = await uploadPhoto(formData)
+      if (res.code === 200) {
+        message.success('上传照片成功')
+        await refreshFunc()
+      }
     }
 
     showModal.value = false
-    message.success('保存成功')
   } catch (error) {
     console.error('Validation failed:', error)
   }
@@ -335,16 +306,6 @@ const handleCancel = () => {
   showModal.value = false
   formRef.value?.resetFields()
 }
-
-// 处理图片预览
-const previewConfig = (url: string) => ({
-  src: url,
-  preview: {
-    visible: false,
-    mask: true,
-    maskClassName: 'photo-preview'
-  }
-})
 
 // 分页相关
 const currentPage = ref(1)
