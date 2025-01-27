@@ -42,6 +42,7 @@ async function refreshFunc() {
     pageSize: pageSize.value,
     parentId: currentAlbumId.value
   }).then(res => {
+    console.log("平铺数据",res.data.page)
     const flatData = res.data.page
     // 构建树形结构
     const buildTree = (items: (Album | Photo)[], parentId: number | null = null): (Album | Photo)[] => {

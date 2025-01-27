@@ -1,19 +1,24 @@
 <script setup lang="ts">
 import PhotoGallery from './components/PhotoGallery.vue'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useDark } from '@vueuse/core'
+import { getPhotoList } from '@/apis/photo'
+import type { PhotoAndAlbumVO } from '@/apis/photo'
+import type { GalleryItem } from './components/PhotoGallery.vue'
 
 // 当前路径状态提升到 App 组件
 const currentPath = ref<number[]>([])
 
-// 从 PhotoGallery 组件共享数据结构
-interface AlbumData {
-  id: number
-  name: string
-  photos: Photo[]
-  subAlbums?: AlbumData[]
-}
+// 加载状态
+const loading = ref(false)
 
+// 分页相关状态
+const currentPage = ref(1)
+const pageSize = 16
+const hasMore = ref(true)
+const total = ref(0)
+
+// 数据结构定义
 interface Photo {
   id: number
   url: string
@@ -21,157 +26,110 @@ interface Photo {
   description: string
 }
 
-interface GalleryItem {
-  type: 'album' | 'photo'
-  data: AlbumData | Photo
+interface AlbumData {
+  id: number
+  name: string
+  description: string
+  photos: Photo[]
+  subAlbums?: AlbumData[]
+  coverUrl?: string | null
 }
 
-// 创建基础图片数组
-const baseImages = [
-  'https://tse4-mm.cn.bing.net/th/id/OIP-C.cS62Bm3m6aNb5IlIUG1VRgHaMb?w=193&h=323&c=7&r=0&o=5&dpr=1.3&pid=1.7',
-  'https://tse3-mm.cn.bing.net/th/id/OIP-C.4m6sCxvmZ7N9YWBqEx_GWAHaLm?w=199&h=312&c=7&r=0&o=5&dpr=1.3&pid=1.7',
-  'https://tse2-mm.cn.bing.net/th/id/OIP-C.Yh06BPbhaS2Pwds2cl-2-QHaFO?w=208&h=147&c=7&r=0&o=5&dpr=1.3&pid=1.7',
-  'https://pic2.zhimg.com/v2-c661740055d91606880283692e40720c_r.jpg',
-  'https://tse1-mm.cn.bing.net/th/id/OIP-C.3J7LSmLYBm-HEJ8nOnrzAAHaLH?rs=1&pid=ImgDetMain',
-  'https://gao7pic.gao7.com/07481182f93f4ad6b17a9b29ec8c7e76.png',
-  'https://5b0988e595225.cdn.sohucs.com/images/20181116/00cccb6d4cff45fe9eafe9b39e041210.png',
-  'https://pic3.zhimg.com/v2-3c8a6dae7606b0cf498e3eda18747853_r.jpg',
-  'https://pic3.zhimg.com/v2-193414bb442fac65b857d46f2a1a87ed_r.jpg',
-  'https://pic2.zhimg.com/v2-70458016c89413161ff4fe3942099bed_r.jpg',
-  'https://pica.zhimg.com/50/v2-83c5a7310c2d3a431784b1228d64ae35_720w.jpg?source=1940ef5c',
-  'https://ts1.cn.mm.bing.net/th/id/R-C.f7644b4034d476dad42166426c31e2f3?rik=o3cOGWU9jX2%2fEg&riu=http%3a%2f%2fn.sinaimg.cn%2fsinacn10113%2f58%2fw750h908%2f20190627%2f6420-hyzpvir4006614.jpg&ehk=SVA%2bf6ELmAtank4c31vpGJbU4X89E0ZwvNfbV3UTHcU%3d&risl=&pid=ImgRaw&r=0',
-  'https://img.keaitupian.cn/uploads/upimg/1592459047193770.jpg',
-  'https://img-baofun.zhhainiao.com/pcwallpaper_ugc_mobile/preview_jpg/82e40c5fb47fa98aacb47c305e4ee27c.jpg',
-  'https://pic2.zhimg.com/v2-32a731a74335036f010ff2a2110d4e28_r.jpg',
-  'https://wallpaperm.cmcm.com/4700eaf249b71d56d95aff8ca94313fa.jpg',
-  'https://tse2-mm.cn.bing.net/th/id/OIP-C.2f9gdL3o5GNTl3G3Myma1AAAAA?rs=1&pid=ImgDetMain',
-  'https://pic2.zhimg.com/v2-3aecfb4a857585d6eb2796902a565956_r.jpg?source=172ae18b',
-  'https://p.qpic.cn/dnfbbspic/0/dnfbbs_dnfbbs_dnf_gamebbs_qq_com_forum_201911_22_083548z4dn4295a5ej89ad.jpg/0',
-  'https://5b0988e595225.cdn.sohucs.com/images/20181029/ef4539a993824e7c9794dff06f0bdfd1.png',
-  'https://tse1-mm.cn.bing.net/th/id/OIP-C.A1U1EzgHqfMUJvAUQNOALwHaLN?rs=1&pid=ImgDetMain',
-  'https://ts1.cn.mm.bing.net/th/id/R-C.1092b972873293f4a63fc3e1c08ea9b3?rik=9jEW%2fahq3DXsBA&riu=http%3a%2f%2fimg2.100bt.com%2fupload%2fzl%2f20140509%2f1399637147977.jpg&ehk=1O3Bln%2bLSBXqT7oRhCkK1n609m4lPwWQEK1Ti%2bI%2bn0Y%3d&risl=&pid=ImgRaw&r=0',
-  'https://ts1.cn.mm.bing.net/th/id/R-C.e5717389af85e7cea3a862a0276bad1d?rik=ahq6mEY1GC0BkA&riu=http%3a%2f%2fwww.puhuajia.com%2fdata%2fattachment%2fforum%2f202001%2f07%2f120726e7eem7792661qozw.png&ehk=GZBwLOKEWYGLGkgxFZCvVy9Mo3PWfvoQ75Hnl836A2s%3d&risl=&pid=ImgRaw&r=0',
-  'https://gao7pic.gao7.com/a597b5551e4345119678baa57b95aba5.png'
-].map((url, index) => ({
-  id: 100 + index,
-  url,
-  title: '动漫壁纸',
-  description: '精美插画'
-}))
+// 相册数据
+const galleries = ref<Record<string, GalleryItem[]>>({
+  root: []
+})
 
-// 定义根相册数据
-const albumData: AlbumData[] = [
-  {
-    id: 1,
-    name: '动漫美图',
-    photos: baseImages.slice(6, 14),
-    subAlbums: [
-      {
-        id: 4,
-        name: '人物集',
-        photos: baseImages.slice(0, 6),
-        subAlbums: [
-          {
-            id: 7,
-            name: '最爱',
-            photos: baseImages.slice(0, 6)
-          }
-        ]
-      },
-      {
-        id: 5,
-        name: '场景集',
-        photos: baseImages.slice(0, 8)
+// 转换后端数据为前端需要的格式
+const convertBackendData = (data: PhotoAndAlbumVO[]) => {
+  return data.map(item => {
+    if (item.type === 1) {
+      // 相册
+      return {
+        type: 'album' as const,
+        data: {
+          id: item.id,
+          name: item.name,
+          description: item.description || '',
+          photos: [],
+          coverUrl: item.url
+        }
       }
-    ]
-  },
-  {
-    id: 2,
-    name: '风景图集',
-    photos: baseImages.slice(14, 24),
-    subAlbums: [
-      {
-        id: 6,
-        name: '壁纸集',
-        photos: baseImages.slice(0, 10),
-        subAlbums: [
-          {
-            id: 8,
-            name: '收藏',
-            photos: baseImages.slice(0, 8)
-          }
-        ]
+    } else {
+      // 照片
+      return {
+        type: 'photo' as const,
+        data: {
+          id: item.id,
+          url: item.url || '',
+          title: item.name,
+          description: item.description || ''
+        }
       }
-    ]
-  },
-  {
-    id: 3,
-    name: '精选集',
-    photos: baseImages.slice(18, 24)
-  },
-  {
-    id: 44,
-    name: '测试集',
-    photos: []
-  }
-]
+    }
+  })
+}
 
-// 转换为原来的 galleries 格式的函数
-const convertToGalleries = (albums: AlbumData[]): Record<string, GalleryItem[]> => {
-  const galleries: Record<string, GalleryItem[]> = {
-    'root': []
-  }
-
-  const processAlbum = (album: AlbumData) => {
-    const parentKey = galleries[album.id.toString()] || []
-
-    if (album.subAlbums) {
-      album.subAlbums.forEach(subAlbum => {
-        parentKey.push({
-          type: 'album',
-          data: {
-            id: subAlbum.id,
-            name: subAlbum.name,
-            photos: subAlbum.photos
-          }
-        })
-
-        processAlbum(subAlbum)
-      })
+// 加载相册和照片数据
+const loadGalleryData = async (parentId?: number, page: number = 1, append: boolean = false) => {
+  try {
+    loading.value = true
+    const response = await getPhotoList({
+      pageNum: page,
+      pageSize: pageSize,
+      parentId: parentId || null
+    })
+    
+    const galleryKey = parentId ? parentId.toString() : 'root'
+    const newItems = convertBackendData(response.data.page)
+    
+    if (append) {
+      galleries.value[galleryKey] = [...(galleries.value[galleryKey] || []), ...newItems]
+    } else {
+      galleries.value[galleryKey] = newItems
     }
 
-    album.photos.forEach(photo => {
-      parentKey.push({
-        type: 'photo',
-        data: photo
-      })
-    })
-
-    galleries[album.id.toString()] = parentKey
+    total.value = response.data.total
+    hasMore.value = page * pageSize < response.data.total
+    currentPage.value = page
+  } catch (error) {
+    console.error('加载相册数据失败:', error)
+  } finally {
+    loading.value = false
   }
-
-  albums.forEach(album => {
-    galleries.root.push({
-      type: 'album',
-      data: {
-        id: album.id,
-        name: album.name,
-        photos: album.photos
-      }
-    })
-    processAlbum(album)
-  })
-
-  galleries.root.push(...baseImages.slice(0, 6).map(img => ({
-    type: 'photo' as const,
-    data: img
-  })))
-
-  return galleries
 }
 
-// 使用新的数据结构
-const galleries = ref(convertToGalleries(albumData))
+// 加载更多数据
+const loadMore = async () => {
+  if (loading.value || !hasMore.value) return
+  const currentId = currentPath.value.length > 0 ? currentPath.value[currentPath.value.length - 1] : undefined
+  await loadGalleryData(currentId, currentPage.value + 1, true)
+}
+
+// 获取相册封面的函数
+const getAlbumCover = (albumId: number) => {
+  const album = galleries.value.root.find(
+      item => item.type === 'album' && (item.data as AlbumData).id === albumId
+  )
+
+  if (album && album.type === 'album') {
+    const albumData = album.data as AlbumData
+    if (albumData.coverUrl) {
+      return albumData.coverUrl
+    }
+  }
+
+  // 返回默认封面
+  return null
+}
+
+// 监听路径变化，加载对应的数据
+watch(() => currentPath.value, async (newPath) => {
+  const currentId = newPath.length > 0 ? newPath[newPath.length - 1] : undefined
+  currentPage.value = 1
+  hasMore.value = true
+  await loadGalleryData(currentId, 1, false)
+}, { immediate: true })
 
 const getCurrentGallery = () => {
   const path = currentPath.value.length === 0 ? 'root' : currentPath.value[currentPath.value.length - 1].toString()
@@ -331,13 +289,6 @@ const albumTree = computed(() => {
   return buildTree();
 });
 
-// 添加 Album 类型定义
-interface Album {
-  id: number
-  name: string
-  photos: Photo[]
-}
-
 // 使用 VueUse 的 useDark
 const isDark = useDark()
 </script>
@@ -417,6 +368,9 @@ const isDark = useDark()
             v-model:currentPath="currentPath"
             :galleries="galleries"
             :is-dark-mode="isDark"
+            :loading="loading"
+            :has-more="hasMore"
+            @load-more="loadMore"
         />
       </div>
     </main>
@@ -428,6 +382,7 @@ const isDark = useDark()
   max-width: 1400px;
   margin: 2rem auto;
   padding: 0;
+  min-height: 100vh;
 }
 
 .header {
@@ -453,7 +408,7 @@ const isDark = useDark()
 .gallery-container {
   min-width: 0;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* 移动端适配 */
@@ -535,7 +490,7 @@ const isDark = useDark()
 .album-menu {
   width: 260px;
   position: sticky;
-  top: 0;
+  top: 20px;
   height: calc(100vh - 100px);
   overflow-y: auto;
   padding: 20px;
@@ -545,6 +500,7 @@ const isDark = useDark()
   border: 1px solid rgba(92, 106, 196, 0.1);
   box-sizing: border-box;
   transition: all 0.3s ease;
+  margin-top: 20px;
 }
 
 /* 深色模式样式 */

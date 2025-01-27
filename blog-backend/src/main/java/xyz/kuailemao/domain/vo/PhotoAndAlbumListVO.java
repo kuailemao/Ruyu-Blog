@@ -34,4 +34,6 @@ public class PhotoAndAlbumListVO {
     private Double size;
     //创建时间
     private Date createTime;
+    // 相册封面
+    private String albumCover;
 }
