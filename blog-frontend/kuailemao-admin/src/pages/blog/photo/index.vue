@@ -267,13 +267,32 @@ const handleDelete = async (item: Album | Photo) => {
 // 处理文件上传
 const uploadProps: UploadProps = {
   beforeUpload: (file) => {
+    // 检查文件格式
+    const allowedTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'image/gif'
+    ]
+    const isValidFormat = allowedTypes.includes(file.type)
+    if (!isValidFormat) {
+      message.error('只支持 JPG/PNG/WebP/GIF 格式的图片')
+      return Upload.LIST_IGNORE
+    }
+
+    // 检查文件大小（8MB = 8 * 1024 * 1024 bytes）
+    const isLessThan8M = file.size / 1024 / 1024 < 8
+    if (!isLessThan8M) {
+      message.error('图片大小不能超过 8MB')
+      return Upload.LIST_IGNORE
+    }
+
     formState.value.file = file
-    // 直接使用完整文件名，不包含后缀
     formState.value.name = file.name.split('.')[0]
     handleFileChange(file)
     return false
   },
-  accept: 'image/*',
+  accept: '.jpg,.jpeg,.png,.webp,.gif',
   listType: 'picture-card',
   maxCount: 1,
   onPreview: () => {
@@ -499,7 +518,10 @@ onMounted(() => {
                 <Upload v-bind="uploadProps">
                   <div class="ant-upload-text">
                     <i class="icon">📷</i>
-                    <span>点击上传</span>
+                    <span>点击上传照片</span>
+                    <p style="margin-top: 8px; color: #999; font-size: 12px;">
+                      支持 JPG/PNG/WebP/GIF 格式，大小不超过 8MB
+                    </p>
                   </div>
                 </Upload>
                 <Image
