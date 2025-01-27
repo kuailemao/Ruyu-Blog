@@ -87,18 +87,22 @@ const handlePreviewChange = (visible: boolean) => {
 
 // 分页相关
 const currentPage = ref(1)
-const pageSize = ref(8)  // 每页8个项目
+const pageSize = ref(10)  // 每页8个项目
 const total = ref(0)
+
+// 添加loading状态
+const loading = ref(false)
 
 // 加载当前相册的内容
 const loadCurrentItems = async () => {
+  loading.value = true
   try {
     const res = await photoAndAlbumList({
       pageNum: currentPage.value,
       pageSize: pageSize.value,
       parentId: currentAlbumId.value
     })
-
+    
     if (res.code === 200) {
       console.log("分页数据", res.data)
       // 更新数据和总数
@@ -108,6 +112,8 @@ const loadCurrentItems = async () => {
   } catch (error) {
     console.error('Failed to load items:', error)
     message.error('加载失败')
+  } finally {
+    loading.value = false
   }
 }
 
@@ -117,19 +123,69 @@ const handlePageChange = async (page: number) => {
   await loadCurrentItems()
 }
 
+// 更新面包屑导航
+const updateBreadcrumb = async (album: Album) => {
+  try {
+    // 直接将当前相册添加到面包屑路径
+    if (breadcrumbPath.value.length === 0) {
+      // 如果是从根目录进入，直接添加
+      breadcrumbPath.value = [album]
+    } else {
+      // 如果已经有路径，检查是否是子相册
+      const lastAlbum = breadcrumbPath.value[breadcrumbPath.value.length - 1]
+      if (album.parentId === lastAlbum.id) {
+        // 是子相册，添加到路径末尾
+        breadcrumbPath.value = [...breadcrumbPath.value, album]
+      } else if (album.parentId === null) {
+        // 如果是根相册，重置路径
+        breadcrumbPath.value = [album]
+      } else {
+        // 如果是其他情况，可能需要重新获取完整路径
+        const res = await photoAndAlbumList({
+          pageNum: 1,
+          pageSize: 1000,  // 获取足够多的数据以构建路径
+          parentId: null   // 从根目录开始查找
+        })
+        
+        if (res.code === 200) {
+          const items = res.data.list
+          const path: Album[] = []
+          let currentId: number | null = album.id
+          
+          // 从当前相册往上查找父级
+          while (currentId !== null) {
+            const current = items.find(item => item.id === currentId) as Album
+            if (current) {
+              path.unshift(current)
+              currentId = current.parentId
+            } else {
+              break
+            }
+          }
+          
+          breadcrumbPath.value = path
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Failed to update breadcrumb:', error)
+    message.error('更新导航失败')
+  }
+}
+
 // 进入相册
 const enterAlbum = async (album: Album) => {
   if (currentAlbumId.value === album.id) {
     return
   }
-
+  
   // 如果是从根目录进入相册，保存当前页码
   if (currentAlbumId.value === null) {
     rootPageNumber.value = currentPage.value
   }
-
+  
   currentAlbumId.value = album.id
-  updateBreadcrumb(album)
+  await updateBreadcrumb(album)  // 等待面包屑更新完成
   // 进入新相册时重置分页到第一页
   currentPage.value = 1
   await loadCurrentItems()
@@ -294,29 +350,6 @@ const handleCancel = () => {
   formRef.value?.resetFields()
 }
 
-// 更新面包屑导航
-const updateBreadcrumb = (album: Album) => {
-  const findPath = (items: (Album | Photo)[], targetId: number, path: Album[] = []): Album[] | null => {
-    for (const item of items) {
-      if (item.type === 1) {
-        if (item.id === targetId) {
-          return [...path, item as Album]
-        }
-        if (item.children) {
-          const found = findPath(item.children, targetId, [...path, item as Album])
-          if (found) return found
-        }
-      }
-    }
-    return null
-  }
-
-  const path = findPath(allItems.value, album.id)
-  if (path) {
-    breadcrumbPath.value = path
-  }
-}
-
 // 添加一个变量来保存根目录的页码
 const rootPageNumber = ref(1)
 
@@ -331,14 +364,22 @@ onMounted(() => {
       <div class="photo-manager">
         <!-- 操作按钮 -->
         <div class="actions">
-          <button class="btn primary" @click="openModal(1)">
-            <i class="icon">📁</i>
-            <span>新建相册</span>
-          </button>
-          <button class="btn primary upload" @click="openModal(2)">
-            <i class="icon">📷</i>
-            <span>上传照片</span>
-          </button>
+          <div class="left-actions">
+            <button class="btn primary" @click="openModal(1)">
+              <i class="icon">📁</i>
+              <span>新建相册</span>
+            </button>
+            <button class="btn primary upload" @click="openModal(2)">
+              <i class="icon">📷</i>
+              <span>上传照片</span>
+            </button>
+          </div>
+          <div class="right-actions">
+            <button class="btn primary refresh" :class="{ 'loading': loading }" @click="loadCurrentItems" :disabled="loading">
+              <i class="icon">🔄</i>
+              <span>{{ loading ? '加载中...' : '刷新' }}</span>
+            </button>
+          </div>
         </div>
 
         <!-- 面包屑导航 -->
@@ -351,7 +392,13 @@ onMounted(() => {
         </div>
 
         <!-- 列表显示 -->
-        <div class="list">
+        <div class="list" :class="{ 'loading': loading }">
+          <div v-if="loading" class="loading-overlay">
+            <div class="loading-spinner">
+              <i class="icon">🔄</i>
+              <span>加载中...</span>
+            </div>
+          </div>
           <div v-if="currentItems.length === 0" class="empty-state">
             <div class="empty-content">
               <i class="empty-icon">📁</i>
@@ -483,6 +530,12 @@ onMounted(() => {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
   padding: 20px;
   min-height: 400px;
+  position: relative;
+  
+  &.loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
 
   .grid-container {
     display: grid;
@@ -507,6 +560,125 @@ onMounted(() => {
         transform: translateX(5px);
       }
     }
+  }
+
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 10;
+    
+    .loading-spinner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      
+      .icon {
+        font-size: 32px;
+        animation: spin 1s linear infinite;
+      }
+      
+      span {
+        color: #666;
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+.actions {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .left-actions {
+    display: flex;
+    gap: 16px;
+  }
+
+  .right-actions {
+    display: flex;
+    gap: 16px;
+  }
+
+  .btn {
+    &.primary {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      border: 2px solid #3498db;
+      padding: 10px 24px;
+      color: #3498db;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.1);
+
+      .icon {
+        font-size: 20px;
+      }
+
+      &:hover {
+        transform: translateY(-2px);
+        background: #3498db;
+        color: white;
+        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.2);
+      }
+
+      &.upload {
+        border-color: #2c3e50;
+        color: #2c3e50;
+
+        &:hover {
+          background: #2c3e50;
+          color: white;
+          box-shadow: 0 6px 20px rgba(44, 62, 80, 0.2);
+        }
+      }
+
+      &.refresh {
+        border-color: #27ae60;
+        color: #27ae60;
+
+        &:hover {
+          background: #27ae60;
+          color: white;
+          box-shadow: 0 6px 20px rgba(39, 174, 96, 0.2);
+        }
+
+        &.loading {
+          opacity: 0.7;
+          pointer-events: none;
+          
+          .icon {
+            animation-play-state: running !important;
+          }
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>
