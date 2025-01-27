@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import xyz.kuailemao.annotation.AccessLimit;
 import xyz.kuailemao.annotation.LogAnnotation;
 import xyz.kuailemao.constants.LogConst;
+import xyz.kuailemao.domain.dto.DeletePhotoOrAlbumDTO;
 import xyz.kuailemao.domain.dto.PhotoAlbumDTO;
 import xyz.kuailemao.domain.entity.Photo;
 import xyz.kuailemao.domain.response.ResponseResult;
@@ -66,10 +67,29 @@ public class PhotoController {
     @AccessLimit(seconds = 60, maxCount = 30)
     @LogAnnotation(module = "相册管理", operation = LogConst.UPLOAD_IMAGE)
     @PostMapping("/upload")
-    public ResponseResult<Void> uploadPhoto(@RequestParam("file") MultipartFile file,
-                                    @RequestParam("name") @Length(min = 1, max = 20, message = "照片名称长度为1-20个字符") String name,
-                                    @RequestParam(value = "parentId", required = false) Long parentId) {
+    public ResponseResult<Void> uploadPhoto(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("name") @Length(min = 1, max = 20, message = "照片名称长度为1-20个字符") String name,
+            @RequestParam(value = "parentId", required = false) Long parentId) {
         return photoService.uploadPhoto(file, name, parentId);
+    }
+
+    @PreAuthorize("hasAnyAuthority('blog:album:update')")
+    @Operation(summary = "后台修改相册")
+    @AccessLimit(seconds = 60, maxCount = 30)
+    @LogAnnotation(module = "相册管理", operation = LogConst.UPDATE)
+    @PostMapping("/album/update")
+    public ResponseResult<Void> updateAlbum(@RequestBody @Validated PhotoAlbumDTO albumDTO) {
+        return photoService.updateAlbum(albumDTO);
+    }
+
+    @PreAuthorize("hasAnyAuthority('blog:photo:delete')")
+    @Operation(summary = "后台删除相册或照片")
+    @AccessLimit(seconds = 60, maxCount = 30)
+    @LogAnnotation(module = "相册管理", operation = LogConst.UPDATE)
+    @DeleteMapping("/delete")
+    public ResponseResult<Void> deletePhotoOrAlbum(@RequestBody @Validated DeletePhotoOrAlbumDTO deletePhotoOrAlbum) {
+        return photoService.deletePhotoOrAlbum(deletePhotoOrAlbum);
     }
 
 }
