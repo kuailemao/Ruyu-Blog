@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.kuailemao.constants.Const;
+import xyz.kuailemao.domain.response.ResponseResult;
 import xyz.kuailemao.enums.UploadEnum;
 import xyz.kuailemao.exceptions.FileUploadException;
 
@@ -48,29 +49,79 @@ public class FileUploadUtils {
      * @throws Exception 异常
      */
     public String upload(UploadEnum uploadEnum, MultipartFile file) throws Exception {
-        // 验证文件大小
-        if (verifyTheFileSize(file.getSize(), uploadEnum.getLimitSize()))
-            throw new FileUploadException("上传文件超过限制大小:" + uploadEnum.getLimitSize() + "MB");
+        isCheck(uploadEnum, file);
         if (isFormatFile(file.getOriginalFilename(), uploadEnum.getFormat())) {
             InputStream stream = file.getInputStream();
             String name = UUID.randomUUID().toString();
-            String originalFilename = file.getOriginalFilename();
-            String fileExtension = null;
-            if (originalFilename != null) {
-                fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-            }
             PutObjectArgs args = PutObjectArgs.builder()
                     .bucket(bucketName)
                     .headers(Map.of(Const.CONTENT_TYPE, Objects.requireNonNull(file.getContentType())))
-                    .object(uploadEnum.getDir() + name + "." + fileExtension)
+                    .object(uploadEnum.getDir() + name + "." + getFileExtension(file.getOriginalFilename()))
                     .stream(stream, file.getSize(), -1)
                     .build();
             client.putObject(args);
-            return endpoint + "/" + bucketName + "/" + uploadEnum.getDir() + name + "." + fileExtension;
+            return endpoint + "/" + bucketName + "/" + uploadEnum.getDir() + name + "." + getFileExtension(file.getOriginalFilename());
         }
         log.error("--------------------上传文件格式不正确--------------------");
         throw new FileUploadException("上传文件类型错误");
     }
+
+    /**
+     * 上传文件
+     *
+     * @param uploadEnum 文件枚举
+     * @param file       文件
+     * @param fileName   文件名 (不带后缀)
+     * @return 上传后的文件地址
+     */
+    public String upload(UploadEnum uploadEnum, MultipartFile file, String fileName) throws FileUploadException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        isCheck(uploadEnum, file);
+        if (isFormatFile(file.getOriginalFilename(), uploadEnum.getFormat())) {
+            InputStream stream = file.getInputStream();
+            PutObjectArgs args = PutObjectArgs.builder()
+                    .bucket(bucketName)
+                    .headers(Map.of(Const.CONTENT_TYPE, Objects.requireNonNull(file.getContentType())))
+                    .object(uploadEnum.getDir() + fileName + "." + getFileExtension(file.getOriginalFilename()))
+                    .stream(stream, file.getSize(), -1)
+                    .build();
+            client.putObject(args);
+            return endpoint + "/" + bucketName + "/" + uploadEnum.getDir() + fileName + "." + getFileExtension(file.getOriginalFilename());
+        }
+        log.error("--------------------上传文件格式不正确--------------------");
+        throw new FileUploadException("上传文件类型错误");
+    }
+
+    /**
+     * 文件上传合法校验
+     *
+     * @param uploadEnum 文件枚举
+     * @param file       文件
+     * @throws FileUploadException 文件上传异常
+     */
+    public void isCheck(UploadEnum uploadEnum, MultipartFile file) throws FileUploadException {
+        if (file.isEmpty()) {
+            throw new FileUploadException("上传文件为空");
+        }
+        // 验证文件大小
+        if (verifyTheFileSize(file.getSize(), uploadEnum.getLimitSize())) {
+            throw new FileUploadException("上传文件超过限制大小:" + uploadEnum.getLimitSize() + "MB");
+        }
+    }
+
+    /**
+     * 获取文件后缀
+     *
+     * @param originalFilename 文件名
+     * @return 文件后缀
+     */
+    public String getFileExtension(String originalFilename) {
+        String fileExtension = null;
+        if (originalFilename != null) {
+            fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+        }
+        return fileExtension;
+    }
+
 
     public Boolean verifyTheFileSize(Long fileSize, Double limitSize) {
         // 转为相同大小格式
@@ -238,6 +289,7 @@ public class FileUploadUtils {
 
     /**
      * 文件大小转换(kb)
+     *
      * @param fileSize 文件大小
      * @return 文件大小(kb)
      */

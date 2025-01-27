@@ -3,6 +3,8 @@ package xyz.kuailemao.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
+import jakarta.validation.constraints.Size;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,7 @@ import xyz.kuailemao.constants.LogConst;
 import xyz.kuailemao.domain.dto.PhotoAlbumDTO;
 import xyz.kuailemao.domain.entity.Photo;
 import xyz.kuailemao.domain.response.ResponseResult;
+import xyz.kuailemao.domain.vo.PageVO;
 import xyz.kuailemao.domain.vo.PhotoAndAlbumListVO;
 import xyz.kuailemao.service.PhotoService;
 import xyz.kuailemao.utils.ControllerUtils;
@@ -26,6 +29,7 @@ import java.util.List;
  * @author kuailemao
  * @since 2025-01-16 16:33:05
  */
+@Validated
 @RestController
 @RequestMapping("photo")
 public class PhotoController {
@@ -40,8 +44,12 @@ public class PhotoController {
     @AccessLimit(seconds = 60, maxCount = 30)
     @LogAnnotation(module = "相册管理", operation = LogConst.GET)
     @GetMapping("/back/list")
-    public ResponseResult<List<PhotoAndAlbumListVO>> backList() {
-        return ControllerUtils.messageHandler(() -> photoService.getBackPhotoList());
+    public ResponseResult<PageVO<List<PhotoAndAlbumListVO>>> backList(
+            @RequestParam(value = "pageNum", defaultValue = "1") Long pageNum,
+            @RequestParam(value = "pageSize", defaultValue = "10") Long pageSize,
+            @RequestParam(value = "parentId", required = false) Long parentId
+    ) {
+        return ControllerUtils.messageHandler(() -> photoService.getBackPhotoList(pageNum, pageSize, parentId));
     }
 
     @PreAuthorize("hasAnyAuthority('blog:album:create')")
@@ -57,10 +65,10 @@ public class PhotoController {
     @Operation(summary = "后台上传照片")
     @AccessLimit(seconds = 60, maxCount = 30)
     @LogAnnotation(module = "相册管理", operation = LogConst.UPLOAD_IMAGE)
-    @PostMapping("/photo/upload")
+    @PostMapping("/upload")
     public ResponseResult<Void> uploadPhoto(@RequestParam("file") MultipartFile file,
-                                    @RequestParam("name") String name,
-                                    @RequestParam("parentId") Long parentId) {
+                                    @RequestParam("name") @Length(min = 1, max = 20, message = "照片名称长度为1-20个字符") String name,
+                                    @RequestParam(value = "parentId", required = false) Long parentId) {
         return photoService.uploadPhoto(file, name, parentId);
     }
 

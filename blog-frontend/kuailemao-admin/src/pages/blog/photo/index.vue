@@ -32,56 +32,35 @@ onMounted(() => {
 })
 // 数据管理
 const allItems = ref<(Album | Photo)[]>([])
+// 当前显示的项目
+const currentItems = ref<(Album | Photo)[]>([])
 
 async function refreshFunc() {
   // 查询所有数据
-  photoAndAlbumList().then(res => {
-    const flatData = res.data
+  photoAndAlbumList({
+    pageNum: currentPage.value,
+    pageSize: pageSize.value,
+    parentId: currentAlbumId.value
+  }).then(res => {
+    const flatData = res.data.page
     // 构建树形结构
     const buildTree = (items: (Album | Photo)[], parentId: number | null = null): (Album | Photo)[] => {
       return items
-        .filter(item => item.parentId === parentId)
-        .map(item => {
-          if (item.type === 1) {
-            const children = buildTree(items, item.id)
-            return { ...item, children } as Album
-          }
-          return item
-        })
+          .filter(item => item.parentId === parentId)
+          .map(item => {
+            if (item.type === 1) {
+              const children = buildTree(items, item.id)
+              return {...item, children} as Album
+            }
+            return item
+          })
     }
-    
+
     // 从根节点开始构建
     allItems.value = buildTree(flatData)
     console.log('构建的树形结构:', allItems.value)
   })
 }
-
-// 当前显示的项目
-const currentItems = computed(() => {
-  if (currentAlbumId.value === null) {
-    // 根目录
-    return allItems.value
-  } else {
-    // 查找当前相册
-    const findAlbum = (items: (Album | Photo)[]): Album | undefined => {
-      for (const item of items) {
-        if (item.type === 1) {
-          if (item.id === currentAlbumId.value) {
-            return item as Album
-          }
-          if (item.children) {
-            const found = findAlbum(item.children)
-            if (found) return found
-          }
-        }
-      }
-      return undefined
-    }
-    
-    const currentAlbum = findAlbum(allItems.value)
-    return currentAlbum?.children || []
-  }
-})
 
 const currentAlbumId = ref<number | null>(null)
 const breadcrumbPath = ref<Album[]>([])
@@ -106,57 +85,58 @@ const handlePreviewChange = (visible: boolean) => {
   previewVisible.value = visible
 }
 
+// 分页相关
+const currentPage = ref(1)
+const pageSize = ref(8)  // 每页8个项目
+const total = ref(0)
+
 // 加载当前相册的内容
 const loadCurrentItems = async () => {
-  // 使用现有的数据结构，不需要重新加载
-  // 数据已经在 currentItems 计算属性中处理
-}
+  try {
+    const res = await photoAndAlbumList({
+      pageNum: currentPage.value,
+      pageSize: pageSize.value,
+      parentId: currentAlbumId.value
+    })
 
-// 更新面包屑导航
-const updateBreadcrumb = (album: Album) => {
-  const findPath = (items: (Album | Photo)[], targetId: number, path: Album[] = []): Album[] | null => {
-    for (const item of items) {
-      if (item.type === 1) {
-        if (item.id === targetId) {
-          return [...path, item as Album]
-        }
-        if (item.children) {
-          const found = findPath(item.children, targetId, [...path, item as Album])
-          if (found) return found
-        }
-      }
+    if (res.code === 200) {
+      console.log("分页数据", res.data)
+      // 更新数据和总数
+      currentItems.value = res.data.page  // 当前页的数据
+      total.value = res.data.total      // 数据总数
     }
-    return null
-  }
-
-  const path = findPath(allItems.value, album.id)
-  if (path) {
-    breadcrumbPath.value = path
+  } catch (error) {
+    console.error('Failed to load items:', error)
+    message.error('加载失败')
   }
 }
 
-// 添加一个变量来保存根目录的页码
-const rootPageNumber = ref(1)
+// 处理页码变化
+const handlePageChange = async (page: number) => {
+  currentPage.value = page
+  await loadCurrentItems()
+}
 
 // 进入相册
-const enterAlbum = (album: Album) => {
+const enterAlbum = async (album: Album) => {
   if (currentAlbumId.value === album.id) {
     return
   }
-  
+
   // 如果是从根目录进入相册，保存当前页码
   if (currentAlbumId.value === null) {
     rootPageNumber.value = currentPage.value
   }
-  
+
   currentAlbumId.value = album.id
   updateBreadcrumb(album)
   // 进入新相册时重置分页到第一页
   currentPage.value = 1
+  await loadCurrentItems()
 }
 
 // 返回指定位置
-const goBack = (index: number) => {
+const goBack = async (index: number) => {
   if (index === -1) {
     // 返回根目录时恢复之前保存的页码
     currentAlbumId.value = null
@@ -167,7 +147,9 @@ const goBack = (index: number) => {
     const targetAlbum = breadcrumbPath.value[index]
     breadcrumbPath.value = breadcrumbPath.value.slice(0, index + 1)
     currentAlbumId.value = targetAlbum.id
+    currentPage.value = 1
   }
+  await loadCurrentItems()
 }
 
 // 打开模态框
@@ -210,10 +192,13 @@ const handleDelete = async (item: Album | Photo) => {
     async onOk() {
       try {
         // const res = await deletePhotoOrAlbum(item.id, item.type)
-        const res = null;
         if (res.code === 200) {
           message.success('删除成功')
-          refreshFunc()
+          // 如果当前页已经没有数据了，则返回上一页
+          if (currentItems.value.length === 1 && currentPage.value > 1) {
+            currentPage.value--
+          }
+          await loadCurrentItems()
         }
       } catch (error) {
         console.error('Delete failed:', error)
@@ -227,8 +212,8 @@ const handleDelete = async (item: Album | Photo) => {
 const uploadProps: UploadProps = {
   beforeUpload: (file) => {
     formState.value.file = file
-    // 直接使用完整文件名，包含后缀
-    formState.value.name = file.name
+    // 直接使用完整文件名，不包含后缀
+    formState.value.name = file.name.split('.')[0]
     handleFileChange(file)
     return false
   },
@@ -265,7 +250,7 @@ const handleFileChange = (file: File) => {
 const handleSubmit = async () => {
   try {
     await formRef.value?.validateFields()
-    
+
     if (modalType.value === 1) {
       // 创建相册
       const res = await createAlbum({
@@ -275,7 +260,7 @@ const handleSubmit = async () => {
       })
       if (res.code === 200) {
         message.success('创建相册成功')
-        await refreshFunc()
+        await loadCurrentItems()
       }
     } else {
       // 上传照片
@@ -286,12 +271,14 @@ const handleSubmit = async () => {
       const formData = new FormData()
       formData.append('file', formState.value.file)
       formData.append('name', formState.value.name)
-      formData.append('parentId', String(formState.value.parentId))
-      
+      if (formState.value.parentId) {
+        formData.append('parentId', String(formState.value.parentId))
+      }
+
       const res = await uploadPhoto(formData)
       if (res.code === 200) {
         message.success('上传照片成功')
-        await refreshFunc()
+        await loadCurrentItems()
       }
     }
 
@@ -307,34 +294,31 @@ const handleCancel = () => {
   formRef.value?.resetFields()
 }
 
-// 分页相关
-const currentPage = ref(1)
-const pageSize = ref(10)  // 每页显示10个项目（5行，每行2个）
-const total = ref(0)
-
-// 计算当前页的数据
-const paginatedItems = computed(() => {
-  // 先计算总数
-  total.value = currentItems.value.length
-  
-  // 计算当前页的数据
-  const start = (currentPage.value - 1) * pageSize.value
-  const end = start + pageSize.value
-  
-  // 确保不会超出范围
-  if (start >= total.value) {
-    currentPage.value = 1
-    return currentItems.value.slice(0, pageSize.value)
+// 更新面包屑导航
+const updateBreadcrumb = (album: Album) => {
+  const findPath = (items: (Album | Photo)[], targetId: number, path: Album[] = []): Album[] | null => {
+    for (const item of items) {
+      if (item.type === 1) {
+        if (item.id === targetId) {
+          return [...path, item as Album]
+        }
+        if (item.children) {
+          const found = findPath(item.children, targetId, [...path, item as Album])
+          if (found) return found
+        }
+      }
+    }
+    return null
   }
-  
-  return currentItems.value.slice(start, end)
-})
 
-// 处理页码变化
-const handlePageChange = (page: number, size: number) => {
-  currentPage.value = page
-  pageSize.value = size
+  const path = findPath(allItems.value, album.id)
+  if (path) {
+    breadcrumbPath.value = path
+  }
 }
+
+// 添加一个变量来保存根目录的页码
+const rootPageNumber = ref(1)
 
 onMounted(() => {
   loadCurrentItems()
@@ -380,47 +364,48 @@ onMounted(() => {
           </div>
 
           <template v-else>
-            <!-- 先显示相册 -->
-            <template v-for="item in paginatedItems" :key="item.id">
-              <div v-if="item.type === 1"
-                   class="list-item album-item"
-                   @click="enterAlbum(item as Album)">
-                <div class="item-image album-icon">
-                  <i class="icon">📁</i>
+            <!-- 统一的网格容器 -->
+            <div class="grid-container">
+              <template v-for="item in currentItems" :key="item.id">
+                <!-- 相册项 -->
+                <div v-if="item.type === 1"
+                     class="list-item album-item"
+                     @click="enterAlbum(item as Album)">
+                  <div class="item-image album-icon">
+                    <i class="icon">📁</i>
+                  </div>
+                  <div class="item-content">
+                    <h3>{{ item.name }}</h3>
+                    <p>{{ (item as Album).description }}</p>
+                    <p class="time">{{ item.createTime }}</p>
+                    <p v-if="item.children" class="count">{{ item.children.length }} 个项目</p>
+                  </div>
+                  <div class="item-actions" @click.stop>
+                    <button class="btn small edit" @click="handleEdit(item)">编辑</button>
+                    <button class="btn small danger" @click="handleDelete(item)">删除</button>
+                  </div>
                 </div>
-                <div class="item-content">
-                  <h3>{{ item.name }}</h3>
-                  <p>{{ (item as Album).description }}</p>
-                  <p class="time">{{ item.createTime }}</p>
-                  <p v-if="item.children" class="count">{{ item.children.length }} 个项目</p>
-                </div>
-                <div class="item-actions" @click.stop>
-                  <button class="btn small edit" @click="handleEdit(item)">编辑</button>
-                  <button class="btn small danger" @click="handleDelete(item)">删除</button>
-                </div>
-              </div>
-            </template>
 
-            <!-- 再显示照片 -->
-            <template v-for="item in paginatedItems" :key="item.id">
-              <div v-if="item.type === 2" class="list-item">
-                <div class="item-image">
-                  <Image
-                      :src="item.url"
-                      :alt="item.name"
-                      preview
-                  />
+                <!-- 照片项 -->
+                <div v-else class="list-item">
+                  <div class="item-image">
+                    <Image
+                        :src="item.url"
+                        :alt="item.name"
+                        preview
+                    />
+                  </div>
+                  <div class="item-content">
+                    <h3>{{ item.name }}</h3>
+                    <p class="size">大小：{{ item.size }}MB</p>
+                    <p class="time">{{ item.createTime }}</p>
+                  </div>
+                  <div class="item-actions">
+                    <button class="btn small danger" @click="handleDelete(item)">删除</button>
+                  </div>
                 </div>
-                <div class="item-content">
-                  <h3>{{ item.name }}</h3>
-                  <p class="size">{{ item.size }}</p>
-                  <p class="time">{{ item.createTime }}</p>
-                </div>
-                <div class="item-actions">
-                  <button class="btn small danger" @click="handleDelete(item)">删除</button>
-                </div>
-              </div>
-            </template>
+              </template>
+            </div>
           </template>
         </div>
 
@@ -429,7 +414,7 @@ onMounted(() => {
           <Pagination
               v-if="total > 0"
               v-model:current="currentPage"
-              v-model:pageSize="pageSize"
+              :pageSize="pageSize"
               :total="total"
               :show-size-changer="false"
               @change="handlePageChange"
@@ -491,4 +476,37 @@ onMounted(() => {
 <style scoped lang="scss">
 @import "./style/index";
 
+.list {
+  border: none;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  min-height: 400px;
+
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .list-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    height: fit-content;
+
+    &.album-item {
+      cursor: pointer;
+
+      &:hover {
+        background: rgba(52, 152, 219, 0.1);
+        transform: translateX(5px);
+      }
+    }
+  }
+}
 </style>

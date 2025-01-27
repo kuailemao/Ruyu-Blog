@@ -113,6 +113,7 @@ public class LogAspect {
                     .build();
             rabbitTemplate.convertAndSend(exchange,routingKey,logEntity);
             log.error("【{}】执行方法【{}】异常", joinPoint.getSignature().getDeclaringTypeName(), joinPoint.getSignature().getName(), e);
+            // 这里一定要重新抛出去，不然全局异常处理器会失效
             throw e;
         }
 
