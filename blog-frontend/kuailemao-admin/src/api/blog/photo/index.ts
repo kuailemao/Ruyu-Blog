@@ -3,8 +3,12 @@ import { message } from 'ant-design-vue'
 /**
  * 相册与照片列表
  */
-export async function photoAndAlbumList() {
-  return useGet('/photo/back/list').catch(msg => message.warn(msg))
+export async function photoAndAlbumList(params: {
+  pageNum: number
+  pageSize: number
+  parentId: number | null
+}) {
+  return useGet('/photo/back/list', params).catch(msg => message.warn(msg))
 }
 
 /**
@@ -21,7 +25,7 @@ export async function createAlbum(data: {
 
 // 上传照片
 export async function uploadPhoto(data: any) {
-  return usePost('/photo/photo/upload', data, {
+  return usePost('/photo/upload', data, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },

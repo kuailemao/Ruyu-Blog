@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import xyz.kuailemao.domain.dto.PhotoAlbumDTO;
 import xyz.kuailemao.domain.entity.Photo;
 import xyz.kuailemao.domain.response.ResponseResult;
+import xyz.kuailemao.domain.vo.PageVO;
 import xyz.kuailemao.domain.vo.PhotoAndAlbumListVO;
 
 import java.util.List;
@@ -20,9 +21,12 @@ public interface PhotoService extends IService<Photo> {
 
     /**
      * 获取后台图片列表
+     * @param pageNum 当前页码
+     * @param pageSize 每页数量
+     * @param parentId 父相册id
      * @return 图片列表
      */
-    List<PhotoAndAlbumListVO> getBackPhotoList();
+    PageVO<List<PhotoAndAlbumListVO>> getBackPhotoList(Long pageNum, Long pageSize, Long parentId);
 
     /**
      * 创建相册
