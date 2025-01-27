@@ -2,33 +2,40 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import PhotoPreview from './PhotoPreview.vue'
 import AlbumBanner from './AlbumBanner.vue'
+import type { PhotoAndAlbumVO } from '@/apis/photo'
 
-interface Album {
-  id: number
-  name: string
-  description: string
-}
-
-interface Photo {
+export interface Photo {
   id: number
   url: string
   title: string
   description: string
 }
 
-interface GalleryItem {
+export interface AlbumData {
+  id: number
+  name: string
+  description: string
+  photos: Photo[]
+  subAlbums?: AlbumData[]
+  coverUrl?: string | undefined
+}
+
+export interface GalleryItem {
   type: 'album' | 'photo'
-  data: Album | Photo
+  data: AlbumData | Photo
 }
 
 const props = defineProps<{
   currentPath: number[]
   galleries: Record<string, GalleryItem[]>
   isDarkMode: boolean
+  loading: boolean
+  hasMore: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:currentPath', value: number[]): void
+  (e: 'loadMore'): void
 }>()
 
 const showPreview = ref(false)
@@ -36,7 +43,7 @@ const currentPhotoIndex = ref(0)
 const previewPhotos = ref<string[]>([])
 
 const handleItemClick = (item: GalleryItem) => {
-  if (item.type === 'photo') {
+  if (isPhoto(item)) {
     // 保存当前滚动位置
     const scrollPosition = window.scrollY
 
@@ -49,18 +56,21 @@ const handleItemClick = (item: GalleryItem) => {
     document.body.style.marginTop = '0'
 
     const photos = getCurrentGallery()
-        .filter(item => item.type === 'photo')
-        .map(item => (item.data as Photo).url)
+        .filter(isPhoto)
+        .map(item => item.data.url)
     previewPhotos.value = photos
-    currentPhotoIndex.value = photos.indexOf((item.data as Photo).url)
+    currentPhotoIndex.value = photos.indexOf(item.data.url)
     showPreview.value = true
-  } else {
-    emit('update:currentPath', [...props.currentPath, (item.data as Album).id])
+  } else if (isAlbum(item)) {
+    emit('update:currentPath', [...props.currentPath, item.data.id])
   }
 }
 
 // 添加缺失的状态
 const itemsVisible = ref<boolean[]>([])
+
+// 添加一个 ref 来跟踪之前的相册长度
+const prevGalleryLength = ref(0)
 
 // 添加缺失的函数
 const getCurrentGallery = () => {
@@ -68,69 +78,93 @@ const getCurrentGallery = () => {
   return props.galleries[path] || []
 }
 
-const initializeVisibility = () => {
-  const gallery = getCurrentGallery()
-  itemsVisible.value = new Array(gallery.length).fill(false)
-  requestAnimationFrame(() => {
-    gallery.forEach((_, index) => {
-      setTimeout(() => {
-        itemsVisible.value[index] = true
-      }, index * 100)
-    })
-  })
+const initializeVisibility = (startIndex: number = 0) => {
+    const gallery = getCurrentGallery()
+    // 确保 itemsVisible 数组长度足够
+    if (itemsVisible.value.length < gallery.length) {
+        itemsVisible.value = new Array(gallery.length).fill(true)
+    }
 }
 
-// 添加生命周期钩子
+// 修改滚动监听
+const handleScroll = () => {
+  const scrollPosition = window.scrollY + window.innerHeight
+  const documentHeight = document.documentElement.scrollHeight
+
+  // 当滚动到距离底部100px时触发加载
+  if (!props.loading && props.hasMore && documentHeight - scrollPosition <= 100) {
+    emit('loadMore')
+  }
+}
+
+// 修改生命周期钩子
 onMounted(() => {
-  initializeVisibility()
+    initializeVisibility()
+    window.addEventListener('scroll', handleScroll)
 })
 
 onUnmounted(() => {
-  // 清理工作
-  document.body.style.position = ''
-  document.body.style.width = ''
-  document.body.style.top = ''
-  document.body.style.overflow = ''
-  document.body.style.left = ''
-  document.body.style.marginTop = ''
+    // 清理工作
+    document.body.style.position = ''
+    document.body.style.width = ''
+    document.body.style.top = ''
+    document.body.style.overflow = ''
+    document.body.style.left = ''
+    document.body.style.marginTop = ''
+
+    window.removeEventListener('scroll', handleScroll)
 })
 
-// 添加 watch 以处理路径变化
-watch(() => [props.currentPath, props.galleries], () => {
-  initializeVisibility()
-}, { deep: true })
+// 修改 watch 函数
+watch(() => [props.currentPath, props.galleries], (newValue, oldValue) => {
+    const gallery = getCurrentGallery()
+    
+    // 检查是否是路径变化（包括返回主页的情况）
+    const isPathChange = oldValue && oldValue[0] ? (
+        // 当前路径长度变化
+        props.currentPath.length !== oldValue[0].length ||
+        // 路径内容变化
+        props.currentPath.some((id, index) => id !== oldValue[0][index]) ||
+        // 从其他路径返回主页
+        (props.currentPath.length === 0 && oldValue[0].length > 0)
+    ) : false
+    
+    if (isPathChange) {
+        // 路径变化时，滚动到顶部
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        })
+    }
+    
+    // 初始化或更新可见性状态
+    initializeVisibility()
+    
+    // 更新 prevGalleryLength
+    prevGalleryLength.value = gallery.length
+}, { deep: true, immediate: true })
 
-// 添加获取相册封面的函数
-const getAlbumCover = (albumId: number) => {
-  const album = props.galleries.root.find(
+// 修改 getAlbumCover 方法
+const getAlbumCover = (albumId: number): string | undefined => {
+  const items = props.galleries['root'] || []
+  const album = items.find(
       item => item.type === 'album' && (item.data as AlbumData).id === albumId
   )
 
   if (album && album.type === 'album') {
     const albumData = album.data as AlbumData
-    if (albumData.photos && albumData.photos.length > 0) {
-      return albumData.photos[0].url
-    }
+    return albumData.coverUrl
   }
 
-  return 'https://pic2.zhimg.com/v2-3aecfb4a857585d6eb2796902a565956_r.jpg?source=172ae18b'
+  return undefined
 }
 
-// 添加判断相册是否有照片的函数
-const hasPhotos = (item: GalleryItem) => {
-  if (item.type === 'album') {
-    const albumData = item.data as AlbumData
-    return albumData.photos && albumData.photos.length > 0
+// 修改 hasPhotos 函数
+const hasPhotos = (item: GalleryItem): boolean => {
+  if (isAlbum(item)) {
+    return item.data.photos.length > 0 || !!item.data.coverUrl
   }
   return false
-}
-
-// 添加缺失的 AlbumData 接口
-interface AlbumData {
-  id: number
-  name: string
-  photos: Photo[]
-  subAlbums?: AlbumData[]
 }
 
 // 修改获取当前相册信息的计算属性
@@ -139,16 +173,17 @@ const currentAlbum = computed(() => {
   const gallery = props.galleries[path] || []
 
   // 获取当前相册信息
-  let albumInfo: { data: Album } | undefined
+  let albumInfo: { data: AlbumData } | undefined
 
   if (path === 'root') {
     // 如果是根目录，使用默认标题
+    const firstPhoto = gallery.find(item => isPhoto(item))
     return {
       title: '我的相册',
       description: '相册功能正在测试阶段，图片来源于网络，如有侵权请联系我！！！',
-      photosCount: gallery.filter(item => item.type === 'photo').length,
-      albumsCount: gallery.filter(item => item.type === 'album').length,
-      coverImage: gallery.find(item => item.type === 'photo')?.data.url
+      photosCount: gallery.filter(item => isPhoto(item)).length,
+      albumsCount: gallery.filter(item => isAlbum(item)).length,
+      coverImage: firstPhoto ? (firstPhoto.data as Photo).url : undefined
     }
   } else {
     // 在父级相册中查找当前相册的信息
@@ -158,16 +193,17 @@ const currentAlbum = computed(() => {
     const parentGallery = props.galleries[parentPath] || []
 
     albumInfo = parentGallery.find(
-        item => item.type === 'album' && (item.data as Album).id === Number(path)
-    ) as { data: Album } | undefined
-  }
+        item => isAlbum(item) && item.data.id === Number(path)
+    ) as { data: AlbumData } | undefined
 
-  return {
-    title: albumInfo?.data.name || '未命名相册',
-    description: albumInfo?.data.description || '',
-    photosCount: gallery.filter(item => item.type === 'photo').length,
-    albumsCount: gallery.filter(item => item.type === 'album').length,
-    coverImage: gallery.find(item => item.type === 'photo')?.data.url
+    const firstPhoto = gallery.find(item => isPhoto(item))
+    return {
+      title: albumInfo?.data.name || '未命名相册',
+      description: albumInfo?.data.description || '',
+      photosCount: gallery.filter(item => isPhoto(item)).length,
+      albumsCount: gallery.filter(item => isAlbum(item)).length,
+      coverImage: firstPhoto ? (firstPhoto.data as Photo).url : undefined
+    }
   }
 })
 
@@ -177,12 +213,12 @@ const recentAlbums = computed(() => {
   const gallery = props.galleries[path] || []
 
   return gallery
-      .filter(item => item.type === 'album')
+      .filter(isAlbum)
       .slice(0, 4) // 只显示前4个相册
       .map(item => ({
-        id: (item.data as Album).id,
-        name: (item.data as Album).name,
-        coverUrl: getAlbumCover((item.data as Album).id)
+        id: item.data.id,
+        name: item.data.name,
+        coverUrl: item.data.coverUrl
       }))
 })
 
@@ -200,12 +236,12 @@ const breadcrumbs = computed(() => {
 
     // 在父级相册中查找当前相册信息
     const albumInfo = parentGallery.find(
-        item => item.type === 'album' && (item.data as Album).id === id
-    ) as { data: Album } | undefined
+        item => isAlbum(item) && item.data.id === id
+    )
 
     return {
       id,
-      name: albumInfo?.data.name || '未命名相册'
+      name: albumInfo ? albumInfo.data.name : '未命名相册'
     }
   })
 })
@@ -217,6 +253,48 @@ const handleBreadcrumbClick = (index: number) => {
   } else {
     emit('update:currentPath', props.currentPath.slice(0, index + 1))
   }
+}
+
+// 转换后端数据为前端需要的格式
+const convertBackendData = (data: PhotoAndAlbumVO[]) => {
+  return data.map(item => {
+    if (item.type === 1) {
+      // 相册
+      const albumData: AlbumData = {
+        id: item.id,
+        name: item.name,
+        description: item.description || '',
+        photos: [],
+        coverUrl: item.url || undefined
+      }
+      return {
+        type: 'album' as const,
+        data: albumData
+      }
+    } else {
+      // 照片
+      const photoData: Photo = {
+        id: item.id,
+        url: item.url || '',
+        title: item.name,
+        description: item.description || ''
+      }
+      return {
+        type: 'photo' as const,
+        data: photoData
+      }
+    }
+  })
+}
+
+// 判断是否为照片类型的辅助函数
+const isPhoto = (item: GalleryItem): item is { type: 'photo', data: Photo } => {
+  return item.type === 'photo'
+}
+
+// 判断是否为相册类型的辅助函数
+const isAlbum = (item: GalleryItem): item is { type: 'album', data: AlbumData } => {
+  return item.type === 'album'
 }
 </script>
 
@@ -234,40 +312,52 @@ const handleBreadcrumbClick = (index: number) => {
     />
 
     <div class="gallery-wrapper">
-      <div v-if="getCurrentGallery().length > 0" class="gallery-grid">
-        <div v-for="(item, index) in getCurrentGallery()"
-             :key="item.type + (item.data as any).id"
-             class="gallery-item"
-             :class="{ visible: itemsVisible[index] }"
-             @click="handleItemClick(item)">
-          <template v-if="item.type === 'album'">
-            <div v-if="!hasPhotos(item)" class="default-album-cover">
-              <div class="default-album-inner">
-                <div class="album-icon"></div>
+      <!-- 修改加载状态的判断逻辑 -->
+      <div v-if="props.loading && getCurrentGallery().length === 0" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>加载中...</p>
+      </div>
+
+      <template v-else>
+        <div v-if="getCurrentGallery().length > 0" class="gallery-grid">
+          <div v-for="(item, index) in getCurrentGallery()"
+               :key="item.type + (isPhoto(item) ? item.data.id : item.data.id)"
+               class="gallery-item"
+               :class="{ visible: itemsVisible[index] }"
+               @click="handleItemClick(item)">
+            <template v-if="isAlbum(item)">
+              <div v-if="!hasPhotos(item) && !item.data.coverUrl" class="default-album-cover">
+                <div class="default-album-inner">
+                  <div class="album-icon"></div>
+                </div>
               </div>
-            </div>
-            <img v-else
-                 :src="getAlbumCover((item.data as Album).id)"
-                 :alt="(item.data as Album).name"
+              <img v-else
+                   :src="item.data.coverUrl || '/images/default-album-cover.jpg'"
+                   :alt="item.data.name"
+                   loading="lazy">
+            </template>
+            <img v-else-if="isPhoto(item)"
+                 :src="item.data.url"
+                 :alt="item.data.title"
                  loading="lazy">
-          </template>
-          <img v-else
-               :src="(item.data as Photo).url"
-               alt=""
-               loading="lazy">
-          <div class="item-info" v-if="item.type === 'album'">
-            <h3>{{ (item.data as Album).name }}</h3>
+            <div class="item-info" v-if="isAlbum(item)">
+              <h3>{{ item.data.name }}</h3>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- 简化的空状态显示 -->
-      <div v-else class="empty-state">
-        <p>这个相册还没有内容哦~</p>
-      </div>
+        <div v-else class="empty-state">
+          <p>这个相册还没有内容哦~</p>
+        </div>
+
+        <!-- 加载更多 -->
+        <div v-if="props.hasMore && getCurrentGallery().length > 0" class="loading-more">
+          <div v-if="props.loading" class="loading-spinner"></div>
+          <p v-else>向下滚动加载更多</p>
+        </div>
+      </template>
     </div>
 
-    <!-- 使用新的 PhotoPreview 组件 -->
     <PhotoPreview
         v-model:show="showPreview"
         v-model:currentIndex="currentPhotoIndex"
@@ -279,7 +369,7 @@ const handleBreadcrumbClick = (index: number) => {
 <style scoped>
 .photo-gallery {
   width: 100%;
-  min-height: calc(100vh - 200px);
+  min-height: 100%;
   background: transparent;
   overflow: visible;
   padding: 0 20px;
@@ -301,11 +391,12 @@ const handleBreadcrumbClick = (index: number) => {
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 固定为4列 */
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   padding: 10px 0 30px 0;
   max-width: 1400px;
   margin: 0 auto;
+  min-height: calc(100vh - 200px); /* 保持最小高度，防止内容加载时页面跳动 */
 }
 
 .gallery-item {
@@ -314,9 +405,17 @@ const handleBreadcrumbClick = (index: number) => {
   overflow: hidden;
   aspect-ratio: 1;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  will-change: opacity, transform;
+}
+
+.gallery-item.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .gallery-item img {
@@ -394,59 +493,20 @@ const handleBreadcrumbClick = (index: number) => {
   .gallery-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
-    padding: 5px 0 20px 0;
-  }
-}
-
-/* 添加进入动画 */
-.gallery-item {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.gallery-item.visible {
-  opacity: 1;
-  transform: translateY(0);
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* 简化的空状态样式 */
-.empty-state {
-  padding: 40px;
-  color: #999;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: 16px;
-  margin: 20px 0;
-}
-
-.empty-state p {
-  font-size: 1.1em;
-  margin: 0;
-}
-
-@media (max-width: 768px) {
-  .empty-state {
-    min-height: 200px;
-    padding: 20px;
+    min-height: calc(100vh - 150px);
   }
 
-  .empty-state p {
-    font-size: 1em;
+  .loading-more {
+    padding: 20px 0;
+    height: 80px;
+    margin-top: -80px;
   }
 }
 
 @media (max-width: 480px) {
-  .empty-state {
-    padding: 12px;
-  }
-
-  .empty-state p {
-    font-size: 0.9em;
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 }
 
@@ -588,18 +648,74 @@ const handleBreadcrumbClick = (index: number) => {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
-/* 移动端适配 */
-@media (max-width: 768px) {
-  .gallery-wrapper {
-    padding: 20px;
-    margin-top: 0;
-    border-radius: 24px;
-  }
+/* 加载更多样式优化 */
+.loading-more {
+  text-align: center;
+  padding: 40px 0;
+  color: #666;
+  position: relative;
+  height: 100px; /* 固定高度，防止加载时页面跳动 */
+  margin-top: -100px; /* 上移，覆盖在内容上方 */
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none; /* 防止遮挡点击 */
+}
 
-  .gallery-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
-    padding: 5px 0 20px 0;
+.loading-spinner {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(92, 106, 196, 0.1);
+  border-radius: 50%;
+  border-top-color: #5c6ac4;
+  animation: spin 1s ease-in-out infinite;
+}
+
+/* 深色模式适配 */
+.dark-mode .loading-more {
+  color: #999;
+  background: linear-gradient(to top, rgba(30, 30, 30, 0.98) 0%, rgba(30, 30, 30, 0.8) 50%, rgba(30, 30, 30, 0) 100%);
+}
+
+.dark-mode .loading-spinner {
+  border-color: rgba(255, 255, 255, 0.1);
+  border-top-color: #7b8cd4;
+}
+
+/* 添加空状态样式 */
+.empty-state {
+  padding: 40px;
+  color: #999;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 16px;
+  margin: 20px 0;
+}
+
+/* 添加加载状态样式 */
+.loading-state {
+  padding: 40px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 300px;
+}
+
+.loading-state p {
+  color: #666;
+  margin: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 </style> 

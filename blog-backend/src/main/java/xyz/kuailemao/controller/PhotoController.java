@@ -53,6 +53,18 @@ public class PhotoController {
         return ControllerUtils.messageHandler(() -> photoService.getBackPhotoList(pageNum, pageSize, parentId));
     }
 
+    @Operation(summary = "前台相册或照片列表")
+    @AccessLimit(seconds = 60, maxCount = 30)
+    @LogAnnotation(module = "相册管理", operation = LogConst.GET)
+    @GetMapping("/list")
+    public ResponseResult<PageVO<List<PhotoAndAlbumListVO>>> getList(
+            @RequestParam(value = "pageNum", defaultValue = "1") Long pageNum,
+            @RequestParam(value = "pageSize", defaultValue = "10") Long pageSize,
+            @RequestParam(value = "parentId", required = false) Long parentId
+    ) {
+        return ControllerUtils.messageHandler(() -> photoService.getBackPhotoList(pageNum, pageSize, parentId));
+    }
+
     @PreAuthorize("hasAnyAuthority('blog:album:create')")
     @Operation(summary = "后台创建相册")
     @AccessLimit(seconds = 60, maxCount = 30)

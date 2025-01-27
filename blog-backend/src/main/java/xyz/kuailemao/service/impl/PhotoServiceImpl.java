@@ -26,6 +26,7 @@ import xyz.kuailemao.utils.StringUtils;
 import java.util.List;
 import java.util.Objects;
 
+import static xyz.kuailemao.constants.SQLConst.LIMIT_ONE_SQL;
 import static xyz.kuailemao.constants.SQLConst.ORDER_BY_CREATE_TIME_DESC;
 
 
@@ -59,6 +60,22 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoMapper, Photo> implements
         lambdaQueryWrapper.last(ORDER_BY_CREATE_TIME_DESC);
         photoMapper.selectPage(page, lambdaQueryWrapper);
         if (page.getRecords().isEmpty()) return new PageVO<>(List.of(), page.getTotal());
+        // 查询每个相册的封面
+        for (Photo photo : page.getRecords()) {
+            if (Objects.equals(photo.getType(), AlbumOrPhotoEnum.ALBUM.getCode())) {
+                Photo photoOne = photoMapper.selectOne(
+                        new LambdaQueryWrapper<Photo>()
+                                .eq(Photo::getParentId, photo.getId())
+                                .eq(Photo::getType, AlbumOrPhotoEnum.PHOTO.getCode())
+                                .last(ORDER_BY_CREATE_TIME_DESC).last(LIMIT_ONE_SQL)
+                );
+                if (null != photoOne) {
+                    photo.setUrl(photoOne.getUrl());
+                    page.getRecords().get(page.getRecords().indexOf(photo)).setUrl(photoOne.getUrl());
+                }
+            }
+        }
+
         List<PhotoAndAlbumListVO> photoAndAlbumListVOS = page.getRecords().stream().map(photo -> photo.asViewObject(PhotoAndAlbumListVO.class)).toList();
         return new PageVO<>(photoAndAlbumListVOS, page.getTotal());
     }
