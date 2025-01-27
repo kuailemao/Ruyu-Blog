@@ -82,8 +82,20 @@ const initializeVisibility = (startIndex: number = 0) => {
     const gallery = getCurrentGallery()
     // 确保 itemsVisible 数组长度足够
     if (itemsVisible.value.length < gallery.length) {
-        itemsVisible.value = new Array(gallery.length).fill(true)
+        itemsVisible.value = [
+            ...itemsVisible.value,
+            ...new Array(gallery.length - itemsVisible.value.length).fill(false)
+        ]
     }
+    
+    // 使用 requestAnimationFrame 确保动画流畅
+    requestAnimationFrame(() => {
+        for (let i = startIndex; i < gallery.length; i++) {
+            setTimeout(() => {
+                itemsVisible.value[i] = true
+            }, (i - startIndex) * 100) // 每个项目间隔 100ms
+        }
+    })
 }
 
 // 修改滚动监听
@@ -135,10 +147,14 @@ watch(() => [props.currentPath, props.galleries], (newValue, oldValue) => {
             top: 0,
             behavior: 'smooth'
         })
+        
+        // 重置可见性状态并触发新的动画
+        itemsVisible.value = new Array(gallery.length).fill(false)
+        initializeVisibility(0)
+    } else if (gallery.length > prevGalleryLength.value) {
+        // 加载更多时，只为新项目添加动画
+        initializeVisibility(prevGalleryLength.value)
     }
-    
-    // 初始化或更新可见性状态
-    initializeVisibility()
     
     // 更新 prevGalleryLength
     prevGalleryLength.value = gallery.length
@@ -407,7 +423,7 @@ const isAlbum = (item: GalleryItem): item is { type: 'album', data: AlbumData } 
   cursor: pointer;
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity 0.5s ease, transform 0.5s ease;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   will-change: opacity, transform;
