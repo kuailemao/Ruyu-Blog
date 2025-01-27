@@ -113,9 +113,9 @@ public class LogAspect {
                     .build();
             rabbitTemplate.convertAndSend(exchange,routingKey,logEntity);
             log.error("【{}】执行方法【{}】异常", joinPoint.getSignature().getDeclaringTypeName(), joinPoint.getSignature().getName(), e);
+            throw e;
         }
 
-        return null;
     }
 
     private void recordLog(ProceedingJoinPoint joinPoint, long time,Object result) {
