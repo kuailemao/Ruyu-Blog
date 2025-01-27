@@ -110,7 +110,7 @@ public class FileUploadUtils {
                     .stream(stream, file.getSize(), -1)
                     .build();
             client.putObject(args);
-            return endpoint + "/" + bucketName + "/" + uploadEnum.getDir() + fileName + "." + getFileExtension(file.getOriginalFilename());
+            return endpoint + "/" + bucketName + "/" + uploadEnum.getDir() + dir + "/" + fileName + "." + getFileExtension(file.getOriginalFilename());
         }
         log.error("--------------------上传文件格式不正确--------------------");
         throw new FileUploadException("上传文件类型错误");

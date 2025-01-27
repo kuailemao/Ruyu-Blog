@@ -108,8 +108,9 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoMapper, Photo> implements
             String bannerUrl;
             // 查询父相册的名称
             if (StringUtils.isNotNull(parentId)) {
-                String albumDir = photoMapper.selectById(parentId).getName();
-                bannerUrl = fileUploadUtils.upload(UploadEnum.PHOTO_ALBUM, file, name, albumDir);
+                // 递归查询父相册并组合路径
+                String albumPath = buildAlbumPath(photoMapper, parentId);
+                bannerUrl = fileUploadUtils.upload(UploadEnum.PHOTO_ALBUM, file, name, albumPath);
             } else {
                 bannerUrl = fileUploadUtils.upload(UploadEnum.PHOTO_ALBUM, file, name);
             }
@@ -131,6 +132,33 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoMapper, Photo> implements
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 递归查询父相册并组合文件路径
+     *
+     * @param photoMapper 相册 Mapper
+     * @param parentId    当前相册的父相册 ID
+     * @return 组合后的文件路径（如 "顶层相册名称/父相册名称/当前相册名称"）
+     */
+    private String buildAlbumPath(PhotoMapper photoMapper, Long parentId) {
+        if (parentId == null) {
+            return ""; // 顶层相册，返回空路径
+        }
+
+        // 查询当前父相册
+        Photo parentAlbum = photoMapper.selectById(parentId);
+        if (parentAlbum == null) {
+            throw new RuntimeException("父相册不存在，ID: " + parentId);
+        }
+
+        // 递归查询父相册的父相册
+        String parentPath = buildAlbumPath(photoMapper, parentAlbum.getParentId());
+
+        // 组合路径
+        return parentPath.isEmpty()
+                ? parentAlbum.getName()
+                : parentPath + "/" + parentAlbum.getName();
     }
 
     @Override
