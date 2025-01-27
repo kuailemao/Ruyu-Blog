@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import {ref, onMounted, computed} from 'vue'
+import {ref, onMounted} from 'vue'
 import {Image, Modal, Form, Input, Upload, message, Pagination} from 'ant-design-vue'
 import type {UploadProps, FormInstance} from 'ant-design-vue'
 import type {Rule} from 'ant-design-vue/es/form'
-import {createAlbum, photoAndAlbumList, uploadPhoto} from "~/api/blog/photo";
+import {createAlbum, photoAndAlbumList, uploadPhoto, updateAlbum, deletePhotoOrAlbum} from "~/api/blog/photo";
 
 // 统一的数据接口
 interface BaseItem {
@@ -65,12 +65,13 @@ async function refreshFunc() {
 const currentAlbumId = ref<number | null>(null)
 const breadcrumbPath = ref<Album[]>([])
 const showModal = ref(false)
-const modalType = ref<1 | 2>(1)
+const modalType = ref<1 | 2 | 3>(1)
 const formRef = ref<FormInstance>()
 const formRules: Record<string, Rule[]> = {
   name: [{required: true, type: 'string', message: '请输入名称', trigger: 'blur'}]
 }
 const formState = ref({
+  id: 0,
   name: '',
   description: '',
   parentId: null as number | null,
@@ -209,10 +210,11 @@ const goBack = async (index: number) => {
 }
 
 // 打开模态框
-const openModal = (type: 1 | 2) => {
+const openModal = (type: 1 | 2 | 3) => {
   modalType.value = type
   // 重置表单状态，并设置当前所在相册的ID作为父ID
   formState.value = {
+    id: 0,
     name: '',
     description: '',
     parentId: currentAlbumId.value,  // 使用当前相册ID作为父ID
@@ -224,13 +226,14 @@ const openModal = (type: 1 | 2) => {
 // 编辑相册
 const handleEdit = (item: Album | Photo) => {
   // 只允许编辑相册
-  if ('url' in item) {
+  if (item.type !== 1) {
     return
   }
-  modalType.value = 1
+  modalType.value = 3  // 3表示编辑模式
   formState.value = {
+    id: item.id,  // 保存要编辑的相册ID
     name: item.name,
-    description: item.description,
+    description: (item as Album).description,
     parentId: item.parentId,
     file: null
   }
@@ -247,7 +250,7 @@ const handleDelete = async (item: Album | Photo) => {
     okType: 'danger',
     async onOk() {
       try {
-        // const res = await deletePhotoOrAlbum(item.id, item.type)
+        const res = await deletePhotoOrAlbum({id: item.id, type: item.type,parentId: item.parentId})
         if (res.code === 200) {
           message.success('删除成功')
           // 如果当前页已经没有数据了，则返回上一页
@@ -335,6 +338,17 @@ const handleSubmit = async () => {
       })
       if (res.code === 200) {
         message.success('创建相册成功')
+        await loadCurrentItems()
+      }
+    } else if (modalType.value === 3) {
+      // 修改相册
+      const res = await updateAlbum({
+        id: formState.value.id,
+        name: formState.value.name,
+        description: formState.value.description,
+      })
+      if (res.code === 200) {
+        message.success('修改相册成功')
         await loadCurrentItems()
       }
     } else {
@@ -447,7 +461,7 @@ onMounted(() => {
                     <p v-if="item.children" class="count">{{ item.children.length }} 个项目</p>
                   </div>
                   <div class="item-actions" @click.stop>
-                    <button class="btn small edit" @click="handleEdit(item)">编辑</button>
+                    <button v-if="item.type === 1" class="btn small edit" @click="handleEdit(item)">编辑</button>
                     <button class="btn small danger" @click="handleDelete(item)">删除</button>
                   </div>
                 </div>
@@ -490,7 +504,7 @@ onMounted(() => {
         <!-- 使用 Ant Design Vue 的模态框 -->
         <Modal
             :visible="showModal"
-            :title="modalType === 1 ? '相册' : '照片'"
+            :title="modalType === 1 ? '新建相册' : modalType === 2 ? '上传照片' : '编辑相册'"
             @cancel="handleCancel"
             @ok="handleSubmit"
             :maskClosable="false"
@@ -505,7 +519,7 @@ onMounted(() => {
               <Input v-model:value="formState.name" placeholder="请输入名称"/>
             </Form.Item>
 
-            <Form.Item v-if="modalType === 1" label="描述" name="description">
+            <Form.Item v-if="modalType === 1 || modalType === 3" label="描述" name="description">
               <Input.TextArea
                   v-model:value="formState.description"
                   :rows="3"

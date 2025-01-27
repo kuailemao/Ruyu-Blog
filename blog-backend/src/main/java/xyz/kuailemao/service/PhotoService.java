@@ -2,6 +2,7 @@ package xyz.kuailemao.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
+import xyz.kuailemao.domain.dto.DeletePhotoOrAlbumDTO;
 import xyz.kuailemao.domain.dto.PhotoAlbumDTO;
 import xyz.kuailemao.domain.entity.Photo;
 import xyz.kuailemao.domain.response.ResponseResult;
@@ -43,4 +44,18 @@ public interface PhotoService extends IService<Photo> {
      * @return 上传结果
      */
     ResponseResult<Void> uploadPhoto(MultipartFile file, String name, Long parentId);
+
+    /**
+     * 修改相册
+     * @param albumDTO 相册信息
+     * @return 修改结果
+     */
+    ResponseResult<Void> updateAlbum(PhotoAlbumDTO albumDTO);
+
+    /**
+     * 删除相册或照片
+     * @param deletePhotoOrAlbum 相册或照片信息
+     * @return 删除结果
+     */
+    ResponseResult<Void> deletePhotoOrAlbum(DeletePhotoOrAlbumDTO deletePhotoOrAlbum);
 }

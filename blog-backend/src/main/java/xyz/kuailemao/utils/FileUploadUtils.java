@@ -67,7 +67,7 @@ public class FileUploadUtils {
     }
 
     /**
-     * 上传文件
+     * 上传文件 -- 指定文件名
      *
      * @param uploadEnum 文件枚举
      * @param file       文件
@@ -82,6 +82,31 @@ public class FileUploadUtils {
                     .bucket(bucketName)
                     .headers(Map.of(Const.CONTENT_TYPE, Objects.requireNonNull(file.getContentType())))
                     .object(uploadEnum.getDir() + fileName + "." + getFileExtension(file.getOriginalFilename()))
+                    .stream(stream, file.getSize(), -1)
+                    .build();
+            client.putObject(args);
+            return endpoint + "/" + bucketName + "/" + uploadEnum.getDir() + fileName + "." + getFileExtension(file.getOriginalFilename());
+        }
+        log.error("--------------------上传文件格式不正确--------------------");
+        throw new FileUploadException("上传文件类型错误");
+    }
+
+    /**
+     * 上传文件 -- 指定动态存储文件夹 -- 指定文件名
+     *
+     * @param uploadEnum 文件枚举
+     * @param file       文件
+     * @param fileName   文件名 (不带后缀)
+     * @return 上传后的文件地址
+     */
+    public String upload(UploadEnum uploadEnum, MultipartFile file, String fileName, String dir) throws FileUploadException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        isCheck(uploadEnum, file);
+        if (isFormatFile(file.getOriginalFilename(), uploadEnum.getFormat())) {
+            InputStream stream = file.getInputStream();
+            PutObjectArgs args = PutObjectArgs.builder()
+                    .bucket(bucketName)
+                    .headers(Map.of(Const.CONTENT_TYPE, Objects.requireNonNull(file.getContentType())))
+                    .object(uploadEnum.getDir() + dir + "/" + fileName + "." + getFileExtension(file.getOriginalFilename()))
                     .stream(stream, file.getSize(), -1)
                     .build();
             client.putObject(args);
