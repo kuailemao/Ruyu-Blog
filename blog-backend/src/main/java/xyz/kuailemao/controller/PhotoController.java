@@ -3,7 +3,6 @@ package xyz.kuailemao.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
-import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -14,7 +13,6 @@ import xyz.kuailemao.annotation.LogAnnotation;
 import xyz.kuailemao.constants.LogConst;
 import xyz.kuailemao.domain.dto.DeletePhotoOrAlbumDTO;
 import xyz.kuailemao.domain.dto.PhotoAlbumDTO;
-import xyz.kuailemao.domain.entity.Photo;
 import xyz.kuailemao.domain.response.ResponseResult;
 import xyz.kuailemao.domain.vo.PageVO;
 import xyz.kuailemao.domain.vo.PhotoAndAlbumListVO;
@@ -59,7 +57,7 @@ public class PhotoController {
     @GetMapping("/list")
     public ResponseResult<PageVO<List<PhotoAndAlbumListVO>>> getList(
             @RequestParam(value = "pageNum", defaultValue = "1") Long pageNum,
-            @RequestParam(value = "pageSize", defaultValue = "10") Long pageSize,
+            @RequestParam(value = "pageSize", defaultValue = "16") Long pageSize,
             @RequestParam(value = "parentId", required = false) Long parentId
     ) {
         return ControllerUtils.messageHandler(() -> photoService.getBackPhotoList(pageNum, pageSize, parentId));
