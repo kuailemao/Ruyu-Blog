@@ -1,6 +1,6 @@
 .photo-manager {
   padding: 24px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-color);
   min-height: 100vh;
 }
 
@@ -8,7 +8,7 @@
   margin-bottom: 24px;
   padding: 12px 20px;
   font-size: 15px;
-  background: #f8fafc;
+  background: var(--photo-but-bg-color);
   border-radius: 12px;
   display: inline-flex;
   align-items: center;
@@ -43,51 +43,6 @@
     margin: 0 4px;
     color: #94a3b8;
     font-weight: 300;
-  }
-}
-
-.actions {
-  margin-bottom: 16px;
-  display: flex;
-  gap: 16px;
-
-  .btn {
-    &.primary {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: white;
-      border: 2px solid #3498db;
-      padding: 10px 24px;
-      color: #3498db;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.1);
-
-      .icon {
-        font-size: 20px;
-      }
-
-      &:hover {
-        transform: translateY(-2px);
-        background: #3498db;
-        color: white;
-        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.2);
-      }
-
-      &.upload {
-        border-color: #2c3e50;
-        color: #2c3e50;
-
-        &:hover {
-          background: #2c3e50;
-          color: white;
-          box-shadow: 0 6px 20px rgba(44, 62, 80, 0.2);
-        }
-      }
-    }
   }
 }
 
@@ -173,7 +128,7 @@
       h3 {
         margin: 0 0 4px;
         font-size: 16px;
-        color: #333;
+        color: var(--text-color);
         font-weight: 600;
         white-space: nowrap;
         overflow: hidden;
@@ -182,18 +137,18 @@
 
       p {
         margin: 0;
-        color: #666;
+        color: var(--text-color);
         font-size: 13px;
         line-height: 1.4;
 
         &.size {
-          color: #666;
+          color: var(--text-color);
           font-size: 13px;
           margin-bottom: 4px;
         }
 
         &.time {
-          color: #999;
+          color: var(--text-color);
           font-size: 12px;
         }
       }
@@ -550,7 +505,7 @@
 .list {
   border: none;
   border-radius: 12px;
-  background: white;
+  background: var(--bg-color);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
   padding: 20px;
   min-height: 400px;
@@ -573,6 +528,7 @@
     display: flex;
     align-items: center;
     padding: 10px 16px;
+    background: var(--photo-list-bg-color);
     border: 1px solid #f0f0f0;
     border-radius: 12px;
     transition: all 0.3s ease;
@@ -606,7 +562,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.92);
+    background: var(--photo-but-bg-color);
     backdrop-filter: blur(8px);
     z-index: 10;
     animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -673,7 +629,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: white;
+      background: var(--photo-but-bg-color);
       border: 2px solid #3498db;
       padding: 10px 24px;
       color: #3498db;
@@ -696,7 +652,7 @@
 
       &.upload {
         border-color: #2c3e50;
-        color: #2c3e50;
+        color: var(--text-color);
 
         &:hover {
           background: #2c3e50;

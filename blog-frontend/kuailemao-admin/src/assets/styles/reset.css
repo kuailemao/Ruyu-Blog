@@ -7,6 +7,8 @@ html {
   --hover-color:rgba(0,0,0,.025);
   --bg-color-container: #f0f2f5;
   --c-shadow: 2px 0 8px 0 rgba(29,35,41,.05);
+  --photo-but-bg-color: white;
+  --photo-list-bg-color: white;
 }
 
 html.dark{
@@ -17,6 +19,8 @@ html.dark{
   --hover-color:rgb(42, 44, 55);
   --bg-color-container: rgb(42, 44, 44);
   --c-shadow: rgba(13, 13, 13, 0.65) 0 2px 8px 0;
+  --photo-but-bg-color: #2a2c2f;
+  --photo-list-bg-color: rgba(0,0,0,.2);
 }
 
 body{
