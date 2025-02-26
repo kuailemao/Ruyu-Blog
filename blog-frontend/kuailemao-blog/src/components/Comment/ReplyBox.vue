@@ -1,9 +1,7 @@
 <script setup lang="ts">
-
-import {emojis} from "@/utils/O.o/emoji.ts";
-import {heo} from "@/utils/O.o/heo.ts";
 import {ElMessage} from "element-plus";
 import {addComment} from "@/apis/article";
+import EmojiPicker from './EmojiPicker.vue';
 
 const route = useRoute()
 
@@ -23,17 +21,13 @@ const prop = defineProps({
   type: Number,
 })
 
-const emojiOptions = ref(['Emoji', 'Heo'])
-const options = ref()
-// 选中下标
-const optionsIndex = ref(0)
-const emojiBtn = ref()
 // 评论框
 const myInput = ref();
-onMounted(() => {
-  options.value.children[optionsIndex.value].style.backgroundColor = '#7B5F69'
-  options.value.children[optionsIndex.value].style.color = 'white'
 
+// 添加引用到弹出框的DOM元素
+const emojiPopover = ref(null);
+
+onMounted(() => {
   myInput.value.addEventListener('focus', function () {
     myInput.value.classList.add('active');
   });
@@ -42,23 +36,25 @@ onMounted(() => {
       myInput.value.classList.remove('active');
     }
   });
+  
+  // 全局事件监听，确保弹出窗口内的任何点击都不会导致文本框失焦
+  document.addEventListener('mousedown', (event) => {
+    // 获取emoji弹出框
+    const popover = document.querySelector('.emoji-popover-container');
+    
+    // 如果点击发生在弹出框内部，阻止默认行为并保持焦点
+    if (popover && popover.contains(event.target)) {
+      // 阻止鼠标点击从弹出框传播到文档
+      event.preventDefault();
+      event.stopPropagation();
+      
+      // 确保文本框保持焦点
+      setTimeout(() => {
+        myInput.value.focus();
+      }, 10);
+    }
+  }, true); // 使用捕获阶段处理事件
 })
-
-function optionEmoji(index: number) {
-  optionsIndex.value = index
-  // 清除前面样式
-  for (let i = 0; i < options.value.children.length; i++) {
-    options.value.children[i].style.backgroundColor = 'white'
-    options.value.children[i].style.color = '#4A4A4A'
-  }
-  // 给选中的div添加样式
-  options.value.children[index].style.backgroundColor = '#7B5F69'
-  options.value.children[index].style.color = 'white'
-}
-
-function showEmojis() {
-  myInput.value.focus()
-}
 
 function addEmoji(emoji: string, comment: object) {
   // 在对应焦点的位置插入
@@ -113,44 +109,62 @@ function addChildComment(comment: any) {
   })
 }
 
+// 防止事件传播和默认行为
+function preventDefaultAndKeepFocus(event) {
+  // 阻止事件冒泡
+  event.stopPropagation();
+  
+  // 添加一点延迟
+  setTimeout(() => {
+    // 让回复框重新获得焦点
+    myInput.value.focus();
+  }, 10);
+}
+
+// 修改方法，确保选择表情后回复框保持焦点
+function handleEmojiSelect(emoji: string) {
+  // 添加表情到回复框
+  addEmoji(emoji, prop.comment);
+  
+  // 立即重新聚焦
+  myInput.value.focus();
+}
+
+// 点击表情按钮时自动聚焦回复框
+function handleEmojiButtonClick() {
+  myInput.value.focus();
+  myInput.value.classList.add('active');
+}
+
+// 在EmojiPicker操作完成时保持焦点
+function handleOperationComplete() {
+  setTimeout(() => {
+    myInput.value.focus();
+  }, 10);
+}
 </script>
 
 <template>
   <transition name="el-zoom-in-top">
     <div class="reply" v-show="comment.showReplyBox">
       <textarea style="color: #7B5F69;" ref="myInput" v-model="comment.replyText" :placeholder="'@'+comment.commentUserNickname"/>
-      <div>
-        <div ref="emojiBtn">
-          <el-popover
-              placement="bottom-end"
-              :width="510"
-              trigger="click"
-              @before-enter="showEmojis"
+      <div class="reply-footer">
+        <div class="reply-tools">
+          <!-- 更新表情选择器，添加操作完成事件处理 -->
+          <EmojiPicker 
+            ref="emojiPopover"
+            :popover-width="510" 
+            @select-emoji="handleEmojiSelect"
+            @operation-complete="handleOperationComplete"
+            @mousedown.capture.stop="preventDefaultAndKeepFocus"
           >
-            <template #reference>
-              <svg-icon name="emojis" width="1.5em" height="1.5em"
-                        style="margin-right: 0.8rem;cursor: pointer"/>
+            <template #trigger>
+              <div class="emoji-trigger-btn" @click="handleEmojiButtonClick">
+                <svg-icon name="emojis" class="emoji-icon"/>
+                <span class="emoji-ripple"></span>
+              </div>
             </template>
-            <div class="emojis_container">
-              <el-scrollbar>
-                <div class="OvO_emojis" v-show="optionsIndex === 0">
-                  <div @click="addEmoji(emoji,comment)" v-for="(emoji,key) in emojis" :key="key" :title="key">
-                    {{ emoji }}
-                  </div>
-                </div>
-                <div class="OvO_heo" v-show="optionsIndex === 1">
-                  <div>
-                    <img @click="addEmoji(key,comment)" v-for="(src,key) in heo" :key="key" :title="key" :src="src"/>
-                  </div>
-                </div>
-                <div class="OvO_options" ref="options">
-                  <div class="item_emoji" v-for="(emojiOption,index) in emojiOptions" @click="optionEmoji(index)">
-                    {{ emojiOption }}
-                  </div>
-                </div>
-              </el-scrollbar>
-            </div>
-          </el-popover>
+          </EmojiPicker>
         </div>
         <el-button type="danger" plain size="small" @click="addChildComment(comment)">发布</el-button>
       </div>
@@ -160,7 +174,6 @@ function addChildComment(comment: any) {
 
 <style scoped lang="scss">
 .reply {
-
   .active {
     height: 4rem;
     background: white;
@@ -195,83 +208,17 @@ function addChildComment(comment: any) {
   }
 }
 
-.emojis_container {
-  height: 20em;
-  width: 100%;
+// 添加样式确保表情按钮在回复框中正确显示
+.emoji-trigger-btn {
+  margin-right: 0.5rem;
+}
 
-  .OvO_heo {
-
-    div {
-      display: flex;
-      flex-wrap: wrap;
-      width: 100%;
-      height: 100%;
-      cursor: pointer;
-
-      img {
-        width: 3em;
-        height: 3em;
-
-        &:hover {
-          background-color: #F1F1F2FF;
-        }
-      }
-
-    }
-  }
-
-  .OvO_emojis {
-    display: flex;
-    flex-wrap: wrap;
-
-    div {
-      font-size: 1.8rem;
-      width: 1.5em;
-      height: 1.8em;
-      color: #4A4A4A;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-
-      &:hover {
-        background-color: #F1F1F2FF;
-      }
-    }
-  }
-
-  .OvO_options {
-    // 选项卡固定到底部
-    position: sticky;
-    bottom: 0;
-    background-color: white;
-    display: flex;
-    flex-wrap: wrap;
-    border-top: 1px solid #ebebeb;
-    justify-content: flex-start;
-    width: 100%;
-
-
-    .item_emoji {
-      width: 4em;
-      height: 2em;
-      color: #4A4A4A;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-right: 0.26rem;
-      cursor: pointer;
-
-      &:first-child {
-        background-color: #7B5F69;
-        color: white;
-      }
-
-      &:hover {
-        background-color: #F1F1F2FF;
-      }
-
-    }
+/* 改进回复框的活跃状态样式 */
+.reply {
+  textarea:focus {
+    height: 4rem;
+    background: white;
+    border: 1px solid #d09aae;
   }
 }
 </style>
