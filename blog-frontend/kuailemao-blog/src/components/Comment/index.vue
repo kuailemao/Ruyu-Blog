@@ -42,14 +42,48 @@ const myInput = ref();
 // 是否加载
 const isLoading = ref(false)
 
+// 添加一个 ref 来跟踪当前活动的评论框
+const activeCommentId = ref(null);
+
+// 添加设置活动评论框的方法
+function setActiveComment(id: number | null) {
+  activeCommentId.value = id;
+}
+
+// 修改父评论的表情按钮点击处理
+function handleParentEmojiButtonClick(event: Event) {
+  event.stopPropagation();
+  event.preventDefault();
+  
+  // 关闭所有回复框
+  if (comments.value) {
+    comments.value.forEach((comment: any) => {
+      comment.showReplyBox = false;
+      if (comment.childComment && comment.childComment.length) {
+        closeAllReplyBoxes(comment.childComment);
+      }
+    });
+  }
+  
+  // 重置活动评论框
+  setActiveComment(null);
+  // 聚焦到父评论输入框
+  myInput.value.focus();
+}
+
+// 修改父评论的表情选择处理
 function handleEmojiSelect(emoji: string) {
-  // 获取光标的位置
-  let start = myInput.value.selectionStart
-  let end = myInput.value.selectionEnd
-  // 拼接到光标的位置
-  textarea.value = textarea.value.substring(0, start) + emoji + textarea.value.substring(end, textarea.value.length)
-  // 获取焦点
-  myInput.value.focus()
+  // 如果没有活动的评论框，则是父评论
+  if (!activeCommentId.value) {
+    let start = myInput.value.selectionStart;
+    let end = myInput.value.selectionEnd;
+    textarea.value = textarea.value.substring(0, start) + emoji + textarea.value.substring(end, textarea.value.length);
+    nextTick(() => {
+      myInput.value.focus();
+      myInput.value.selectionStart = start + emoji.length;
+      myInput.value.selectionEnd = start + emoji.length;
+    });
+  }
 }
 
 // 获取选项卡div
@@ -143,28 +177,56 @@ function recursionChildComment(childComment: any, res: any) {
   })
 }
 
+// 修改 replyBtn 函数
 function replyBtn(comment: object[], id: number) {
   // 在对应评论项目显示回复框
   comment.forEach((item: any) => {
     if (item.id === id) {
-      item.showReplyBox = !item.showReplyBox
+      // 如果正在打开回复框，设置为活动评论
+      if (!item.showReplyBox) {
+        setActiveComment(id);
+      } else {
+        // 如果正在关闭回复框，清除活动评论
+        setActiveComment(null);
+      }
+      item.showReplyBox = !item.showReplyBox;
+    } else {
+      // 关闭其他所有回复框
+      item.showReplyBox = false;
     }
     if (item.childComment && item.childComment.length) {
-      recursionReplyBtn(item.childComment, id)
+      recursionReplyBtn(item.childComment, id);
     }
-  })
+  });
 }
 
-//  递归子评论方法
+// 修改递归函数也需要同样的逻辑
 function recursionReplyBtn(childComment: object[], id: number) {
   childComment.forEach((child: any) => {
     if (child.id === id) {
-      child.showReplyBox = !child.showReplyBox
+      if (!child.showReplyBox) {
+        setActiveComment(id);
+      } else {
+        setActiveComment(null);
+      }
+      child.showReplyBox = !child.showReplyBox;
+    } else {
+      child.showReplyBox = false;
     }
     if (child.childComment && child.childComment.length) {
-      recursionReplyBtn(child.childComment, id)
+      recursionReplyBtn(child.childComment, id);
     }
-  })
+  });
+}
+
+// 添加一个辅助函数来关闭所有回复框
+function closeAllReplyBoxes(comments: any[]) {
+  comments.forEach(comment => {
+    comment.showReplyBox = false;
+    if (comment.childComment && comment.childComment.length) {
+      closeAllReplyBoxes(comment.childComment);
+    }
+  });
 }
 
 watch(() => props.typeId, (value) => {
@@ -275,7 +337,19 @@ function addParentComment() {
             <EmojiPicker 
               :popover-width="510" 
               @select-emoji="handleEmojiSelect"
-            />
+              @mousedown.stop
+              @click.stop
+            >
+              <template #trigger>
+                <div 
+                  class="emoji-trigger-btn" 
+                  @click.stop="handleParentEmojiButtonClick"
+                  @mousedown.stop
+                >
+                  <svg-icon name="emojis" class="emoji-icon"/>
+                </div>
+              </template>
+            </EmojiPicker>
           </div>
           <div>
             <el-button type="info" plain size="small" @click="isPreview=!isPreview">预览</el-button>
@@ -327,15 +401,29 @@ function addParentComment() {
           <!--          </div>-->
           <!-- 回复框 -->
           <template v-if="isLoading">
-            <ReplyBox :type="type" :comment="comment" :get-comments="getComments" :page-size="pageSize"/>
+            <ReplyBox 
+              :type="type" 
+              :comment="comment" 
+              :get-comments="getComments" 
+              :page-size="pageSize"
+              :active-comment-id="activeCommentId"
+              :set-active-comment="setActiveComment"
+            />
           </template>
           <!-- 子评论 -->
           <template v-if="comment.childComment && comment.childComment.length">
-            <ChildComment :reply-btn="replyBtn" :like-btn="likeBtn" :cancel-like-btn="cancelLikeBtn" :comment="comment"
-                          :author-id="authorId"
-                          :show-all-child-comments="showAllChildComments"
-                          :get-comments="getComments" :page-size="pageSize"
-                          :type="type"
+            <ChildComment 
+              :reply-btn="replyBtn" 
+              :like-btn="likeBtn" 
+              :cancel-like-btn="cancelLikeBtn" 
+              :comment="comment"
+              :author-id="authorId"
+              :show-all-child-comments="showAllChildComments"
+              :get-comments="getComments" 
+              :page-size="pageSize"
+              :type="type"
+              :active-comment-id="activeCommentId"
+              :set-active-comment="setActiveComment"
             />
           </template>
           <!-- 查看更多 -->
