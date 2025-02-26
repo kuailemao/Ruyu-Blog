@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import {MdPreview} from 'md-editor-v3';
 import 'md-editor-v3/lib/preview.css';
-
-import {emojis} from '@/utils/O.o/emoji.ts';
+import EmojiPicker from './EmojiPicker.vue';
 import {heo} from "@/utils/O.o/heo.ts";
+
 import {
   addComment,
   getComment
 } from "@/apis/article";
 import {cancelLike, isLike, userLike} from '@/apis/like'
 import ChildComment from "./ChildComment.vue";
-import {ElMessage, ElMessageBox} from "element-plus";
+import {ElMessage} from "element-plus";
 import {useColorMode} from "@vueuse/core";
 
 const props = defineProps({
@@ -42,32 +42,21 @@ const myInput = ref();
 // 是否加载
 const isLoading = ref(false)
 
-function addEmoji(emoji: string) {
+function handleEmojiSelect(emoji: string) {
   // 获取光标的位置
   let start = myInput.value.selectionStart
   let end = myInput.value.selectionEnd
   // 拼接到光标的位置
   textarea.value = textarea.value.substring(0, start) + emoji + textarea.value.substring(end, textarea.value.length)
-  // 关闭窗口
-  isShowEmojis.value = false
   // 获取焦点
   myInput.value.focus()
-
 }
 
-// 选中下标
-const optionsIndex = ref(0)
-
 // 获取选项卡div
-const options = ref()
 const comments = ref()
 const commentsTotal = ref(0)
-// 是否显示表情包
-const isShowEmojis = ref(false)
 // 是否预览
 const isPreview = ref(false)
-// 表情包选项卡
-const emojiOptions = ref(['Emoji', 'Heo'])
 // 是否展示全部子评论
 const showAllChildComments = ref(false)
 // 查询评论数
@@ -77,24 +66,8 @@ const mode = useColorMode()
 
 // 默认选中第一个
 onMounted(() => {
-  if (options.value !== undefined && options.value.children.length > 0) {
-    options.value.children[optionsIndex.value].style.backgroundColor = '#7B5F69'
-    options.value.children[optionsIndex.value].style.color = 'white'
-  }
   getComments(props.typeId, '1', String(pageSize.value))
 })
-
-function optionEmoji(index: number) {
-  optionsIndex.value = index
-  // 清除前面样式
-  for (let i = 0; i < options.value.children.length; i++) {
-    options.value.children[i].style.backgroundColor = 'white'
-    options.value.children[i].style.color = '#4A4A4A'
-  }
-  // 给选中的div添加样式
-  options.value.children[index].style.backgroundColor = '#7B5F69'
-  options.value.children[index].style.color = 'white'
-}
 
 // 用户预览
 watch(() => textarea.value, (value) => {
@@ -299,28 +272,10 @@ function addParentComment() {
         <textarea ref="myInput" class="textarea" v-model="textarea" placeholder="留下你的精彩评论吧！"/>
         <div class="btn">
           <div>
-            <svg-icon @click="isShowEmojis=!isShowEmojis" name="emojis" style="margin-right: 0.8rem;cursor: pointer"/>
-            <!--            <svg-icon name="image"/>-->
-          </div>
-          <!-- 表情包选择框 -->
-          <div class="emojis_container" v-show="isShowEmojis">
-            <el-scrollbar>
-              <div class="OvO_emojis" v-show="optionsIndex == 0">
-                <div v-for="(emoji,key) in emojis" :key="key" :title="key" @click="addEmoji(emoji)">
-                  {{ emoji }}
-                </div>
-              </div>
-              <div class="OvO_heo" v-show="optionsIndex == 1">
-                <div>
-                  <img v-for="(src,key) in heo" :key="key" :title="key" :src="src" @click="addEmoji(key)"/>
-                </div>
-              </div>
-            </el-scrollbar>
-            <div class="OvO_options" ref="options">
-              <div v-for="(emojiOption,index) in emojiOptions" class="item_emoji" @click="optionEmoji(index)">
-                {{ emojiOption }}
-              </div>
-            </div>
+            <EmojiPicker 
+              :popover-width="510" 
+              @select-emoji="handleEmojiSelect"
+            />
           </div>
           <div>
             <el-button type="info" plain size="small" @click="isPreview=!isPreview">预览</el-button>
@@ -413,5 +368,10 @@ function addParentComment() {
   .el-button {
     width: 100%;
   }
+}
+
+/* 确保表情按钮在评论组件中也有合适的间距 */
+.emoji-trigger-btn {
+  margin-right: 0.8rem;
 }
 </style>
