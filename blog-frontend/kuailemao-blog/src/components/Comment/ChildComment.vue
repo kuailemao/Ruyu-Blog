@@ -36,6 +36,14 @@ defineProps({
     required: true
   },
   type: Number,
+  activeCommentId: {
+    type: [Number, null],
+    default: null
+  },
+  setActiveComment: {
+    type: Function,
+    required: true
+  }
 })
 
 </script>
@@ -81,7 +89,8 @@ defineProps({
           <!--            <div><span><SvgIcon name="google_icon"/></span>google chrome</div>-->
           <!--            <div><span><SvgIcon name="address_icon"/></span>北京</div>-->
           <!--          </div>-->
-          <ReplyBox :type="type" :comment="child" :get-comments="getComments" :page-size="pageSize"/>
+          <ReplyBox :type="type" :comment="child" :get-comments="getComments" :page-size="pageSize"
+                    :active-comment-id="activeCommentId" :set-active-comment="setActiveComment"/>
         </div>
       </div>
       <div v-if="child.childComment && child.childComment.length">
@@ -89,6 +98,8 @@ defineProps({
                       :author-id="authorId"
                       :get-comments="getComments" :page-size="pageSize"
                       :type="type"
+                      :active-comment-id="activeCommentId"
+                      :set-active-comment="setActiveComment"
         />
       </div>
     </div>

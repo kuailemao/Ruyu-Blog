@@ -19,6 +19,14 @@ const prop = defineProps({
     required: true
   },
   type: Number,
+  activeCommentId: {
+    type: [Number, null],
+    default: null
+  },
+  setActiveComment: {
+    type: Function,
+    required: true
+  }
 })
 
 // 评论框
@@ -123,23 +131,36 @@ function preventDefaultAndKeepFocus(event) {
 
 // 修改方法，确保选择表情后回复框保持焦点
 function handleEmojiSelect(emoji: string) {
-  // 添加表情到回复框
-  addEmoji(emoji, prop.comment);
-  
-  // 立即重新聚焦
-  myInput.value.focus();
+  if (prop.activeCommentId === prop.comment.id) {
+    addEmoji(emoji, prop.comment);
+    nextTick(() => {
+      myInput.value.focus();
+    });
+  }
 }
 
 // 点击表情按钮时自动聚焦回复框
-function handleEmojiButtonClick() {
-  myInput.value.focus();
-  myInput.value.classList.add('active');
+function handleEmojiButtonClick(event: Event) {
+  event.stopPropagation();
+  event.preventDefault();
+  
+  if (prop.comment.showReplyBox) {
+    prop.setActiveComment(prop.comment.id);
+    myInput.value.focus();
+    myInput.value.classList.add('active');
+  }
 }
 
 // 在EmojiPicker操作完成时保持焦点
-function handleOperationComplete() {
+function handleOperationComplete(event: Event) {
+  // 阻止事件冒泡
+  event?.stopPropagation();
+  
   setTimeout(() => {
-    myInput.value.focus();
+    // 只有当这个回复框是显示状态时才聚焦
+    if (prop.comment.showReplyBox) {
+      myInput.value.focus();
+    }
   }, 10);
 }
 </script>
@@ -150,16 +171,20 @@ function handleOperationComplete() {
       <textarea style="color: #7B5F69;" ref="myInput" v-model="comment.replyText" :placeholder="'@'+comment.commentUserNickname"/>
       <div class="reply-footer">
         <div class="reply-tools">
-          <!-- 更新表情选择器，添加操作完成事件处理 -->
           <EmojiPicker 
             ref="emojiPopover"
             :popover-width="510" 
             @select-emoji="handleEmojiSelect"
             @operation-complete="handleOperationComplete"
-            @mousedown.capture.stop="preventDefaultAndKeepFocus"
+            @mousedown.stop.prevent
+            @click.stop.prevent
           >
             <template #trigger>
-              <div class="emoji-trigger-btn" @click="handleEmojiButtonClick">
+              <div 
+                class="emoji-trigger-btn" 
+                @click.stop.prevent="handleEmojiButtonClick"
+                @mousedown.stop.prevent
+              >
                 <svg-icon name="emojis" class="emoji-icon"/>
                 <span class="emoji-ripple"></span>
               </div>
@@ -200,7 +225,7 @@ function handleOperationComplete() {
     }
   }
 
-  div {
+  .reply-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -208,9 +233,40 @@ function handleOperationComplete() {
   }
 }
 
-// 添加样式确保表情按钮在回复框中正确显示
-.emoji-trigger-btn {
-  margin-right: 0.5rem;
+/* 表情按钮样式 */
+.reply-tools {
+  display: flex;
+  align-items: center;
+
+  :deep(.el-button) {
+    border: none;
+    padding: 8px;
+    height: auto;
+    
+    &:hover {
+      background-color: var(--el-fill-color-light);
+    }
+  }
+
+  .emoji-trigger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    transition: all 0.3s;
+    
+    &:hover {
+      background-color: var(--el-fill-color-light);
+    }
+
+    .emoji-icon {
+      font-size: 1.25em;
+      color: var(--el-text-color-regular);
+    }
+  }
 }
 
 /* 改进回复框的活跃状态样式 */
