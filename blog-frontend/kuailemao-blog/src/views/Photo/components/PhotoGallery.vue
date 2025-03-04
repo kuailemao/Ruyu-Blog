@@ -2,7 +2,6 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import PhotoPreview from './PhotoPreview.vue'
 import AlbumBanner from './AlbumBanner.vue'
-import type { PhotoAndAlbumVO } from '@/apis/photo'
 
 export interface Photo {
   id: number
@@ -160,21 +159,6 @@ watch(() => [props.currentPath, props.galleries], (newValue, oldValue) => {
     prevGalleryLength.value = gallery.length
 }, { deep: true, immediate: true })
 
-// 修改 getAlbumCover 方法
-const getAlbumCover = (albumId: number): string | undefined => {
-  const items = props.galleries['root'] || []
-  const album = items.find(
-      item => item.type === 'album' && (item.data as AlbumData).id === albumId
-  )
-
-  if (album && album.type === 'album') {
-    const albumData = album.data as AlbumData
-    return albumData.coverUrl
-  }
-
-  return undefined
-}
-
 // 修改 hasPhotos 函数
 const hasPhotos = (item: GalleryItem): boolean => {
   if (isAlbum(item)) {
@@ -223,26 +207,6 @@ const currentAlbum = computed(() => {
   }
 })
 
-// 添加获取最近相册的计算属性
-const recentAlbums = computed(() => {
-  const path = props.currentPath.length === 0 ? 'root' : props.currentPath[props.currentPath.length - 1].toString()
-  const gallery = props.galleries[path] || []
-
-  return gallery
-      .filter(isAlbum)
-      .slice(0, 4) // 只显示前4个相册
-      .map(item => ({
-        id: item.data.id,
-        name: item.data.name,
-        coverUrl: item.data.coverUrl
-      }))
-})
-
-// 添加相册点击处理
-const handleAlbumClick = (albumId: number) => {
-  emit('update:currentPath', [...props.currentPath, albumId])
-}
-
 // 修改面包屑数据计算属性
 const breadcrumbs = computed(() => {
   return props.currentPath.map((id, index) => {
@@ -269,38 +233,6 @@ const handleBreadcrumbClick = (index: number) => {
   } else {
     emit('update:currentPath', props.currentPath.slice(0, index + 1))
   }
-}
-
-// 转换后端数据为前端需要的格式
-const convertBackendData = (data: PhotoAndAlbumVO[]) => {
-  return data.map(item => {
-    if (item.type === 1) {
-      // 相册
-      const albumData: AlbumData = {
-        id: item.id,
-        name: item.name,
-        description: item.description || '',
-        photos: [],
-        coverUrl: item.url || undefined
-      }
-      return {
-        type: 'album' as const,
-        data: albumData
-      }
-    } else {
-      // 照片
-      const photoData: Photo = {
-        id: item.id,
-        url: item.url || '',
-        title: item.name,
-        description: item.description || ''
-      }
-      return {
-        type: 'photo' as const,
-        data: photoData
-      }
-    }
-  })
 }
 
 // 判断是否为照片类型的辅助函数
@@ -348,14 +280,14 @@ const isAlbum = (item: GalleryItem): item is { type: 'album', data: AlbumData } 
                 </div>
               </div>
               <img v-else
-                   :src="item.data.coverUrl || '/images/default-album-cover.jpg'"
+                   :data-src="item.data.coverUrl || '/images/default-album-cover.jpg'"
                    :alt="item.data.name"
-                   loading="lazy">
+                   v-lazy="true" />
             </template>
             <img v-else-if="isPhoto(item)"
-                 :src="item.data.url"
+                 :data-src="item.data.url"
                  :alt="item.data.title"
-                 loading="lazy">
+                 v-lazy="true" >
             <div class="item-info" v-if="isAlbum(item)">
               <h3>{{ item.data.name }}</h3>
             </div>
@@ -412,7 +344,7 @@ const isAlbum = (item: GalleryItem): item is { type: 'album', data: AlbumData } 
   padding: 10px 0 30px 0;
   max-width: 1400px;
   margin: 0 auto;
-  min-height: calc(100vh - 200px); /* 保持最小高度，防止内容加载时页面跳动 */
+  min-height: calc(100vh - 350px); /* 保持最小高度，防止内容加载时页面跳动 */
 }
 
 .gallery-item {
