@@ -84,7 +84,7 @@ public class WebsiteInfoServiceImpl extends ServiceImpl<WebsiteInfoMapper, Websi
         WebsiteInfoVO websiteInfoVO = this.getById(WebsiteInfoConst.WEBSITE_INFO_ID).asViewObject(WebsiteInfoVO.class);
         // 运行时长
         if (StringUtils.isNotNull(websiteInfoVO)) {
-            if (StringUtils.isNull(articleMapper.selectOne(null)))  return websiteInfoVO;
+            if (articleMapper.selectCount(null) <= 0)  return websiteInfoVO;
             LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
             wrapper.select(Article::getUpdateTime).orderByDesc(Article::getUpdateTime).last(SQLConst.LIMIT_ONE_SQL);
             websiteInfoVO.setLastUpdateTime(articleMapper.selectOne(wrapper).getUpdateTime());
