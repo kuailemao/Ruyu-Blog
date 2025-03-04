@@ -1,5 +1,7 @@
 package xyz.kuailemao.utils;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -610,5 +612,19 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * 该字符串是否是一个完整的url地址
+     * @param urlString url
+     * @return 是否是完整的url地址
+     */
+    public static boolean isValidUrl(String urlString) {
+        try {
+            new URL(urlString);
+            return true;
+        } catch (MalformedURLException e) {
+            return false;
+        }
     }
 }

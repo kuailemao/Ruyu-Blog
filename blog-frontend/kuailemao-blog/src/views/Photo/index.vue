@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import PhotoGallery from './components/PhotoGallery.vue'
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useDark } from '@vueuse/core'
 import { getPhotoList } from '@/apis/photo'
 import type { PhotoAndAlbumVO } from '@/apis/photo'
@@ -106,23 +106,6 @@ const loadMore = async () => {
   await loadGalleryData(currentId, currentPage.value + 1, true)
 }
 
-// 获取相册封面的函数
-const getAlbumCover = (albumId: number) => {
-  const album = galleries.value.root.find(
-      item => item.type === 'album' && (item.data as AlbumData).id === albumId
-  )
-
-  if (album && album.type === 'album') {
-    const albumData = album.data as AlbumData
-    if (albumData.coverUrl) {
-      return albumData.coverUrl
-    }
-  }
-
-  // 返回默认封面
-  return null
-}
-
 // 监听路径变化，加载对应的数据
 watch(() => currentPath.value, async (newPath) => {
   const currentId = newPath.length > 0 ? newPath[newPath.length - 1] : undefined
@@ -130,19 +113,6 @@ watch(() => currentPath.value, async (newPath) => {
   hasMore.value = true
   await loadGalleryData(currentId, 1, false)
 }, { immediate: true })
-
-const getCurrentGallery = () => {
-  const path = currentPath.value.length === 0 ? 'root' : currentPath.value[currentPath.value.length - 1].toString()
-  return galleries.value[path] || []
-}
-
-const getBreadcrumbPath = computed(() => {
-  if (currentPath.value.length === 0) return '当前位置：/'
-
-  // 获取完整的路径名称
-  const names = currentPath.value.map(id => getBreadcrumbName(id))
-  return `当前位置：/${names.join('/')}`
-})
 
 const navigateToAlbum = (id: number) => {
   // 如果已经在这个相册中，不做任何操作
@@ -217,31 +187,6 @@ const toggleMobileMenu = (isOpen: boolean) => {
 // 修改关闭菜单方法
 const closeMobileMenu = () => {
   toggleMobileMenu(false)
-}
-
-// 添加面包屑导航点击处理方法
-const handleBreadcrumbClick = (index: number) => {
-  if (index === -1) {
-    currentPath.value = []
-  } else {
-    currentPath.value = currentPath.value.slice(0, index + 1)
-  }
-  // 关闭动端菜单
-  closeMobileMenu()
-}
-
-// 添加 getBreadcrumbName 函数
-const getBreadcrumbName = (id: number) => {
-  // 在所有相册数据中查找对应的相册
-  for (const [key, items] of Object.entries(galleries.value)) {
-    const album = items.find(item =>
-        item.type === 'album' && (item.data as AlbumData).id === id
-    )
-    if (album) {
-      return (album.data as AlbumData).name
-    }
-  }
-  return ''
 }
 
 // 添加简化版的 albumTree computed 属性
