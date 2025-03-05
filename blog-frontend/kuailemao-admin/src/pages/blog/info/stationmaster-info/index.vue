@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {ref} from 'vue'
 import {LoadingOutlined, PlusOutlined, UploadOutlined} from '@ant-design/icons-vue'
-import type {UploadChangeParam, UploadProps} from 'ant-design-vue'
+import type {UploadProps} from 'ant-design-vue'
 import {message} from 'ant-design-vue'
-import {useAuthorization} from '~/composables/authorization.ts'
-import {updateStationmaster, updateWebsiteInfo} from "~/api/blog/webInfo";
+import {updateStationmaster, uploadAckgroundImage, uploadAvatar} from "~/api/blog/webInfo";
+import {compressImage} from "~/utils/CompressedImage.ts";
 
 const emit = defineEmits(["reset:stationmaster:info"])
 
@@ -25,21 +25,29 @@ interface FormDataType {
 
 const formData:Partial<FormDataType> = reactive(props.info as object)
 
-// 头像上传
-function getBase64(img: Blob, callback: (base64Url: string) => void) {
-  const reader = new FileReader()
-  reader.addEventListener('load', () => callback(reader.result as string))
-  reader.readAsDataURL(img)
+/**
+ * 将文件转换为 Base64 字符串
+ * @param {File} file - 用户上传的文件
+ * @returns {Promise<string>} 返回一个 Promise，成功时返回 Base64 字符串
+ */
+function fileToBase64(file: any) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    // 将文件读取为 Data URL 格式（即 Base64）
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
 }
 
 const avatarFileList = ref([])
 const loading = ref<boolean>(false)
-const imageUrl = ref<string>()
+const imageAvatarUrl = ref<string>()
 // 背景上传
 const backFileList = ref<UploadProps['fileList']>([])
 
 if(formData.webmasterAvatar && formData.webmasterProfileBackground){
-  imageUrl.value = formData.webmasterAvatar as string
+  imageAvatarUrl.value = formData.webmasterAvatar as string
   const myUrl = new URL(formData.webmasterProfileBackground as string);
   const fileName = myUrl.pathname.split('/').pop();
   backFileList.value = [{
@@ -48,51 +56,69 @@ if(formData.webmasterAvatar && formData.webmasterProfileBackground){
   }]
 }
 
-// 上传图片请求头
-const headers = {
-  'Authorization': `Bearer ${JSON.parse(<string>useAuthorization().value).token}`,
-}
-
-function handleChangeAvatar(info: UploadChangeParam) {
-  if (info.file.status === 'uploading') {
-    loading.value = true
-    return
-  }
-  if (info.file.status === 'done') {
-    // Get this url from response in real world.
-    getBase64(info.file.originFileObj, (base64Url: string) => {
-      imageUrl.value = base64Url
-      loading.value = false
-    })
-  }
-  if (info.file.response && info.file.response.code === 200)
-    message.success('头像上传成功')
-  else
-    message.error(`头像上传失败：${info.file.response.msg}`)
-
-  loading.value = false
-}
-
-function handleChangeBack(info: UploadChangeParam) {
-  if (info.file.status === 'uploading') {
-    return
-  }
-  if (info.file.response && info.file.response.code === 200)
-    message.success('背景上传成功')
-  else
-    message.error(`背景上传失败：${info.file.response.msg}`)
-}
-
-function beforeUpload(file: UploadProps['fileList'][number]) {
+async function beforeUploadAvatar(file: UploadProps['fileList'][number]) {
+  loading.value = true
   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp'
-  if (!isJpgOrPng)
+  if (!isJpgOrPng){
     message.error('文件格式必须是jpg或png或webp')
+    return
+  }
 
-  const isLt2M = file.size / 1024 / 1024 < 5
-  if (!isLt2M)
-    message.error('图片必须小于 0.3MB')
+  const compressedFile = await compressImage(file)
+  const isLt03M = compressedFile.size / 1024 / 1024 < 0.3
+  if (!isLt03M) {
+    message.error('图片压缩后大小必须小于 0.3MB')
+    return
+  }
 
-  return isJpgOrPng && isLt2M
+  await fileToBase64(file).then(base64Url => {
+    imageAvatarUrl.value = base64Url
+    loading.value = false
+  })
+
+  const webmasterAvatar = new FormData()
+  webmasterAvatar.append('avatar', compressedFile,compressedFile.name)
+
+  uploadAvatar(webmasterAvatar).then((res) => {
+    if (res.code === 200) {
+      message.success('头像上传成功')
+    } else {
+      message.error(`头像上传失败：${res.msg}`)
+    }
+  })
+
+  return false
+}
+
+async function beforeUploadAckgroundImag(file: UploadProps['fileList'][number]) {
+  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp'
+  if (!isJpgOrPng){
+    message.error('文件格式必须是jpg或png或webp')
+    return
+  }
+
+  const compressedFile = await compressImage(file)
+  const isLt03M = compressedFile.size / 1024 / 1024 < 0.3
+  if (!isLt03M){
+    message.error('图片压缩后大小必须小于 0.3MB')
+    return
+  }
+
+  const webmasterAvatar = new FormData()
+  webmasterAvatar.append('background', compressedFile,compressedFile.name)
+  uploadAckgroundImage(webmasterAvatar).then((res) => {
+    if (res.code === 200) {
+      backFileList.value = [{
+        thumbUrl: res.data,
+        name: new URL(res.data).pathname.split('/').pop(),
+      }]
+      message.success('资料卡背景图上传成功')
+    }else{
+      message.error(`资料卡背景图上传失败：${res.msg}`)
+    }
+  })
+
+  return false
 }
 
 // 修改
@@ -109,7 +135,6 @@ function resetStationmasterInfo(){
   emit('reset:stationmaster:info')
 }
 
-const env = import.meta.env
 </script>
 
 <template>
@@ -117,17 +142,14 @@ const env = import.meta.env
     <a-form>
       <div class="avatar">
         <a-upload
-            v-model:file-list="avatarFileList"
+            :file-list="avatarFileList"
             name="avatar"
             list-type="picture-card"
             class="avatar-uploader"
-            :headers="headers"
             :show-upload-list="false"
-            :action="env.MODE === 'production' ? env.VITE_APP_BASE_URL + env.VITE_APP_BASE_API + '/websiteInfo/upload/avatar' : env.VITE_APP_BASE_URL + '/websiteInfo/upload/avatar'"
-            :before-upload="beforeUpload"
-            @change="handleChangeAvatar"
+            :before-upload="beforeUploadAvatar"
         >
-          <img v-if="imageUrl" :src="imageUrl" alt="avatar">
+          <img v-if="imageAvatarUrl" :src="imageAvatarUrl" alt="avatar">
           <div v-else>
             <LoadingOutlined v-if="loading"/>
             <PlusOutlined v-else/>
@@ -146,15 +168,12 @@ const env = import.meta.env
       <a-form-item label="背景">
         <div>
           <a-upload
-              v-model:file-list="backFileList"
+              :file-list="backFileList"
               list-type="picture"
               name="background"
               :show-upload-list="{showRemoveIcon: false}"
-              :headers="headers"
-              :before-upload="beforeUpload"
+              :before-upload="beforeUploadAckgroundImag"
               :max-count="1"
-              :action="env.MODE === 'production' ? env.VITE_APP_BASE_URL + env.VITE_APP_BASE_API + '/websiteInfo/upload/background' : env.VITE_APP_BASE_URL + '/websiteInfo/upload/background'"
-              @change="handleChangeBack"
           >
             <div style="display: flex;">
               <a-button>
