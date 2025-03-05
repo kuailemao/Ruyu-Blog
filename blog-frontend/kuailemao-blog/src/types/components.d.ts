@@ -55,6 +55,7 @@ declare module 'vue' {
     ElTag: typeof import('element-plus/es')['ElTag']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
+    EmojiPicker: typeof import('./../components/Comment/EmojiPicker.vue')['default']
     Footer: typeof import('./../components/Layout/Footer/index.vue')['default']
     Fullscreen: typeof import('./../components/Fullscreen/index.vue')['default']
     GoBottom: typeof import('./../components/GoBottom/index.vue')['default']

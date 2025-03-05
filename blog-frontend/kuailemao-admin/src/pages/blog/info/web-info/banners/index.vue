@@ -9,6 +9,7 @@ import {
 import {ref} from 'vue'
 import {message, UploadProps} from 'ant-design-vue'
 import {backGetBanners, deleteBanner, updateOrder, uploadBanner} from "~/api/blog/banners";
+import {compressImage} from "~/utils/CompressedImage.ts";
 
 // 图片类型
 interface FileItem {
@@ -74,16 +75,17 @@ async function beforeUpload(file: UploadProps['fileList'][number]) {
     message.error('文件格式必须是jpg或png或webp')
     return
   }
+  const compressedFile = await compressImage(file)
 
-  const isLt400KB = file.size / 1024 < 400
-  if (!isLt400KB) {
-    message.error('图片必须小于 0.3MB')
+  const isLt03MB = compressedFile.size / 1024 / 1024 < 0.3
+  if (!isLt03MB) {
+    message.error('图片压缩后大小大于 0.3MB')
     return
   }
 
   // 手动上传
   const formData = new FormData();
-  formData.append('bannerImage', file);
+  formData.append('bannerImage', compressedFile, compressedFile.name);
   uploading.value = true;
   uploadBanner(formData, handleProgress).then(async (res) => {
     if (res.code === 200) {

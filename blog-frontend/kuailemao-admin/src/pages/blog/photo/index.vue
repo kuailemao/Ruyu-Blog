@@ -4,6 +4,7 @@ import {Image, Modal, Form, Input, Upload, message, Pagination} from 'ant-design
 import type {UploadProps, FormInstance} from 'ant-design-vue'
 import type {Rule} from 'ant-design-vue/es/form'
 import {createAlbum, photoAndAlbumList, uploadPhoto, updateAlbum, deletePhotoOrAlbum} from "~/api/blog/photo";
+import {compressImage} from "~/utils/CompressedImage.ts";
 
 // 统一的数据接口
 interface BaseItem {
@@ -358,18 +359,30 @@ const handleSubmit = async () => {
         message.error('请选择要上传的照片')
         return
       }
-      const formData = new FormData()
-      formData.append('file', formState.value.file)
-      formData.append('name', formState.value.name)
-      if (formState.value.parentId) {
-        formData.append('parentId', String(formState.value.parentId))
+
+      try {
+        // 压缩图片
+        const compressedFile = await compressImage(formState.value.file)
+
+        // 构建 FormData
+        const formData = new FormData()
+
+        formData.append('file', compressedFile, compressedFile.name)
+        formData.append('name', formState.value.name)
+        if (formState.value.parentId) {
+          formData.append('parentId', String(formState.value.parentId))
+        }
+
+        // 上传压缩后的图片
+        const res = await uploadPhoto(formData)
+        if (res.code === 200) {
+          message.success('上传照片成功')
+          await loadCurrentItems()
+        }
+      } catch (error) {
+        message.error('上传照片成功')
       }
 
-      const res = await uploadPhoto(formData)
-      if (res.code === 200) {
-        message.success('上传照片成功')
-        await loadCurrentItems()
-      }
     }
 
     showModal.value = false
@@ -535,7 +548,7 @@ onMounted(() => {
                     <i class="icon">📷</i>
                     <span>点击上传照片</span>
                     <p style="margin-top: 8px; color: #999; font-size: 12px;">
-                      支持 JPG/PNG/WebP/GIF 格式，大小不超过 8MB
+                      支持 JPG/PNG/WebP/GIF 格式，大小不超过 4MB
                     </p>
                   </div>
                 </Upload>

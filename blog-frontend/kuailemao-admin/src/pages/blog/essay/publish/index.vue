@@ -18,6 +18,7 @@ import {
 } from '~/api/blog/article'
 import type { CategoryType, TagType } from '~/pages/blog/essay/publish/type.ts'
 import { useMultiTab } from '~/stores/multi-tab.ts'
+import {compressImage} from "~/utils/CompressedImage.ts";
 
 const route = useRoute()
 const multiTab = useMultiTab()
@@ -114,20 +115,22 @@ function addTagFunc(e: MouseEvent) {
   }, 0)
 }
 
-function beforeUpload(file: UploadProps['fileList'][number]) {
+async function beforeUpload(file: UploadProps['fileList'][number]) {
   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp'
   if (!isJpgOrPng) {
     message.error('文件格式必须是jpg或png或webp')
     return false
   }
 
-  const isLt5M = file.size / 1024 / 1024 < 5
-  if (!isLt5M) {
-    message.error('图片必须小于 3MB')
+  // 压缩图片
+  const compressedFile = await compressImage(file)
+  const isLt03M = compressedFile.size / 1024 / 1024 < 0.3
+  if (!isLt03M) {
+    message.error('图片压缩后大于 0.3MB')
     return false
   }
 
-  fileList.value = [file]
+  fileList.value = [compressedFile]
   getBase64(file, (base64Url: string) => {
     previewBase64.value = base64Url
   })
@@ -157,7 +160,7 @@ function onFinish() {
   }
   else {
     const articleCover = new FormData()
-    articleCover.append('articleCover', fileList.value[0])
+    articleCover.append('articleCover', fileList.value[0],fileList.value[0].name)
     uploadCover(articleCover).then((res) => {
       if (res.code === 200) {
         const articleCover = res.data
@@ -193,10 +196,11 @@ function onFinish() {
 
 async function onUploadArticleImg(files: any, callback: any) {
   const res = await Promise.all(
-    files.map((file) => {
+    files.map(async (file) => {
+      const compressedFile = await compressImage(file)
       return new Promise((rev, rej) => {
         const form = new FormData()
-        form.append('articleImage', file)
+        form.append('articleImage', compressedFile, compressedFile.name)
         uploadArticleImage(form).then((res) => {
           if (res.code === 200)
             rev(res.data)
