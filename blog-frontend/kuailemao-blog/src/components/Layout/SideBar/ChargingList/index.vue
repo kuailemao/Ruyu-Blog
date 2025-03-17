@@ -14,6 +14,11 @@ const chargingList = ref([
     message: "随心"
   },
   {
+    name: "白菜豆腐汤",
+    money: "50",
+    message: "在线膜拜大佬"
+  },
+  {
     name: "曦月",
     money: "30",
     message: "仰天大笑出门去，我辈岂是蓬蒿人"
