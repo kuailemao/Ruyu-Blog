@@ -10,9 +10,11 @@ function iframeLoaded() {
 </script>
 
 <template>
-  <div id="loading">正在加载...</div>
   <div>
-        <iframe :src="env.VITE_MUSIC_FRONTEND_URL" class="if" frameborder="0" :onload="iframeLoaded"></iframe>
+    <div id="loading">正在加载...</div>
+    <div>
+          <iframe :src="env.VITE_MUSIC_FRONTEND_URL" class="if" frameborder="0" :onload="iframeLoaded"></iframe>
+    </div>
   </div>
 </template>
 
