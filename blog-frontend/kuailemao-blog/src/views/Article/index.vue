@@ -15,6 +15,7 @@ import useWebsiteStore from "@/store/modules/website.ts";
 import {useColorMode, useTitle} from "@vueuse/core";
 import MobileDirectoryCard from "./MobileDirectoryCard/index.vue";
 import {throttle} from "@/utils/optimize.ts";
+import {ARTICLE_VISIT_PREFIX} from "@/const/Visits";
 
 // .env
 const env = import.meta.env;
@@ -74,7 +75,11 @@ async function getArticleDetailById() {
     // 设置title
     useTitle(res.data.articleTitle)
     if (route.params.id) {
-      addArticleVisit(route.params.id)
+      if (!sessionStorage.getItem(ARTICLE_VISIT_PREFIX + route.params.id)) {
+        // 避免重复刷新
+        sessionStorage.setItem(ARTICLE_VISIT_PREFIX + route.params.id, route.params.id as string)
+        addArticleVisit(route.params.id as string)
+      }
     }
     // 时间去掉时分秒
     res.data.createTime = res.data.createTime.split(' ')[0]
