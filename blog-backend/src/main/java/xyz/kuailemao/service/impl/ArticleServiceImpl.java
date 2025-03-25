@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,12 +22,10 @@ import xyz.kuailemao.enums.*;
 import xyz.kuailemao.exceptions.FileUploadException;
 import xyz.kuailemao.mapper.*;
 import xyz.kuailemao.service.*;
-import xyz.kuailemao.utils.FileUploadUtils;
-import xyz.kuailemao.utils.RedisCache;
-import xyz.kuailemao.utils.SecurityUtils;
-import xyz.kuailemao.utils.StringUtils;
+import xyz.kuailemao.utils.*;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -227,9 +226,19 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     public void addVisitCount(Long id) {
-        if (redisCache.isHasKey(RedisConst.ARTICLE_VISIT_COUNT + id))
-            redisCache.increment(RedisConst.ARTICLE_VISIT_COUNT + id, 1L);
-        else redisCache.setCacheObject(RedisConst.ARTICLE_VISIT_COUNT + id, 0);
+        // 访问量去重
+        HttpServletRequest request = SecurityUtils.getCurrentHttpRequest();
+        // key + id + ip + time(秒)
+        String KEY = RedisConst.ARTICLE_VISIT_COUNT_LIMIT + id + ":" + IpUtils.getIpAddr(request);
+        if (redisCache.getCacheObject(KEY) == null) {
+            // 设置间隔时间
+            redisCache.setCacheObject(KEY, 1, RedisConst.ARTICLE_VISIT_COUNT_INTERVAL, TimeUnit.SECONDS);
+
+            if (redisCache.isHasKey(RedisConst.ARTICLE_VISIT_COUNT + id))
+                redisCache.increment(RedisConst.ARTICLE_VISIT_COUNT + id, 1L);
+            else redisCache.setCacheObject(RedisConst.ARTICLE_VISIT_COUNT + id, 0);
+        }
+
     }
 
     @Override

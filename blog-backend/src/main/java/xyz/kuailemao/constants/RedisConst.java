@@ -61,6 +61,16 @@ public class RedisConst {
     public static final String ARTICLE_VISIT_COUNT = "article:count:visit:";
 
     /**
+     * 文章访问量限制key
+     */
+    public static final String ARTICLE_VISIT_COUNT_LIMIT = "article:count:visit:limit:";
+
+    /**
+     * 文章访问量新增间隔时间，15分钟,单位秒
+     */
+    public static final Integer ARTICLE_VISIT_COUNT_INTERVAL = 15 * 60;
+
+    /**
      * 邮箱确认友链通过，状态码
      */
     public static final String EMAIL_VERIFICATION_LINK = "email:verification:link:";
