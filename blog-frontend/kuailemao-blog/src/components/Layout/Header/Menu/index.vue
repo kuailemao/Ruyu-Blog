@@ -9,7 +9,6 @@ import {
   HomeFilled,
   Postcard,
   PriceTag,
-  UserFilled,
   Link, Setting, Promotion, ArrowDownBold, IceCreamRound, Close, PictureFilled
 } from "@element-plus/icons-vue";
 import {logout} from "@/apis/user"

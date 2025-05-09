@@ -5,11 +5,15 @@
   <!-- 全局loading -->
   <loading></loading>
   <Music />
+  <DevToolsBlocker :enableDevToolsBlocker="true" />
+  <ContextMenu />
 </template>
 
 <script setup lang="ts">
 import {useDark, useToggle} from "@vueuse/core";
 import useWebsiteStore from "@/store/modules/website.ts";
+import DevToolsBlocker from "@/components/DevToolsBlocker/index.vue";
+import ContextMenu from "@/components/ContextMenu/index.vue";
 
 const useWebsite = useWebsiteStore()
 
