@@ -2,7 +2,7 @@
   <div class="brand-container">
     <div class="brand">
       <!-- 标题 -->
-      <p class="artboard">{{ useWebsite?.webInfo?.websiteName }}</p>
+      <TextGlitch :text="useWebsite?.webInfo?.websiteName || ''" />
       <!-- 打字机 -->
       <div class="brand-text">
         <div class="title">
@@ -14,7 +14,10 @@
     <!-- 波浪 -->
     <Wave></Wave>
     <!-- 向下按钮 -->
-    <SvgIcon class="arrow-down" name="jt_x" width="50px" height="50px" @click="scrollDown"/>
+    <div class="button-container" @click="scrollDown">
+      <SvgIcon class="arrow-down" name="jt_x" width="50px" height="50px" />
+      <div class="button-ripple"></div>
+    </div>
   </div>
 </template>
 
@@ -22,6 +25,7 @@
 
 import useWebsiteStore from "@/store/modules/website.ts";
 import {getSoupTyping} from "@/apis/thirdParty";
+import TextGlitch from "@/components/TextGlitch/index.vue";
 
 const useWebsite = useWebsiteStore()
 
@@ -72,38 +76,6 @@ onMounted(() => {
   z-index: -1;
   top: 15em;
 
-  .artboard {
-    font-family: "Fredericka the Great", Mulish, -apple-system, "PingFang SC", "Microsoft YaHei",
-    sans-serif;
-    font-size: 4.5em;
-
-    @media (max-width: 500px) {
-      font-size: 3em;
-      // 字体大小过渡效果
-      @keyframes titleScale {
-        0% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.1);
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
-    }
-    line-height: 1.5;
-    animation: titleScale 1s;
-    color: white;
-    text-shadow: 0 1px 0 hsl(174, 5%, 80%), 0 2px 0 hsl(174, 5%, 75%),
-    0 3px 0 hsl(174, 5%, 70%), 0 4px 0 hsl(174, 5%, 66%),
-    0 5px 0 hsl(174, 5%, 64%), 0 6px 0 hsl(174, 5%, 62%),
-    0 7px 0 hsl(174, 5%, 61%), 0 8px 0 hsl(174, 5%, 60%),
-    0 0 5px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.2),
-    0 3px 5px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(0, 0, 0, 0.2),
-    0 10px 10px rgba(0, 0, 0, 0.2), 0 20px 20px rgba(0, 0, 0, 0.3);
-  }
-
   .brand-text{
     // 白色半透明背景
     background: rgba(255, 255, 255, 0.5);
@@ -137,12 +109,32 @@ onMounted(() => {
   }
 }
 
-.arrow-down {
+.button-container {
   position: absolute;
   bottom: 15vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 8;
+}
+
+.arrow-down {
   -webkit-animation: arrow-shake 1.5s ease-out infinite;
   animation: arrow-shake 1.5s ease-out infinite;
-  cursor: pointer;
+  z-index: 9;
+  position: relative;
+}
+
+.button-ripple {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #f79533, #f37055, #ef4e7b, #a166ab, #5073b8, #1098ad, #07b39b, #6fba82);
+  background-size: 300% 300%;
+  animation: gradientAnimation 4s ease infinite, ripple 2s ease-out infinite;
+  opacity: 0.7;
   z-index: 8;
 }
 
@@ -182,6 +174,33 @@ onMounted(() => {
 
   100% {
     opacity: 1;
+  }
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.7;
   }
 }
 </style>
