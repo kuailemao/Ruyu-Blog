@@ -27,6 +27,21 @@ const chargingList = ref([
     name: "sn",
     money: "6",
     message: "膜拜大佬，学习了"
+  },
+  {
+    name: "venus",
+    money: "50",
+    message: "感谢您的开源项目，致敬用爱发电!"
+  },
+  {
+    name: "SmallL-U",
+    money: "10",
+    message: "加油"
+  },
+  {
+    name: "御坂10086号",
+    money: "10",
+    message: "感谢群主开源，未来希望能看到更多的作品"
   }
 ])
 </script>
@@ -37,6 +52,7 @@ const chargingList = ref([
     <Card title="项目充电榜" prefix-icon="edit" :isScale="true">
       <div class="text-[12px] text-left">
         你们的每一次充电，不仅仅是电量的累积，更是对我们项目的信任和对未来的期待。每一份捐赠，无论大小，都承载着你们对我们的鼓励和对改变世界的信念。是你们，让项目持续更新得到了进一步保障，非常感谢大家！！！
+        <br>（以下榜单时间排序）
       </div>
       <div class="flex items-center justify-between bg-[--mao-charging-bg-color] rounded">
         <div class="item-div">
