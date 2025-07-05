@@ -84,6 +84,11 @@ async function getTag() {
 const categoryLoading = ref(false)
 
 function addCategoryFunc(e: MouseEvent) {
+  console.log(categoryName.value)
+  if (!categoryName.value) {
+    message.warn('请检查分类内容是否填写完整')
+    return
+  }
   categoryLoading.value = true
   e.preventDefault()
   const data = { categoryName: categoryName.value, id: categoryList.value[categoryList.value.length - 1].id + 1 }
@@ -101,6 +106,10 @@ function addCategoryFunc(e: MouseEvent) {
 const tagLoading = ref(false)
 
 function addTagFunc(e: MouseEvent) {
+  if (!tagName.value) {
+    message.warn('请检查标签内容是否填写完整')
+    return
+  }
   tagLoading.value = true
   e.preventDefault()
   const data = { tagName: tagName.value, id: tagList.value[tagList.value.length - 1].id + 1 }
