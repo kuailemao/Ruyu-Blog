@@ -13,22 +13,52 @@
 ## 项目部分截图
 
 ### 前台
+前台首页
+![前台首页](img/new/%E5%89%8D%E5%8F%B0%E9%A6%96%E9%A1%B5.png)
 
-![前台首页](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%89%8D%E5%8F%B0%E9%A6%96%E9%A1%B5.jpg)
+前台中心
+![前台中心](img/new/%E5%89%8D%E5%8F%B0%E4%B8%AD%E5%BF%83.png)
 
-![前台中心](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%89%8D%E5%8F%B0%E4%B8%AD%E5%BF%83.jpg)
+前台文章
+![前台文章](img/new/%E5%89%8D%E5%8F%B0%E6%96%87%E7%AB%A0.png)
 
-![前台文章](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%89%8D%E5%8F%B0%E6%96%87%E7%AB%A0.jpg)
+前台评论表情包
+![前台评论表情包](img/new/%E5%89%8D%E5%8F%B0%E8%AF%84%E8%AE%BA%E8%A1%A8%E6%83%85%E5%8C%85.png)
+
+前台树洞
+![前台树洞](img/new/%E5%89%8D%E5%8F%B0%E6%A0%91%E6%B4%9E.png)
+
+前台关于
+![前台关于](img/new/%E5%89%8D%E5%8F%B0%E5%85%B3%E4%BA%8E.png)
+
+前台相册
+![前台相册](img/new/%E5%89%8D%E5%8F%B0%E7%9B%B8%E5%86%8C.png)
 
 ### 后台
 
-![后台发布文章](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%90%8E%E5%8F%B0%E5%8F%91%E5%B8%83%E6%96%87%E7%AB%A0.jpg)
+后台发布文章
+![后台发布文章](img/new/%E5%90%8E%E5%8F%B0%E5%8F%91%E5%B8%83%E6%96%87%E7%AB%A0.png)
 
-![后台文章列表](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%90%8E%E5%8F%B0%E6%96%87%E7%AB%A0%E5%88%97%E8%A1%A8.jpg)
+后台文章列表
+![后台文章列表](img/new/%E5%90%8E%E5%8F%B0%E6%96%87%E7%AB%A0%E5%88%97%E8%A1%A8.png)
+
+后台相册管理
+![后台相册管理](img/new/%E5%90%8E%E5%8F%B0%E7%9B%B8%E5%86%8C%E7%AE%A1%E7%90%86.png)
+
+后台黑名单管理
+![后台黑名单管理](img/new/%E5%90%8E%E5%8F%B0%E9%BB%91%E5%90%8D%E5%8D%95%E7%AE%A1%E7%90%86.png)
+
+后台操作日志
+![后台操作日志](img/new/%E5%90%8E%E5%8F%B0%E6%93%8D%E4%BD%9C%E6%97%A5%E5%BF%97.png)
+
+后台服务监控
+![后台服务监控](img/new/%E5%90%8E%E5%8F%B0%E6%9C%8D%E5%8A%A1%E7%9B%91%E6%8E%A7.png)
+
+以上只是该项目**部分**功能截图，更多功能待**自行探索**！！！
 
 ## 在线体验地址
 **注意：在线预览地址可能与仓库代码不同步，以仓库为主**
-> 服务器比较垃圾，随机可能崩掉，发现了会进行维护，且看且珍惜
+> 如无法访问可能就是我没钱续费服务器了，服务器配置不低，费用不低，望各位能理解，且看且珍惜
 
 **前台博客：** https://kuailemao.xyz
 
@@ -42,7 +72,7 @@
 
 **Github地址：** https://github.com/kuailemao/Ruyu-Blog
 
-**B站视频介绍：** https://www.bilibili.com/video/BV181hNeiEDb/?vd_source=ff1e09f5473622b91dc0efc92418b537#reply112716668797561
+**B站视频介绍(最初版本预览，不代表最终品质)：** https://www.bilibili.com/video/BV181hNeiEDb/?vd_source=ff1e09f5473622b91dc0efc92418b537#reply112716668797561
 
 **接口文档：** [API文档 (kuailemao.xyz)](http://kuailemao.xyz:8088/doc.html#/home)
 
@@ -106,11 +136,11 @@
 
 > 最低 2 核 4 G
 
-**我的：** 腾讯云 2 核 2 G  4 M * 2  （穷）
+**我的：** 腾讯云 2 核 4 G  （带宽 6Mbps）
 
-**系统：** **OpenCloudOS**
+**系统：** **CentOS**
 
-**前端：** Docker   **后端：** jenkins
+**前端\后端：** Docker
 
 ## 后续计划（有空）
 
@@ -171,5 +201,5 @@
 
 **二维码：**
 
-<img src="https://gitee.com/kuailemao/ruyu-blog/raw/master/img/Ruyu开源博客交流群群聊二维码.png" />
+![Ruyu开源博客交流群群聊二维码](img/Ruyu%E5%BC%80%E6%BA%90%E5%8D%9A%E5%AE%A2%E4%BA%A4%E6%B5%81%E7%BE%A4%E7%BE%A4%E8%81%8A%E4%BA%8C%E7%BB%B4%E7%A0%81.png)
 
