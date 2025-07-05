@@ -7,6 +7,7 @@
   <Music />
   <DevToolsBlocker :enableDevToolsBlocker="true" />
   <ContextMenu />
+  <WelcomeCharacter />
 </template>
 
 <script setup lang="ts">
@@ -14,6 +15,7 @@ import {useDark, useToggle} from "@vueuse/core";
 import useWebsiteStore from "@/store/modules/website.ts";
 import DevToolsBlocker from "@/components/DevToolsBlocker/index.vue";
 import ContextMenu from "@/components/ContextMenu/index.vue";
+import WelcomeCharacter from "@/components/WelcomeCharacter.vue";
 
 const useWebsite = useWebsiteStore()
 
