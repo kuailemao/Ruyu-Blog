@@ -4,7 +4,11 @@
     <div>
       <InfoCard/>
     </div>
-    <div>
+    <div v-slide-in class="announcement-container">
+      <!-- 坐姿动漫少女 -->
+      <div class="anime-girl">
+        <img src="@/assets/images/动漫少女坐姿-公告_压缩.png" alt="动漫少女" />
+      </div>
       <Card title="公告" prefixIcon="announcement" suffix-icon="jt_y" :isDithering="true" :isArrow="true"
             @invoke="announcement">
         <pre class="pre-text">
@@ -110,6 +114,29 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+.announcement-container {
+  position: relative;
+  margin-top: 70px; // 为动漫少女预留空间
+}
+
+.anime-girl {
+  position: absolute;
+  top: -85px; // 向上偏移以实现坐在容器上的效果
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  
+  img {
+    max-height: 120px;
+    width: auto;
+    // 添加一些阴影效果增强立体感
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    // 图片禁止拖拽
+    -webkit-user-drag: none;
+    user-drag: none;
+  }
+}
+
 .statistics {
   display: flex;
   flex-direction: column;
@@ -132,7 +159,7 @@ onMounted(() => {
   position: relative;
   padding: 10px 25px;
   margin: 10px 0;
-  
+
   .soup-text {
     font-size: 15px;
     line-height: 1.6;
