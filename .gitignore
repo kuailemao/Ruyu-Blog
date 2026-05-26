@@ -11,6 +11,7 @@ dependencies.txt
 
 .env
 
+# IDE
 .idea
 .windsurf
 .vscode
@@ -19,5 +20,3 @@ dependencies.txt
 # AI
 .codex
 .claude
-.playwright-cli
-.git-change-playwright-regression

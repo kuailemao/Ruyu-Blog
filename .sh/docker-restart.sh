@@ -17,7 +17,7 @@ COMPOSE_FILE="${ROOT_DIR}/docker-compose.yml"
 
 DO_PULL=true
 FORCE_RECREATE=true
-SERVICES=("backend" "admin" "blog")
+SERVICES=("backend" "admin" "webdav" "blog")
 
 print_help() {
   cat <<'EOF'

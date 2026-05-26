@@ -65,7 +65,8 @@ docker compose up -d mysql redis rabbitmq minio
 ### 启动指定服务
 
 ```bash
-docker compose up -d backend admin blog
+# 入宫不使用webdev服务可以不创建webdev服务
+docker compose up -d backend admin webdav blog
 ```
 
 ## 服务端口
@@ -76,9 +77,33 @@ docker compose up -d backend admin blog
 | Redis | 6379 |
 | RabbitMQ | 5672, 15672 |
 | Minio | 9000, 9001 |
+| WebDAV | Docker 内网 6065，对外通过 dav.zhuyuxi.xyz |
 | 后端 | 8088 |
 | 后台管理 | 81 |
 | 前台博客 | 80 |
+
+## WebDAV
+
+WebDAV 使用 [`hacdias/webdav`](http://github.com/hacdias/webdav)。容器只暴露到 Docker 内网，由现有 `blog` 容器里的 Nginx 按域名 `dav.zhuyuxi.xyz` 反向代理。
+
+部署前在 `.env` 增加：
+
+```bash
+WEBDAV_USERNAME=your_webdav_user
+WEBDAV_PASSWORD=your_strong_webdav_password
+```
+
+启动或更新：
+
+```bash
+docker compose up -d webdav blog
+```
+
+验证：
+
+```bash
+curl -u "$WEBDAV_USERNAME:$WEBDAV_PASSWORD" -X PROPFIND "http://dav.zhuyuxi.xyz/" -H "Depth: 1" -i
+```
 
 ## 常用命令
 

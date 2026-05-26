@@ -23,7 +23,7 @@ WAIT_TIMEOUT=240
 
 # Default deploy targets app services only. Use --all for full stack.
 # 默认部署 app 服务，使用 --all 部署全部服务
-SERVICES=("backend" "admin" "blog")
+SERVICES=("backend" "admin" "webdav" "blog")
 TARGET_TAG=""
 
 log() { printf '[%s] %s\n' "$(date +'%F %T')" "$*"; }
