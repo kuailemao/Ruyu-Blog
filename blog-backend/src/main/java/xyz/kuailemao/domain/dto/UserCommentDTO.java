@@ -20,7 +20,7 @@ public class UserCommentDTO implements BaseData {
     //类型id
     @Schema(description = "类型id")
     @NotNull
-    private Integer typeId;
+    private Long typeId;
     //父评论id
     @Schema(description = "父评论id")
     private Long parentId;

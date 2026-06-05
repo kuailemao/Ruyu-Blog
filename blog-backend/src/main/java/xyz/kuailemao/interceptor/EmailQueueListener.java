@@ -155,21 +155,24 @@ public class EmailQueueListener {
                     "expirationTime", "5分钟",
                     "code", code,
                     "toUrl", webIndexPath,
-                    "openSourceAddress", "https://gitee.com/kuailemao/ruyu-blog"
+                    // CONFIG: 注册邮件的开源项目地址
+                    "openSourceAddress", "https://github.com/timefiy/Blog"
             ));
         } else if (MailboxAlertsEnum.RESET.getCodeStr().equals(type)) {
             mimeMessage = sendHtmlMail(email, MailboxAlertsEnum.RESET.getSubject(), MailboxAlertsEnum.RESET.getTemplateName(), Map.of(
                     "expirationTime", "5分钟",
                     "code", code,
                     "toUrl", webIndexPath,
-                    "openSourceAddress", "https://gitee.com/kuailemao/ruyu-blog"
+                    // CONFIG: 重置密码邮件的开源项目地址
+                    "openSourceAddress", "https://github.com/timefiy/Blog"
             ));
         } else if (MailboxAlertsEnum.RESET_EMAIL.getCodeStr().equals(type)) {
             mimeMessage = sendHtmlMail(email, MailboxAlertsEnum.RESET_EMAIL.getSubject(), MailboxAlertsEnum.RESET_EMAIL.getTemplateName(), Map.of(
                     "expirationTime", "5分钟",
                     "code", code,
                     "toUrl", webIndexPath,
-                    "openSourceAddress", "https://gitee.com/kuailemao/ruyu-blog"
+                    // CONFIG: 重置邮箱邮件里的开源项目地址
+                    "openSourceAddress", "https://github.com/timefiy/Blog"
             ));
         } else if (MailboxAlertsEnum.FRIEND_LINK_APPLICATION.getCodeStr().equals(type)) {
             mimeMessage = sendHtmlMail(email, MailboxAlertsEnum.FRIEND_LINK_APPLICATION.getSubject(), MailboxAlertsEnum.FRIEND_LINK_APPLICATION.getTemplateName(), Map.of(
@@ -184,7 +187,8 @@ public class EmailQueueListener {
         } else if (MailboxAlertsEnum.FRIEND_LINK_APPLICATION_PASS.getCodeStr().equals(type)) {
             mimeMessage = sendHtmlMail(email, MailboxAlertsEnum.FRIEND_LINK_APPLICATION_PASS.getSubject(), MailboxAlertsEnum.FRIEND_LINK_APPLICATION_PASS.getTemplateName(), Map.of(
                     "toUrl", webIndexPath + "link",
-                    "openSourceAddress", "https://gitee.com/kuailemao/ruyu-blog"
+                    // CONFIG: 友链申请通过邮件里的开源项目地址
+                    "openSourceAddress", "https://github.com/timefiy/Blog"
             ));
         } else if (MailboxAlertsEnum.COMMENT_NOTIFICATION_EMAIL.getCodeStr().equals(type)) {
             mimeMessage = sendHtmlMail(email, MailboxAlertsEnum.COMMENT_NOTIFICATION_EMAIL.getSubject(), MailboxAlertsEnum.COMMENT_NOTIFICATION_EMAIL.getTemplateName(), Map.of(

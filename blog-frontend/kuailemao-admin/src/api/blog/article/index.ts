@@ -1,5 +1,10 @@
 import { message } from 'ant-design-vue'
 
+function warnAndReject(err: any) {
+  message.warn(typeof err === 'string' ? err : err?.msg || '请求失败')
+  return Promise.reject(err)
+}
+
 // 查询文章分类
 export async function articleCategory() {
   return useGet('/category/list').catch(msg => message.warn(msg))
@@ -12,12 +17,12 @@ export async function articleTag() {
 
 // 新增标签
 export async function addTag(data: any) {
-  return usePut('/tag', data).catch(msg => message.warn(msg))
+  return usePut('/tag', data).catch(warnAndReject)
 }
 
 // 新增分类
 export async function addCategory(data: any) {
-  return usePut('/category', data).catch(msg => message.warn(msg))
+  return usePut('/category', data).catch(warnAndReject)
 }
 
 // 上传文章封面
@@ -26,17 +31,17 @@ export async function uploadCover(data: any) {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
-  }).catch(msg => message.warn(msg))
+  }).catch(warnAndReject)
 }
 
 // 发布文章
 export async function publishArticle(data: any) {
-  return usePost('/article/publish', data).catch(msg => message.warn(msg))
+  return usePost('/article/publish', data).catch(warnAndReject)
 }
 
 // 发布错误，删除封面
 export async function deleteCover(articleCoverUrl: string) {
-  return useGet('/article/delete/articleCover', { articleCoverUrl }).catch(msg => message.warn(msg))
+  return useGet('/article/delete/articleCover', { articleCoverUrl }).catch(warnAndReject)
 }
 
 // 上传文章图片
@@ -45,7 +50,7 @@ export async function uploadArticleImage(data: any) {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
-  }).catch(msg => message.warn(msg))
+  }).catch(warnAndReject)
 }
 
 // 文章列表

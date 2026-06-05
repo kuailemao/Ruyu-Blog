@@ -23,7 +23,7 @@ public interface CommentService extends IService<Comment> {
     /**
      * 查询文章评论
      */
-    PageVO<List<ArticleCommentVO>> getComment(Integer type, Integer typeId, Integer pageNum, Integer pageSize);
+    PageVO<List<ArticleCommentVO>> getComment(Integer type, Long typeId, Integer pageNum, Integer pageSize);
 
     /**
      * 添加评论

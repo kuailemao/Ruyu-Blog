@@ -34,7 +34,7 @@ public interface FavoriteService extends IService<Favorite> {
      * @param typeId 收藏id
      * @return 取消收藏结果
      */
-    ResponseResult<Void> cancelFavorite(Integer type, Integer typeId);
+    ResponseResult<Void> cancelFavorite(Integer type, Long typeId);
 
     /**
      * 是否已经收藏
@@ -43,7 +43,7 @@ public interface FavoriteService extends IService<Favorite> {
      * @param typeId 收藏id
      * @return 是否已经收藏
      */
-    Boolean isFavorite(Integer type, Integer typeId);
+    Boolean isFavorite(Integer type, Long typeId);
 
     /**
      * 后台收藏列表

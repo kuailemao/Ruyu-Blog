@@ -45,6 +45,7 @@ function getBase64(img: Blob, callback: (base64Url: string) => void) {
   reader.readAsDataURL(img)
 }
 
+// 虚拟节点
 const VNodes = defineComponent({
   props: {
     vnodes: {
@@ -83,7 +84,7 @@ async function getTag() {
 
 const categoryLoading = ref(false)
 
-function addCategoryFunc(e: MouseEvent) {
+async function addCategoryFunc(e: MouseEvent) {
   console.log(categoryName.value)
   if (!categoryName.value) {
     message.warn('请检查分类内容是否填写完整')
@@ -91,12 +92,22 @@ function addCategoryFunc(e: MouseEvent) {
   }
   categoryLoading.value = true
   e.preventDefault()
-  const data = { categoryName: categoryName.value, id: categoryList.value[categoryList.value.length - 1].id + 1 }
-  addCategory(data).then((res) => {
-    if (res.code === 200)
-      categoryLoading.value = false
-    categoryList.value.push(data)
-  })
+  const data = { categoryName: categoryName.value }
+  try {
+    const res = await addCategory(data)
+    if (res.code === 200) {
+      await getCategory()
+      const created = categoryList.value.find(item => item.categoryName === data.categoryName)
+      if (created)
+        formData.value.categoryId = created.id
+    }
+  }
+  catch (error) {
+    console.error('addCategory failed:', error)
+  }
+  finally {
+    categoryLoading.value = false
+  }
   categoryName.value = ''
   setTimeout(() => {
     inputRef.value?.focus()
@@ -105,19 +116,32 @@ function addCategoryFunc(e: MouseEvent) {
 
 const tagLoading = ref(false)
 
-function addTagFunc(e: MouseEvent) {
+async function addTagFunc(e: MouseEvent) {
   if (!tagName.value) {
     message.warn('请检查标签内容是否填写完整')
     return
   }
   tagLoading.value = true
   e.preventDefault()
-  const data = { tagName: tagName.value, id: tagList.value[tagList.value.length - 1].id + 1 }
-  addTag(data).then((res) => {
-    if (res.code === 200)
-      tagLoading.value = false
-    tagList.value.push(data)
-  })
+  const data = { tagName: tagName.value }
+  try {
+    const res = await addTag(data)
+    if (res.code === 200) {
+      await getTag()
+      const created = tagList.value.find(item => item.tagName === data.tagName)
+      if (created) {
+        const current = (formData.value.tagId as any[]) || []
+        if (!current.includes(created.id))
+          formData.value.tagId = [...current, created.id] as any
+      }
+    }
+  }
+  catch (error) {
+    console.error('addTag failed:', error)
+  }
+  finally {
+    tagLoading.value = false
+  }
   tagName.value = ''
   setTimeout(() => {
     inputRef.value?.focus()
@@ -127,7 +151,7 @@ function addTagFunc(e: MouseEvent) {
 async function beforeUpload(file: UploadProps['fileList'][number]) {
   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp'
   if (!isJpgOrPng) {
-    message.error('文件格式必须是jpg或png或webp')
+    message.error('图片只能是 JPG/PNG/WebP 格式!')
     return false
   }
 
@@ -147,7 +171,18 @@ async function beforeUpload(file: UploadProps['fileList'][number]) {
   return false
 }
 
-function onFinish() {
+async function safeDeleteCover(coverUrl?: string) {
+  if (!coverUrl)
+    return
+  try {
+    await deleteCover(coverUrl)
+  }
+  catch (error) {
+    console.error('deleteCover failed:', error)
+  }
+}
+
+async function onFinish() {
   if (!formData.value.articleTitle || !formData.value.categoryId || !formData.value.tagId || !formData.value.articleContent) {
     message.warn('请检查是否填写完整')
     return
@@ -159,47 +194,50 @@ function onFinish() {
   }
 
   if (!fileList.value[0] && formData.value.articleCover) {
-    publishArticle(formData.value).then((res) => {
-      if (res.code === 200)
-        message.success('发布成功')
-
-      else
-        message.error(`发布失败`)
-    })
+    try {
+      await publishArticle(formData.value)
+      message.success('发布成功')
+    }
+    catch (error) {
+      console.error('发布失败:', error)
+    }
+    return
   }
-  else {
-    const articleCover = new FormData()
-    articleCover.append('articleCover', fileList.value[0],fileList.value[0].name)
-    uploadCover(articleCover).then((res) => {
-      if (res.code === 200) {
-        const articleCover = res.data
-        formData.value.articleCover = res.data
-        publishArticle(formData.value).then((res) => {
-          if (res.code === 200) {
-            message.success('发布成功')
-            formData.value.categoryId = undefined
-            formData.value.tagId = undefined
-            formData.value.articleCover = undefined
-            formData.value.articleTitle = undefined
-            formData.value.articleContent = undefined
-            formData.value.articleType = 1
-            formData.value.isTop = 0
-            formData.value.status = 1
-            fileList.value = []
-            previewBase64.value = ''
-          }
-          else {
-            message.error(`发布失败`)
-            deleteCover(articleCover)
-          }
-        }).catch(() => {
-          deleteCover(articleCover)
-        })
-      }
-      else {
-        message.error(`上传文章封面失败`)
-      }
-    })
+
+  const coverForm = new FormData()
+  coverForm.append('articleCover', fileList.value[0], fileList.value[0].name)
+
+  try {
+    const uploadRes = await uploadCover(coverForm)
+    const uploadedCover = uploadRes?.data as string | undefined
+    if (!uploadedCover) {
+      message.error('上传文章封面失败')
+      return
+    }
+
+    formData.value.articleCover = uploadedCover
+
+    try {
+      await publishArticle(formData.value)
+      message.success('发布成功')
+      formData.value.categoryId = undefined
+      formData.value.tagId = undefined
+      formData.value.articleCover = undefined
+      formData.value.articleTitle = undefined
+      formData.value.articleContent = undefined
+      formData.value.articleType = 1
+      formData.value.isTop = 0
+      formData.value.status = 1
+      fileList.value = []
+      previewBase64.value = ''
+    }
+    catch (error) {
+      console.error('publishArticle failed:', error)
+      await safeDeleteCover(uploadedCover)
+    }
+  }
+  catch (error) {
+    console.error('uploadCover failed:', error)
   }
 }
 

@@ -2,20 +2,24 @@ package xyz.kuailemao;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import xyz.kuailemao.config.Bean.CreateBean;
 
-@SpringBootTest
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@SpringJUnitConfig
+@Import(CreateBean.class)
 class BlogBackendApplicationTests {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
     @Test
-    void contextLoads() throws Exception {
-//        String encode = passwordEncoder.encode("123456");
-//        System.out.println(encode);
+    void contextLoads() {
+        assertNotNull(passwordEncoder);
+        assertTrue(passwordEncoder.matches("123456", passwordEncoder.encode("123456")));
     }
-
 }

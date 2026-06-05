@@ -62,7 +62,7 @@ public class FavoriteController {
     @DeleteMapping("/auth/favorite")
     public ResponseResult<Void> cancelFavorite(
             @Valid @NotNull @RequestParam("type") Integer type,
-            @RequestParam(value = "typeId", required = false) Integer typeId
+            @RequestParam(value = "typeId", required = false) Long typeId
     ) {
         return favoriteService.cancelFavorite(type, typeId);
     }
@@ -76,7 +76,7 @@ public class FavoriteController {
     @GetMapping("/whether/favorite")
     public ResponseResult<Boolean> isFavorite(
             @Valid @NotNull @RequestParam("type") Integer type,
-            @RequestParam(value = "typeId", required = false) Integer typeId
+            @RequestParam(value = "typeId", required = false) Long typeId
     ) {
         return ControllerUtils.messageHandler((() -> favoriteService.isFavorite(type, typeId)));
     }

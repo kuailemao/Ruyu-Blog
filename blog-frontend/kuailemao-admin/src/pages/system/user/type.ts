@@ -1,5 +1,5 @@
 export interface UserData {
-  id: number
+  id: string | number
   nickname: string
   username: string
   roles: string[]

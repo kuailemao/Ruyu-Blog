@@ -112,7 +112,7 @@ public class ArticleController {
     @Parameter(name = "id", description = "文章id", required = true)
     @AccessLimit(seconds = 60, maxCount = 60)
     @GetMapping("/detail/{id}")
-    public ResponseResult<ArticleDetailVO> detail(@PathVariable("id") @NotNull Integer id) {
+    public ResponseResult<ArticleDetailVO> detail(@PathVariable("id") @NotNull Long id) {
         return ControllerUtils.messageHandler((() -> articleService.getArticleDetail(id)));
     }
 
@@ -124,8 +124,8 @@ public class ArticleController {
     @AccessLimit(seconds = 60, maxCount = 60)
     @GetMapping("/related/{categoryId}/{articleId}")
     public ResponseResult<List<RelatedArticleVO>> related(
-            @PathVariable("categoryId") @NotNull Integer categoryId,
-            @PathVariable("articleId") @NotNull Integer articleId
+            @PathVariable("categoryId") @NotNull Long categoryId,
+            @PathVariable("articleId") @NotNull Long articleId
     ) {
         return ControllerUtils.messageHandler((() -> articleService.relatedArticleList(categoryId, articleId)));
     }

@@ -1,13 +1,22 @@
-### Vue template
-# gitignore template for Vue.js projects
-
-### Vuejs template
-# Recommended template: Node.gitignore
-
 node_modules/
 dist/
 npm-debug.log
 yarn-error.log
-.idea
 blog.iml
 ruyu-blog-doc/
+
+dependencies.txt
+
+*.code-workspace
+
+.env
+
+# IDE
+.idea
+.windsurf
+.vscode
+.cursor
+
+# AI
+.codex
+.claude

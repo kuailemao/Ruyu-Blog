@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 // 音乐模块前台
+
 const env = import.meta.env
 
 function iframeLoaded() {
@@ -13,7 +14,7 @@ function iframeLoaded() {
   <div>
     <div id="loading">正在加载...</div>
     <div>
-          <iframe :src="env.VITE_MUSIC_FRONTEND_URL" class="if" frameborder="0" :onload="iframeLoaded"></iframe>
+      <iframe :src="env.VITE_MUSIC_FRONTEND_URL" class="if" frameborder="0" :onload="iframeLoaded"></iframe>
     </div>
   </div>
 </template>

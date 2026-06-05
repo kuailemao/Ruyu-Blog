@@ -38,7 +38,7 @@ public interface ArticleService extends IService<Article> {
      * @param id 文章id
      * @return 文章相关数据
      */
-    ArticleDetailVO getArticleDetail(Integer id);
+    ArticleDetailVO getArticleDetail(Long id);
 
     /**
      * 相关文章信息
@@ -47,7 +47,7 @@ public interface ArticleService extends IService<Article> {
      * @param articleId 文章id
      * @return 文章相关数据
      */
-    List<RelatedArticleVO> relatedArticleList(Integer categoryId, Integer articleId);
+    List<RelatedArticleVO> relatedArticleList(Long categoryId, Long articleId);
 
     /**
      * 查询时间轴数据

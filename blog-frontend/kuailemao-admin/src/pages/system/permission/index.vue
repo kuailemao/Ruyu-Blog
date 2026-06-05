@@ -131,7 +131,7 @@ const modalInfo = reactive({
   title: '',
 })
 
-async function openBtnFunc(value: boolean, flag?: number, id?: number) {
+async function openBtnFunc(value: boolean, flag?: number, id?: string | number) {
   if (flag === 0) {
     modalData.value = {} as any
     modalInfo.title = '新增权限'

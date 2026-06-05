@@ -32,7 +32,7 @@ public class LikeServiceImpl extends ServiceImpl<LikeMapper, Like> implements Li
     private RedisCache redisCache;
 
     @Override
-    public ResponseResult<Void> userLike(Integer type, Integer typeId) {
+    public ResponseResult<Void> userLike(Integer type, Long typeId) {
         // 查询是否已经点赞
         Like like = likeMapper.selectOne(new LambdaQueryWrapper<Like>()
                 .eq(Like::getUserId, SecurityUtils.getUserId())
@@ -50,7 +50,7 @@ public class LikeServiceImpl extends ServiceImpl<LikeMapper, Like> implements Li
     }
 
     @Override
-    public ResponseResult<Void> cancelLike(Integer type, Integer typeId) {
+    public ResponseResult<Void> cancelLike(Integer type, Long typeId) {
         // 查询是否已经点赞
         Like isLike = likeMapper.selectOne(new LambdaQueryWrapper<Like>()
                 .eq(Like::getUserId, SecurityUtils.getUserId())
@@ -68,7 +68,7 @@ public class LikeServiceImpl extends ServiceImpl<LikeMapper, Like> implements Li
     }
 
     @Override
-    public ResponseResult<List<Like>> isLike(Integer type, Integer typeId) {
+    public ResponseResult<List<Like>> isLike(Integer type, Long typeId) {
         if (SecurityUtils.isLogin()) {
             LambdaQueryWrapper<Like> wrapper = new LambdaQueryWrapper<>();
             if (Objects.equals(type, LikeEnum.LIKE_TYPE_ARTICLE.getType())) {

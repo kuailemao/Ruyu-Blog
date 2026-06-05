@@ -37,8 +37,8 @@ public class FileUploadUtils {
     @Value("${minio.bucketName}")
     private String bucketName;
 
-    @Value("${minio.endpoint}")
-    private String endpoint;
+    @Value("${MINIO_PUBLIC_ENDPOINT:${minio.endpoint}}")
+    private String publicEndpoint;
 
     /**
      * 上传文件
@@ -60,7 +60,7 @@ public class FileUploadUtils {
                     .stream(stream, file.getSize(), -1)
                     .build();
             client.putObject(args);
-            return endpoint + "/" + bucketName + "/" + uploadEnum.getDir() + name + "." + getFileExtension(file.getOriginalFilename());
+            return publicEndpoint + "/" + bucketName + "/" + uploadEnum.getDir() + name + "." + getFileExtension(file.getOriginalFilename());
         }
         log.error("--------------------上传文件格式不正确--------------------");
         throw new FileUploadException("上传文件类型错误");
@@ -85,7 +85,7 @@ public class FileUploadUtils {
                     .stream(stream, file.getSize(), -1)
                     .build();
             client.putObject(args);
-            return endpoint + "/" + bucketName + "/" + uploadEnum.getDir() + fileName + "." + getFileExtension(file.getOriginalFilename());
+            return publicEndpoint + "/" + bucketName + "/" + uploadEnum.getDir() + fileName + "." + getFileExtension(file.getOriginalFilename());
         }
         log.error("--------------------上传文件格式不正确--------------------");
         throw new FileUploadException("上传文件类型错误");
@@ -110,7 +110,7 @@ public class FileUploadUtils {
                     .stream(stream, file.getSize(), -1)
                     .build();
             client.putObject(args);
-            return endpoint + "/" + bucketName + "/" + uploadEnum.getDir() + dir + "/" + fileName + "." + getFileExtension(file.getOriginalFilename());
+            return publicEndpoint + "/" + bucketName + "/" + uploadEnum.getDir() + dir + "/" + fileName + "." + getFileExtension(file.getOriginalFilename());
         }
         log.error("--------------------上传文件格式不正确--------------------");
         throw new FileUploadException("上传文件类型错误");
@@ -147,22 +147,25 @@ public class FileUploadUtils {
         return fileExtension;
     }
 
-
+    /**
+     * 判断文件是否符合大小
+     *
+     * @param fileSize
+     * @param limitSize
+     * @return 文件是否符合大小
+     */
     public Boolean verifyTheFileSize(Long fileSize, Double limitSize) {
-        // 转为相同大小格式
-        double formatFileSize = convertFileSizeToMB(fileSize);
-        if (formatFileSize < limitSize) {
-            return false;
-        }
-        return true;
+        double fileSizeInMB = (double) fileSize / (1024 * 1024);
+        return fileSizeInMB > limitSize;
     }
 
     /**
-     * B 转 MB
+     * B 转 MB,四舍五入到两位小数
      *
      * @param sizeInBytes 文件大小 B
      * @return 文件大小 MB
      */
+    
     public double convertFileSizeToMB(long sizeInBytes) {
         double sizeInMB = (double) sizeInBytes / (1024 * 1024);
         String formatted = String.format("%.2f", sizeInMB);
@@ -193,8 +196,8 @@ public class FileUploadUtils {
                 item = result.get();
                 fileNames.add(item.objectName());
             } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException |
-                     InvalidResponseException | IOException | NoSuchAlgorithmException | ServerException |
-                     XmlParserException e) {
+                    InvalidResponseException | IOException | NoSuchAlgorithmException | ServerException |
+                    XmlParserException e) {
                 log.error("获取文件出现错误", e);
             }
         });

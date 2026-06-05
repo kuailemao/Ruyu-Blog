@@ -306,8 +306,9 @@ const isDark = useDark()
         </ul>
       </aside>
       <div class="overlay"
-           v-if="isMobileMenuOpen"
-           @click="closeMobileMenu"></div>
+          v-if="isMobileMenuOpen"
+          @click="closeMobileMenu">
+      </div>
       <div class="gallery-container">
         <PhotoGallery
             v-model:currentPath="currentPath"

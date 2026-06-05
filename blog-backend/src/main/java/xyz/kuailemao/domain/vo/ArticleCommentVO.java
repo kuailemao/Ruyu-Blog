@@ -26,7 +26,7 @@ public class ArticleCommentVO {
     //评论类型 (1文章 2友链 3说说)
     private Integer commentType;
     //类型id
-    private Integer typeId;
+    private Long typeId;
     //父评论id
     private Long parentId;
     //回复评论id

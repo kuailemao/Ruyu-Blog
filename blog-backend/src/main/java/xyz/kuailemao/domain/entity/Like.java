@@ -29,7 +29,7 @@ public class Like {
     //点赞类型(1,文章，2,评论)
     private Integer type;
     //点赞的文章id
-    private Integer typeId;
+    private Long typeId;
     //点赞时间
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;

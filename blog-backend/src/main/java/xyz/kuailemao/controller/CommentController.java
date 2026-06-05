@@ -51,7 +51,7 @@ public class CommentController {
     @GetMapping("/getComment")
     public ResponseResult<PageVO<List<ArticleCommentVO>>> comment(
             @Valid @NotNull Integer type,
-            @Valid @NotNull Integer typeId,
+            @Valid @NotNull Long typeId,
             @Valid @NotNull Integer pageNum,
             @Valid @NotNull Integer pageSize
     ) {

@@ -7,12 +7,12 @@
   <div style="width: 100vw;height: 100vh;overflow: hidden;display: flex">
     <!-- 左边区域 -->
     <div class="left-card">
+      <!-- CONFIG:欢迎页面的背景图 -->
       <el-image style="width: 100%;height: 100%" fit="cover"
-                src="https://image.kuailemao.xyz/blog/background/压缩水狗.png"/>
+                src="http://image.zhuyuxi.xyz/blog/background/%E8%83%8C%E6%99%AF.png"/>
     </div>
     <div class="welcome-title">
       <div>欢迎来到我的个人博客</div>
-      <div style="margin-top: 10px">在这里你可以学习如何使用Java，如何搭建网站，如何拥有自己的个人网站</div>
     </div>
     <!-- 右边区域 -->
     <div class="right-card">

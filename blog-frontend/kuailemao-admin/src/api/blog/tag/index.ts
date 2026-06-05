@@ -1,5 +1,10 @@
 import { message } from 'ant-design-vue'
 
+function warnAndReject(err: any) {
+  message.warn(typeof err === 'string' ? err : err?.msg || '请求失败')
+  return Promise.reject(err)
+}
+
 // 标签列表
 export async function tagList() {
   return useGet('/tag/back/list').catch(msg => message.warn(msg))
@@ -17,15 +22,15 @@ export async function searchTagById(id: string) {
 
 // 新增标签
 export async function addTag(data: any) {
-  return usePut('/tag/back/add', data).catch(msg => message.warn(msg))
+  return usePut('/tag/back/add', data).catch(warnAndReject)
 }
 
 // 修改标签
 export async function updateTag(data: any) {
-  return usePost('/tag/back/update', data).catch(msg => message.warn(msg))
+  return usePost('/tag/back/update', data).catch(warnAndReject)
 }
 
 // 删除标签
 export async function deleteTagByIds(ids: string[]) {
-  return useDelete('/tag/back/delete', JSON.stringify(ids)).catch(msg => message.warn(msg))
+  return useDelete('/tag/back/delete', JSON.stringify(ids)).catch(warnAndReject)
 }

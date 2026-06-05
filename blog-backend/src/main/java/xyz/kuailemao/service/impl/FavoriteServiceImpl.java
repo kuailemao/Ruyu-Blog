@@ -67,7 +67,7 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
     }
 
     @Override
-    public ResponseResult<Void> cancelFavorite(Integer type, Integer typeId) {
+    public ResponseResult<Void> cancelFavorite(Integer type, Long typeId) {
         // 查询是否已经收藏
         Favorite isFavorite = favoriteMapper.selectOne(new LambdaQueryWrapper<Favorite>()
                 .eq(Favorite::getUserId, SecurityUtils.getUserId())
@@ -84,7 +84,7 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
     }
 
     @Override
-    public Boolean isFavorite(Integer type, Integer typeId) {
+    public Boolean isFavorite(Integer type, Long typeId) {
         if (SecurityUtils.isLogin()) {
             // 是否收藏
             Favorite favorite = favoriteMapper.selectOne(new LambdaQueryWrapper<Favorite>()

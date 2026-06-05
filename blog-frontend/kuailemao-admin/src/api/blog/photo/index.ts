@@ -1,12 +1,14 @@
 import { message } from 'ant-design-vue'
 
+type IdType = string | number
+
 /**
  * 相册与照片列表
  */
 export async function photoAndAlbumList(params: {
   pageNum: number
   pageSize: number
-  parentId: number | null
+  parentId: IdType | null
 }) {
   return useGet('/photo/back/list', params).catch(msg => message.warn(msg))
 }
@@ -18,7 +20,7 @@ export async function photoAndAlbumList(params: {
 export async function createAlbum(data: {
   name: string
   description: string
-  parentId: number | null
+  parentId: IdType | null
 }) {
   return usePost('/photo/album/create', data).catch(msg => message.warn(msg))
 }
@@ -39,7 +41,7 @@ export async function uploadPhoto(data: any) {
  * 修改相册
  */
 export async function updateAlbum(data: {
-  id: number
+  id: IdType
   name: string
   description: string
 }) {
@@ -49,6 +51,6 @@ export async function updateAlbum(data: {
 /**
  * 删除相册或照片
  */
-export async function deletePhotoOrAlbum(data: { id: number; type: 1 | 2 ;parentId: number | null }) {
+export async function deletePhotoOrAlbum(data: { id: IdType; type: 1 | 2; parentId: IdType | null }) {
   return useDelete('/photo/delete', data).catch(msg => message.warn(msg))
 }

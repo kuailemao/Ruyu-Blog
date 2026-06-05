@@ -41,7 +41,7 @@ public class LikeController {
     @PostMapping("/auth/like")
     public ResponseResult<Void> like(
             @RequestParam("type") @Valid @NotNull Integer type,
-            @RequestParam("typeId") @Valid @NotNull Integer typeId
+            @RequestParam("typeId") @Valid @NotNull Long typeId
     ) {
         return likeService.userLike(type, typeId);
     }
@@ -56,7 +56,7 @@ public class LikeController {
     @DeleteMapping("/auth/like")
     public ResponseResult<Void> cancelLike(
             @RequestParam("type") @Valid @NotNull Integer type,
-            @RequestParam("typeId") @Valid @NotNull Integer typeId
+            @RequestParam("typeId") @Valid @NotNull Long typeId
     ) {
         return likeService.cancelLike(type, typeId);
     }
@@ -70,7 +70,7 @@ public class LikeController {
     @GetMapping("whether/like")
     public ResponseResult<List<Like>> isLike(
             @Valid @NotNull @RequestParam("type") Integer type,
-            @RequestParam(value = "typeId", required = false) Integer typeId
+            @RequestParam(value = "typeId", required = false) Long typeId
     ) {
         return likeService.isLike(type, typeId);
     }

@@ -1,0 +1,209 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库
+  mysql:
+    image: timeflyflower/blog-mysql:latest
+    container_name: blog-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: blog
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - blog-network
+
+# Redis 缓存
+  redis:
+    image: redis:7.2.3-alpine
+    container_name: blog-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - blog-network
+
+# RabbitMQ 消息队列
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: blog-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - blog-network
+
+  # Minio 对象存储
+  minio:
+    image: minio/minio:latest
+    container_name: blog-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - blog-network
+
+  # MinIO 初始化（自动创建桶）
+  minio-init:
+    image: minio/mc:latest
+    container_name: blog-minio-init
+    restart: "no"
+    depends_on:
+      minio:
+        condition: service_started
+    entrypoint: >
+      /bin/sh -c "
+      until mc alias set local http://minio:9000 ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD}; do sleep 2; done &&
+      mc mb --ignore-existing local/${MINIO_BUCKETNAME:-blog} &&
+      mc anonymous set download local/${MINIO_BUCKETNAME:-blog}
+      "
+    networks:
+      - blog-network
+
+  # WebDAV file service
+  webdav:
+    image: ghcr.io/hacdias/webdav:latest
+    container_name: blog-webdav
+    restart: unless-stopped
+    command: ["-c", "/config.yml"]
+    environment:
+      WEBDAV_USERNAME: ${WEBDAV_USERNAME:?WEBDAV_USERNAME must be set}
+      WEBDAV_PASSWORD: ${WEBDAV_PASSWORD:?WEBDAV_PASSWORD must be set}
+    expose:
+      - "6065"
+    volumes:
+      - ./webdav/config.yml:/config.yml:ro
+      - webdav_data:/data
+    networks:
+      - blog-network
+
+  # 后端服务
+  backend:
+    image: timeflyflower/blog-backend:latest
+    container_name: blog-backend
+    restart: unless-stopped
+    ports:
+      - "8088:8088"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Hong_Kong}
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: "6379"
+      SPRING_DATA_REDIS_DATABASE: ${SPRING_DATA_REDIS_DATABASE:-1}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: "5672"
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_DEFAULT_USER:-admin}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_DEFAULT_PASS}
+      SPRING_SECURITY_JWT_KEY: ${SPRING_SECURITY_JWT_KEY}
+      SPRING_SECURITY_JWT_EXPIRE: ${SPRING_SECURITY_JWT_EXPIRE:-7}
+      SPRING_RABBITMQ_QUEUE_EMAIL: ${SPRING_RABBITMQ_QUEUE_EMAIL:-email_queue}
+      SPRING_RABBITMQ_QUEUE_LOG_LOGIN: ${SPRING_RABBITMQ_QUEUE_LOG_LOGIN:-log_login_queue}
+      SPRING_RABBITMQ_QUEUE_LOG_SYSTEM: ${SPRING_RABBITMQ_QUEUE_LOG_SYSTEM:-log_system_queue}
+      SPRING_RABBITMQ_EXCHANGE_EMAIL: ${SPRING_RABBITMQ_EXCHANGE_EMAIL:-email_exchange}
+      SPRING_RABBITMQ_EXCHANGE_LOG: ${SPRING_RABBITMQ_EXCHANGE_LOG:-log_exchange}
+      SPRING_RABBITMQ_ROUTINGKEY_EMAIL: ${SPRING_RABBITMQ_ROUTINGKEY_EMAIL:-email_routing_key}
+      SPRING_RABBITMQ_ROUTINGKEY_LOG_LOGIN: ${SPRING_RABBITMQ_ROUTINGKEY_LOG_LOGIN:-log_routing_key_login}
+      SPRING_RABBITMQ_ROUTINGKEY_LOG_SYSTEM: ${SPRING_RABBITMQ_ROUTINGKEY_LOG_SYSTEM:-log_routing_key_system}
+
+      SPRING_MAIL_HOST: ${SPRING_MAIL_HOST}
+      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-587}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH:-true}
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE:-true}
+
+      MAIL_ARTICLE_EMAIL_NOTICE: ${MAIL_ARTICLE_EMAIL_NOTICE:-false}
+      MAIL_ARTICLE_REPLY_NOTICE: ${MAIL_ARTICLE_REPLY_NOTICE:-false}
+      MAIL_MESSAGE_EMAIL_NOTICE: ${MAIL_MESSAGE_EMAIL_NOTICE:-false}
+      MAIL_MESSAGE_REPLY_NOTICE: ${MAIL_MESSAGE_REPLY_NOTICE:-false}
+      MAIL_MESSAGE_NEW_NOTICE: ${MAIL_MESSAGE_NEW_NOTICE:-false}
+      MAIL_APPLY_NOTICE: ${MAIL_APPLY_NOTICE:-false}
+      MAIL_PASS_NOTICE: ${MAIL_PASS_NOTICE:-false}
+      MAIL_LINK_APPLY_REDIRECT_URI: ${MAIL_LINK_APPLY_REDIRECT_URI:-http://admin.zhuyuxi.xyz:81/api/link/email/apply}
+      WEB_INDEX_PATH: ${WEB_INDEX_PATH:-http://www.zhuyuxi.xyz/}
+
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-https://image.zhuyuxi.xyz}
+      MINIO_ACCESSKEY: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_SECRETKEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKETNAME: ${MINIO_BUCKETNAME:-blog}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      minio:
+        condition: service_started
+      minio-init:
+        condition: service_completed_successfully
+    networks:
+      - blog-network
+
+  # 后台管理前端
+  admin:
+    image: timeflyflower/blog-admin:latest
+    container_name: blog-admin
+    restart: unless-stopped
+    ports:
+      - "81:81"
+    depends_on:
+      - backend
+    networks:
+      - blog-network
+
+  # 前台博客
+  blog:
+    image: timeflyflower/blog-front:latest
+    container_name: blog-front
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./blog-frontend/kuailemao-blog/default-docker.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+      - webdav
+    networks:
+      - blog-network
+
+# 容器卷
+volumes:
+  mysql_data:
+  redis_data:
+  rabbitmq_data:
+  minio_data:
+  webdav_data:
+
+# 网络
+networks:
+  blog-network:
+    driver: bridge

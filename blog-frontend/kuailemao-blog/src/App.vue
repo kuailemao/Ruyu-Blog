@@ -4,7 +4,8 @@
   </div>
   <!-- 全局loading -->
   <loading></loading>
-  <Music />
+  <!-- CONFIG：注释了前端音乐模块(左下角的播放器) -->
+  <!-- <Music /> -->
   <DevToolsBlocker :enableDevToolsBlocker="true" />
   <ContextMenu />
 </template>

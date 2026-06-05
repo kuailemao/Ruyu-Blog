@@ -18,8 +18,8 @@ function isClose(){
   emit("update:closeDrawer")
 }
 
-// 是否显示音乐模块
 const env = import.meta.env
+
 </script>
 <template>
 <div>
@@ -86,7 +86,9 @@ const env = import.meta.env
       </el-icon>
       友链
     </el-menu-item>
-    <template v-if="env.VITE_MUSIC_FRONTEND_URL">
+    <!-- CONFIG：注释了前端音乐的路由 -->
+    <!-- <template v-if="env.VITE_MUSIC_FRONTEND_URL"> -->
+    <template v-if="false">
       <el-menu-item index="/music">
         <el-icon>
           <Headset/>
@@ -100,7 +102,9 @@ const env = import.meta.env
       </el-icon>
       关于
     </el-menu-item>
-    <el-menu-item index="/photo" @click="isClose">
+    <!-- CONFIG：注释了前端相册的路由 -->
+    <!-- <el-menu-item index="/photo" @click="isClose"> -->
+    <el-menu-item index="/photo" @click="isClose" v-if="false">
       <el-icon>
         <PictureFilled/>
       </el-icon>

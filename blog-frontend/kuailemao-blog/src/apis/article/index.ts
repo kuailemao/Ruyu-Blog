@@ -9,7 +9,7 @@ export const getArticleDetail = (id: string | string[]) => {
 }
 
 // 获取评论
-export const getComment = (type: number, typeId: number, pageNum: string, pageSize: string) => {
+export const getComment = (type: number, typeId: string | number, pageNum: string, pageSize: string) => {
     return http.request({
         url: '/comment/getComment',
         method: "get",

@@ -63,7 +63,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     private LikeMapper likeMapper;
 
     @Override
-    public PageVO<List<ArticleCommentVO>> getComment(Integer type, Integer typeId, Integer pageNum, Integer pageSize) {
+    public PageVO<List<ArticleCommentVO>> getComment(Integer type, Long typeId, Integer pageNum, Integer pageSize) {
         // 查询父评论
         LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper
@@ -239,7 +239,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             // 同步redis评论数量
             // 如果是文章评论，则改变redis中文章数量
             // 1.查询评论所在的文章id
-            Integer articleId = commentMapper
+            Long articleId = commentMapper
                     .selectOne(
                             new LambdaQueryWrapper<Comment>()
                                     .eq(Comment::getId, isCheckDTO.getId())

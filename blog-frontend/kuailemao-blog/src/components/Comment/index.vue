@@ -15,11 +15,11 @@ import {useColorMode} from "@vueuse/core";
 
 const props = defineProps({
   authorId: {
-    type: Number,
+    type: [String, Number],
     required: true
   },
   typeId: {
-    type: Number,
+    type: [String, Number],
     required: true
   },
   // 是否显示头部添加框
@@ -46,7 +46,7 @@ const isLoading = ref(false)
 const activeCommentId = ref(null);
 
 // 添加设置活动评论框的方法
-function setActiveComment(id: number | null) {
+function setActiveComment(id: string | number | null) {
   activeCommentId.value = id;
 }
 
@@ -178,7 +178,7 @@ function recursionChildComment(childComment: any, res: any) {
 }
 
 // 修改 replyBtn 函数
-function replyBtn(comment: object[], id: number) {
+function replyBtn(comment: object[], id: string | number) {
   // 在对应评论项目显示回复框
   comment.forEach((item: any) => {
     if (item.id === id) {
@@ -201,7 +201,7 @@ function replyBtn(comment: object[], id: number) {
 }
 
 // 修改递归函数也需要同样的逻辑
-function recursionReplyBtn(childComment: object[], id: number) {
+function recursionReplyBtn(childComment: object[], id: string | number) {
   childComment.forEach((child: any) => {
     if (child.id === id) {
       if (!child.showReplyBox) {
@@ -234,7 +234,7 @@ watch(() => props.typeId, (value) => {
 })
 
 // 获取文章评论
-function getComments(typeId: number, pageNum: string, pageSize: string) {
+function getComments(typeId: string | number, pageNum: string, pageSize: string) {
   getComment(<number>props.type, typeId, pageNum, pageSize).then(res => {
     if (res.code == 200) {
       isLoading.value = true

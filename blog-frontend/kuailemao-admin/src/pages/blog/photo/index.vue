@@ -6,11 +6,18 @@ import type {Rule} from 'ant-design-vue/es/form'
 import {createAlbum, photoAndAlbumList, uploadPhoto, updateAlbum, deletePhotoOrAlbum} from "~/api/blog/photo";
 import {compressImage} from "~/utils/CompressedImage.ts";
 
+type IdType = string | number
+
+function isSameId(a: IdType | null | undefined, b: IdType | null | undefined) {
+  if (a === null || a === undefined || b === null || b === undefined)
+    return a === b
+  return String(a) === String(b)
+}
 // 统一的数据接口
 interface BaseItem {
-  id: number
+  id: IdType
   name: string
-  parentId: number | null
+  parentId: IdType | null
   createTime: string
   type: 1 | 2  // 1: 相册, 2: 照片
   children?: BaseItem[]  // 子数据字段
@@ -46,9 +53,9 @@ async function refreshFunc() {
     console.log("平铺数据",res.data.page)
     const flatData = res.data.page
     // 构建树形结构
-    const buildTree = (items: (Album | Photo)[], parentId: number | null = null): (Album | Photo)[] => {
+    const buildTree = (items: (Album | Photo)[], parentId: IdType | null = null): (Album | Photo)[] => {
       return items
-          .filter(item => item.parentId === parentId)
+          .filter(item => isSameId(item.parentId, parentId))
           .map(item => {
             if (item.type === 1) {
               const children = buildTree(items, item.id)
@@ -64,7 +71,7 @@ async function refreshFunc() {
   })
 }
 
-const currentAlbumId = ref<number | null>(null)
+const currentAlbumId = ref<IdType | null>(null)
 const breadcrumbPath = ref<Album[]>([])
 const showModal = ref(false)
 const modalType = ref<1 | 2 | 3>(1)
@@ -73,10 +80,10 @@ const formRules: Record<string, Rule[]> = {
   name: [{required: true, type: 'string', message: '请输入名称', trigger: 'blur'}]
 }
 const formState = ref({
-  id: 0,
+  id: "" as IdType,
   name: '',
   description: '',
-  parentId: null as number | null,
+  parentId: null as IdType | null,
   file: null as File | null
 })
 
@@ -153,11 +160,11 @@ const updateBreadcrumb = async (album: Album) => {
         if (res.code === 200) {
           const items = res.data.list
           const path: Album[] = []
-          let currentId: number | null = album.id
+          let currentId: IdType | null = album.id
           
           // 从当前相册往上查找父级
           while (currentId !== null) {
-            const current = items.find(item => item.id === currentId) as Album
+            const current = items.find(item => isSameId(item.id, currentId)) as Album
             if (current) {
               path.unshift(current)
               currentId = current.parentId
@@ -178,7 +185,7 @@ const updateBreadcrumb = async (album: Album) => {
 
 // 进入相册
 const enterAlbum = async (album: Album) => {
-  if (currentAlbumId.value === album.id) {
+  if (isSameId(currentAlbumId.value, album.id)) {
     return
   }
   
@@ -216,7 +223,7 @@ const openModal = (type: 1 | 2 | 3) => {
   modalType.value = type
   // 重置表单状态，并设置当前所在相册的ID作为父ID
   formState.value = {
-    id: 0,
+    id: "" as IdType,
     name: '',
     description: '',
     parentId: currentAlbumId.value,  // 使用当前相册ID作为父ID

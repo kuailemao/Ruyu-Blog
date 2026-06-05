@@ -141,7 +141,8 @@
         </li>
         
         <!-- 音乐 -->
-        <li class="menu-item" @click="navigateTo('/music')">
+        <!-- CONFIG：注释了前端音乐的右键菜单导航栏 -->
+        <!-- <li class="menu-item" @click="navigateTo('/music')">
           <div class="menu-item-icon">
             <svg viewBox="0 0 24 24" width="24" height="24" :stroke="isDarkMode ? '#a78bfa' : '#8b5cf6'" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 18V5l12-2v13"></path>
@@ -150,10 +151,11 @@
             </svg>
           </div>
           <span>音乐</span>
-        </li>
+        </li> -->
         
         <!-- 相册 -->
-        <li class="menu-item" @click="navigateTo('/photo')">
+        <!-- CONFIG：注释了前端相册的右键菜单导航栏 -->
+        <!-- <li class="menu-item" @click="navigateTo('/photo')">
           <div class="menu-item-icon">
             <svg viewBox="0 0 24 24" width="24" height="24" :stroke="isDarkMode ? '#a78bfa' : '#8b5cf6'" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -162,7 +164,7 @@
             </svg>
           </div>
           <span>相册</span>
-        </li>
+        </li> -->
         
         <li class="menu-divider" :style="isDarkMode ? 'background: #372f52;' : 'background: #f0e6ff;'"></li>
         

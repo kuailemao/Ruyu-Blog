@@ -85,14 +85,25 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Page<Article> page = new Page<>(pageNum, pageSize);
         this.page(page, new LambdaQueryWrapper<Article>().eq(Article::getStatus, SQLConst.PUBLIC_ARTICLE).orderByDesc(Article::getCreateTime));
         List<Article> list = page.getRecords();
+        /*
+        timefiy
+        增添list为空的处理
+        */
+        if (list == null || list.isEmpty()) {
+            return new PageVO<>(List.of(), page.getTotal());
+        }
         // 文章分类
         // 1. 优化：使用 Map 存储分类和标签信息，避免 N+1 问题
-        Map<Long, String> categoryMap = categoryMapper.selectBatchIds(list.stream().map(Article::getCategoryId).toList())
-                .stream().collect(Collectors.toMap(Category::getId, Category::getCategoryName));
+        List<Long> categoryIds = list.stream().map(Article::getCategoryId).filter(Objects::nonNull).distinct().toList();
+        Map<Long, String> categoryMap = categoryIds.isEmpty() ? Map.of()
+                : categoryMapper.selectBatchIds(categoryIds).stream().collect(Collectors.toMap(Category::getId, Category::getCategoryName));
 
-        List<ArticleTag> articleTags = articleTagMapper.selectBatchIds(list.stream().map(Article::getId).toList());
-        Map<Long, String> tagMap = tagMapper.selectBatchIds(articleTags.stream().map(ArticleTag::getTagId).toList())
-                .stream().collect(Collectors.toMap(Tag::getId, Tag::getTagName));
+        List<Long> articleIds = list.stream().map(Article::getId).filter(Objects::nonNull).toList();
+        List<ArticleTag> articleTags = articleIds.isEmpty() ? List.of()
+                : articleTagMapper.selectList(new LambdaQueryWrapper<ArticleTag>().in(ArticleTag::getArticleId, articleIds));
+        List<Long> tagIds = articleTags.stream().map(ArticleTag::getTagId).filter(Objects::nonNull).distinct().toList();
+        Map<Long, String> tagMap = tagIds.isEmpty() ? Map.of()
+                : tagMapper.selectBatchIds(tagIds).stream().collect(Collectors.toMap(Tag::getId, Tag::getTagName));
 
         List<ArticleVO> articleVOS = list.stream().map(article -> {
             ArticleVO articleVO = article.asViewObject(ArticleVO.class);
@@ -153,7 +164,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     @Override
-    public ArticleDetailVO getArticleDetail(Integer id) {
+    public ArticleDetailVO getArticleDetail(Long id) {
         Article article = articleMapper.selectOne(new LambdaQueryWrapper<Article>().eq(Article::getStatus, SQLConst.PUBLIC_ARTICLE).and(i -> i.eq(Article::getId, id)));
         if (StringUtils.isNull(article)) return null;
         // 文章分类
@@ -161,7 +172,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // 文章关系
         List<ArticleTag> articleTags = articleTagMapper.selectList(new LambdaQueryWrapper<ArticleTag>().eq(ArticleTag::getArticleId, article.getId()));
         // 标签
-        List<Tag> tags = tagMapper.selectBatchIds(articleTags.stream().map(ArticleTag::getTagId).toList());
+        List<Long> tagIds = articleTags.stream().map(ArticleTag::getTagId).filter(Objects::nonNull).toList();
+        List<Tag> tags = tagIds.isEmpty() ? List.of() : tagMapper.selectBatchIds(tagIds);
         // 当前文章的上一篇文章与下一篇文章,大于当前文章的最小文章与小于当前文章的最大文章
         LambdaQueryWrapper<Article> preAndNextWrapper = new LambdaQueryWrapper<>();
         preAndNextWrapper.lt(Article::getId, id);
@@ -185,7 +197,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     @Override
-    public List<RelatedArticleVO> relatedArticleList(Integer categoryId, Integer articleId) {
+    public List<RelatedArticleVO> relatedArticleList(Long categoryId, Long articleId) {
         // 文章id不等于当前文章id,相关推荐排除自己，5条
         List<Article> articles = articleMapper.selectList(
                 new LambdaQueryWrapper<Article>()
@@ -214,9 +226,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             else articles = List.of();
         } else articles = List.of();
 
-        if (Objects.isNull(articles) || articles.isEmpty()) return null;
-        List<ArticleTag> articleTags = articleTagMapper.selectBatchIds(articles.stream().map(Article::getId).toList());
-        List<Tag> tags = tagMapper.selectBatchIds(articleTags.stream().map(ArticleTag::getTagId).toList());
+        if (Objects.isNull(articles) || articles.isEmpty()) return List.of();
+        List<Long> articleIds = articles.stream().map(Article::getId).filter(Objects::nonNull).toList();
+        List<ArticleTag> articleTags = articleIds.isEmpty() ? List.of()
+                : articleTagMapper.selectList(new LambdaQueryWrapper<ArticleTag>().in(ArticleTag::getArticleId, articleIds));
+        List<Long> tagIds = articleTags.stream().map(ArticleTag::getTagId).filter(Objects::nonNull).distinct().toList();
+        List<Tag> tags = tagIds.isEmpty() ? List.of() : tagMapper.selectBatchIds(tagIds);
 
         return articles.stream().map(article -> article.asViewObject(CategoryArticleVO.class, item -> {
             item.setCategoryId(articles.stream().filter(art -> Objects.equals(art.getId(), article.getId())).findFirst().orElseThrow().getCategoryId());
@@ -256,7 +271,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                 return ResponseResult.failure("上传格式错误");
         } catch (Exception e) {
             log.error("文章封面上传失败", e);
-            return ResponseResult.failure();
+            return ResponseResult.failure("upload article cover failed");
         }
     }
 
@@ -266,16 +281,25 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Transactional
     @Override
     public ResponseResult<Void> publish(ArticleDTO articleDTO) {
-        Article article = articleDTO.asViewObject(Article.class, v -> v.setUserId(SecurityUtils.getUserId()));
-        if (this.saveOrUpdate(article)) {
+        try {
+            Article article = articleDTO.asViewObject(Article.class, v -> v.setUserId(SecurityUtils.getUserId()));
+            if (this.saveOrUpdate(article)) {
             // 清除标签关系
-            articleTagMapper.deleteById(article.getId());
+            articleTagMapper.delete(new LambdaQueryWrapper<ArticleTag>().eq(ArticleTag::getArticleId, article.getId()));
             // 新增标签关系
-            List<ArticleTag> articleTags = articleDTO.getTagId().stream().map(articleTag -> ArticleTag.builder().articleId(article.getId()).tagId(articleTag).build()).toList();
-            articleTagService.saveBatch(articleTags);
-            return ResponseResult.success();
+            List<ArticleTag> articleTags = articleDTO.getTagId().stream()
+                    .map(articleTag -> ArticleTag.builder().articleId(article.getId()).tagId(articleTag).build())
+                    .toList();
+            if (articleTags.isEmpty() || articleTagService.saveBatch(articleTags))
+                return ResponseResult.success();
+
+            return ResponseResult.failure("save article tags failed");
+            }
+            return ResponseResult.failure("save article failed");
+        } catch (Exception e) {
+            log.error("publish article failed", e);
+            return ResponseResult.failure("publish article failed");
         }
-        return ResponseResult.failure();
     }
 
     @Value("${minio.bucketName}")
@@ -305,7 +329,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         } catch (Exception e) {
             log.error("文章图片上传失败", e);
         }
-        return null;
+        return ResponseResult.failure("upload article image failed");
     }
 
     @Override
@@ -318,7 +342,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                 articleListVO.setUserName(userMapper.selectById(articleListVO.getUserId()).getUsername());
                 // 查询文章标签
                 List<Long> tagIds = articleTagMapper.selectList(new LambdaQueryWrapper<ArticleTag>().eq(ArticleTag::getArticleId, articleListVO.getId())).stream().map(ArticleTag::getTagId).toList();
-                articleListVO.setTagsName(tagMapper.selectBatchIds(tagIds).stream().map(Tag::getTagName).toList());
+                articleListVO.setTagsName(tagIds.isEmpty() ? List.of() : tagMapper.selectBatchIds(tagIds).stream().map(Tag::getTagName).toList());
             });
             return articleListVOS;
         }
@@ -339,7 +363,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                 articleListVO.setUserName(userMapper.selectById(articleListVO.getUserId()).getUsername());
                 // 查询文章标签
                 List<Long> tagIds = articleTagMapper.selectList(new LambdaQueryWrapper<ArticleTag>().eq(ArticleTag::getArticleId, articleListVO.getId())).stream().map(ArticleTag::getTagId).toList();
-                articleListVO.setTagsName(tagMapper.selectBatchIds(tagIds).stream().map(Tag::getTagName).toList());
+                articleListVO.setTagsName(tagIds.isEmpty() ? List.of() : tagMapper.selectBatchIds(tagIds).stream().map(Tag::getTagName).toList());
             });
             return articleListVOS;
         }
@@ -368,7 +392,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (StringUtils.isNotNull(articleDTO)) {
             // 查询文章标签
             List<Long> tagIds = articleTagMapper.selectList(new LambdaQueryWrapper<ArticleTag>().eq(ArticleTag::getArticleId, articleDTO.getId())).stream().map(ArticleTag::getTagId).toList();
-            articleDTO.setTagId(tagMapper.selectBatchIds(tagIds).stream().map(Tag::getId).toList());
+            articleDTO.setTagId(tagIds.isEmpty() ? List.of() : tagMapper.selectBatchIds(tagIds).stream().map(Tag::getId).toList());
             return articleDTO;
         }
         return null;

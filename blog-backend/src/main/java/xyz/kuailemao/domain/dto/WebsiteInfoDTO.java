@@ -1,5 +1,6 @@
 package xyz.kuailemao.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import xyz.kuailemao.domain.BaseData;
@@ -26,5 +27,6 @@ public class WebsiteInfoDTO implements BaseData {
     @Length(max = 100, message = "备案信息字数不能超过100")
     private String recordInfo;
     //开始运行时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private Date startTime;
 }

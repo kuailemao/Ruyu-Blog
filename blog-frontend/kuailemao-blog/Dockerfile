@@ -1,9 +1,4 @@
-FROM nginx
-
-MAINTAINER 博客前台
-
-RUN rm /etc/nginx/conf.d/default.conf
-
-ADD default.conf /etc/nginx/conf.d/
-
+FROM nginx:1.30.1-alpine
+RUN rm -f /etc/nginx/conf.d/default.conf
+COPY default-docker.conf /etc/nginx/conf.d/default.conf
 COPY dist/ /usr/share/nginx/html/

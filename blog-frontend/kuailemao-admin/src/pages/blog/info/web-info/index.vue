@@ -52,15 +52,26 @@ function getRunTime(startTime: string) {
   return `${days + 1} 天 ${hours + 1} 小时 ${minutes} 分钟 ${seconds} 秒`.replace(/-/g, '')
 }
 
+// 重置表单
 function resetWebsiteInfo() {
   emit('reset:web:info')
 }
 
+// 更新网站信息
 function updateWebsiteInfo() {
-  console.log()
-  const startTime = dayjs(formData.startTime).format('YYYY-MM-DD HH:mm:ss')
-  const form = Object.assign({}, formData)
-  form.startTime = startTime
+  const start = dayjs(formData.startTime)
+  if (!start.isValid()) {
+    message.warning('运行时间格式不正确')
+    return
+  }
+
+  const form = {
+    websiteName: formData.websiteName,
+    headerNotification: formData.headerNotification,
+    sidebarAnnouncement: formData.sidebarAnnouncement,
+    recordInfo: formData.recordInfo,
+    startTime: start.format('YYYY-MM-DD HH:mm:ss'),
+  }
 
   updateWebInfo(form).then((res) => {
     if (res.code === 200)

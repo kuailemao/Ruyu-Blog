@@ -87,6 +87,7 @@ export default ({ mode }: ConfigEnv): UserConfig => {
       host: '0.0.0.0',
       proxy: {
         [env.VITE_APP_BASE_API]: {
+          // OPTIMIZE：现在的baseurl为空不能用 vite dev --mode production 跑开发服务器
           target: env.VITE_APP_BASE_URL,
           changeOrigin: true,
           rewrite: path => path.replace(new RegExp(`^${env.VITE_APP_BASE_API}`), ''),

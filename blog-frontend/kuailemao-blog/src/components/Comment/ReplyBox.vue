@@ -20,7 +20,7 @@ const prop = defineProps({
   },
   type: Number,
   activeCommentId: {
-    type: [Number, null],
+    type: [String, Number],
     default: null
   },
   setActiveComment: {

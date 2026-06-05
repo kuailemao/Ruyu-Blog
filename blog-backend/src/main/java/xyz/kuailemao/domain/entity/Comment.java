@@ -28,7 +28,7 @@ public class Comment implements BaseData {
     //评论类型 (1文章 2留言板)
     private Integer type;
     //类型id
-    private Integer typeId;
+    private Long typeId;
     //父评论id
     private Long parentId;
     //回复评论id

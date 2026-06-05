@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# 构建产生
+visualizer.html
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

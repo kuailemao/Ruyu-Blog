@@ -83,14 +83,15 @@ export const constantRouter = [
                 }
             },
             // 音乐
-            {
-                path: '/music',
-                component: () => import('@/views/Music/index.vue'),
-                name: 'music',
-                meta: {
-                    title: '音乐',
-                }
-            },
+            // CONFIG：注释了前端音乐的路由
+            // {
+            //     path: '/music',
+            //     component: () => import('@/views/Music/index.vue'),
+            //     name: 'music',
+            //     meta: {
+            //         title: '音乐',
+            //     }
+            // },
             // 关于
             {
                 path: '/about',
@@ -101,14 +102,15 @@ export const constantRouter = [
                 }
             },
             // 相册
-            {
-                path: '/photo',
-                component: () => import('@/views/Photo/index.vue'),
-                name: 'photo',
-                meta: {
-                    title: '相册',
-                }
-            },
+            // CONFIG：注释了前端相册的路由
+            // {
+            //     path: '/photo',
+            //     component: () => import('@/views/Photo/index.vue'),
+            //     name: 'photo',
+            //     meta: {
+            //         title: '相册',
+            //     }
+            // },
         ]
     },
     // 文章

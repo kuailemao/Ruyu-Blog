@@ -10,6 +10,7 @@ public class FunctionConst {
     /**
      * 未知用户标记
      */
+    // HACK：UNKNOWN_USER不够直观
     public static final String UNKNOWN_USER = "unknown-1702606997";
 
     /**

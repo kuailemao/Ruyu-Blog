@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import {ElMessage, FormRules, UploadInstance} from 'element-plus'
+import {dayjs, ElMessage, FormRules, UploadInstance} from 'element-plus'
 import {Plus, User, Select, Message, Refresh, Unlock} from '@element-plus/icons-vue'
 
 import type {UploadProps} from 'element-plus'
 import useUserStore from "@/store/modules/user.ts";
 import {updateEmail, updateThirdEmail, updateUserAccount} from "@/apis/user";
 import {sendEmail} from "@/apis/email";
+import { imageConversion } from '@/utils/tool';
 
 
 const uploadRef = ref<UploadInstance>()
 
+// 用户信息表单
 const accountForm = ref<any>({
   nickname: '',
   gender: undefined,
@@ -17,7 +19,10 @@ const accountForm = ref<any>({
   avatar: ''
 })
 
+// 头像预览
 const avatarImg = ref()
+// 头像加载错误
+const avatarLoadError = ref(false)
 
 const userStore = useUserStore()
 
@@ -27,6 +32,7 @@ const emailForm = reactive({
   password: '',
 })
 
+// 更新用户信息
 function updateUser() {
   baseFormRef.value.validate((isValid: boolean) => {
     if (isValid) {
@@ -56,8 +62,21 @@ const env = import.meta.env;
 // 上传头像
 const uploadAvatar = env.MODE === 'development' ? '/api/user/auth/upload/avatar' : env.VITE_SERVE + '/api/user/auth/upload/avatar'
 // token
-const token = localStorage.getItem('Token') || sessionStorage.getItem('Token') || ''
+const rawToken = localStorage.getItem('Token') || sessionStorage.getItem('Token') || ''
+const getAuthToken = (value: string) => {
+  if (!value) return ''
+  try {
+    const parsed = JSON.parse(value)
+    return parsed?.token || value
+  } catch {
+    return value
+  }
+}
+const uploadHeaders = {
+  Authorization: `Bearer ${getAuthToken(rawToken)}`
+}
 
+// 头像上传成功回调
 const handleAvatarSuccess: UploadProps['onSuccess'] = (
     response
 ) => {
@@ -66,24 +85,50 @@ const handleAvatarSuccess: UploadProps['onSuccess'] = (
     return
   }
   accountForm.value.avatar = response.data
+  // 图像为压缩后的图像
+  avatarImg.value = response.data
   updateUser()
   firstImg.value = avatarImg.value
 }
 
-const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+const beforeAvatarUpload:  UploadProps['beforeUpload'] = async (rawFile) => {
   firstImg.value = avatarImg.value
-  if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
-    ElMessage.error('头像图片需要jpg或者png类型的图片！！')
-    return false
-  } else if (rawFile.size / 1024 / 1024 > 2) {
-    ElMessage.error('头像图片大小不能超过2MB！')
+  if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png' && rawFile.type !== 'image/webp') {
+    ElMessage.error('头像图片需要jpg/png或/webp类型的图片！！')
     return false
   }
-  return true
+
+  // OPTIMIZE：PNG压缩可能压缩不到0.3MB导致上传失败，后续优化一下算法
+  // INFO：这里对图片的进行限制0.3MB，下面imageConversion函数会对图片进行压缩，参数为0.28
+  // 压缩后的图片如果仍然超过0.3MB则提示用户更换更小的图片
+  const limitMb = 0.3
+  const sizeMb = rawFile.size / 1024 / 1024
+  if (sizeMb <= limitMb) return true
+
+  try {
+    const blob = (await imageConversion(rawFile, 280, 1, 5)) as Blob
+    const compressed = new File([blob], rawFile.name, {
+      type: rawFile.type,
+      lastModified: Date.now(),
+    })
+
+    const compressedMb = compressed.size / 1024 / 1024
+    if (compressedMb > limitMb) {
+      ElMessage.error('图片压缩后仍超过 0.3MB，请换更小图片')
+      return false
+    }
+
+    ElMessage.success('已自动压缩后上传')
+    return compressed
+  } catch (e) {
+    ElMessage.error('图片压缩失败，请重试或选择更小的图片')
+    return false
+  }
 }
 
 const handleChange = (uploadFile: any) => {
   avatarImg.value = URL.createObjectURL(uploadFile.raw)
+  avatarLoadError.value = false
 }
 
 onMounted(() => {
@@ -91,11 +136,16 @@ onMounted(() => {
     if (userStore.userInfo) {
       accountForm.value = userStore.userInfo
       avatarImg.value = userStore.userInfo.avatar
+      avatarLoadError.value = false
       firstImg.value = userStore.userInfo.avatar
       emailForm.email = userStore.userInfo.email
     }
   });
 })
+
+const handleAvatarError = () => {
+  avatarLoadError.value = true
+}
 
 // 验证用户昵称
 const validateUsername = (_: any, value: any, callback: any) => {
@@ -177,6 +227,13 @@ const isEmailValid = computed(() => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]
 // 邮件发送验证码冷却时间
 const coldTime = ref(0)
 
+const formatDateTime = (value?: string) => {
+  if (!value) return '-'
+  const date = dayjs(value)
+  return date.isValid() ? date.format('YYYY-MM-DD HH:mm:ss') : value
+}
+
+
 /**
  * 获取验证码
  */
@@ -250,12 +307,12 @@ function getEmailCode(){
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload"
                     :on-change="handleChange"
-                    :headers="{'Authorization': 'Bearer ' + JSON.parse(token).token}"
+                    :headers="uploadHeaders"
                     :auto-upload="false"
                     ref="uploadRef"
                     name="avatarFile"
                 >
-                  <img v-if="avatarImg" :src="avatarImg" class="avatar" alt="头像" style="border-radius: 50%"/>
+                  <img v-if="avatarImg && !avatarLoadError" :src="avatarImg" class="avatar" alt="" style="border-radius: 50%" @error="handleAvatarError"/>
                   <el-icon v-else class="avatar-uploader-icon">
                     <Plus/>
                   </el-icon>
@@ -338,7 +395,7 @@ function getEmailCode(){
             <div style="text-align: center;padding: 15px 15px 10px 15px">
               <el-avatar :size="70" :src="userStore.userInfo?.avatar"/>
               <div style="font-weight: bold">
-                你好，{{ userStore.userInfo?.nickname }}
+                {{ userStore.userInfo?.nickname }}
               </div>
               <el-divider style="margin: 10px 0"/>
               <div style="font-size: 14px;color: grey;padding: 10px">
@@ -352,8 +409,8 @@ function getEmailCode(){
             <div class="text-gray-400 font-bold">
               欢迎加入Ruyu个人博客！
             </div>
-            <div>注册时间：{{ userStore.userInfo?.createTime }}</div>
-            <div>登录时间：{{ userStore.userInfo?.loginTime }}</div>
+            <div>注册时间：{{ formatDateTime(userStore.userInfo?.createTime) }}</div>
+            <div>登录时间：{{ formatDateTime(userStore.userInfo?.loginTime) }}</div>
           </div>
         </transition>
       </div>
@@ -366,6 +423,7 @@ function getEmailCode(){
   width: 178px;
   height: 178px;
   display: block;
+  object-fit: cover;
 }
 
 .el-icon.avatar-uploader-icon {

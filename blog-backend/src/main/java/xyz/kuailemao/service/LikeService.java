@@ -22,7 +22,7 @@ public interface LikeService extends IService<Like> {
      * @param typeId 点赞id
      * @return 点赞结果
      */
-    ResponseResult<Void> userLike(Integer type, Integer typeId);
+    ResponseResult<Void> userLike(Integer type, Long typeId);
 
     /**
      * 取消点赞
@@ -31,7 +31,7 @@ public interface LikeService extends IService<Like> {
      * @param typeId 点赞id
      * @return 取消点赞结果
      */
-    ResponseResult<Void> cancelLike(Integer type, Integer typeId);
+    ResponseResult<Void> cancelLike(Integer type, Long typeId);
 
     /**
      * 是否点赞
@@ -40,7 +40,7 @@ public interface LikeService extends IService<Like> {
      * @param typeId 点赞id
      * @return 是否点赞
      */
-    ResponseResult<List<Like>> isLike(Integer type, Integer typeId);
+    ResponseResult<List<Like>> isLike(Integer type, Long typeId);
 
     /**
      * 获取点赞数

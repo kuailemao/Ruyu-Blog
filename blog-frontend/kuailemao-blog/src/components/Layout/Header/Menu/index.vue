@@ -41,7 +41,6 @@ function changeToggle({detail}) {
   mode.value = detail
 }
 
-// 是否显示音乐模块
 const env = import.meta.env
 
 const isMenuVisible = ref(true);
@@ -95,7 +94,7 @@ onUnmounted(() => {
         <div style="display: flex;justify-content: space-between;align-items: center">
           <span style="font-size: 1.2rem">搜索</span>
           <el-button :icon="Close" style="background: none;font-size: 1.5rem;width: 30px;border: none"
-                     @click="dialogVisible = false"/>
+                    @click="dialogVisible = false"/>
         </div>
       </template>
       <Search @isShowSearch="dialogVisible = false"/>
@@ -159,7 +158,7 @@ onUnmounted(() => {
                 <IceCreamRound/>
               </el-icon>
               <span>其他</span>
-               <el-icon class="arrow">
+              <el-icon class="arrow">
                 <ArrowDownBold/>
               </el-icon>
             </span>
@@ -198,15 +197,18 @@ onUnmounted(() => {
               <span>友链</span>
             </span>
           </div>
-          <div class="menus_item" @click="router.push('/music')" v-if="env.VITE_MUSIC_FRONTEND_URL">
+          <!-- CONFIG：注释了前端音乐的导航栏 -->
+          <!-- <div class="menus_item" @click="router.push('/music')" v-if="env.VITE_MUSIC_FRONTEND_URL"> -->
+          <div class="menus_item" @click="router.push('/music')" v-if="false">
             <span>
               <el-icon>
                 <Headset/>
               </el-icon>
-             <span>音乐</span>
+              <span>音乐</span>
             </span>
           </div>
-          <div class="menus_item" @click="router.push('/photo')">
+          <!-- CONFIG：注释了前端相册的导航栏 -->
+          <div class="menus_item" @click="router.push('/photo')" v-if="false">
             <span>
               <el-icon>
                 <PictureFilled/>
@@ -243,15 +245,14 @@ onUnmounted(() => {
           <div class="profile">
             <div style="font-size: 15px;font-weight: bold;color: black">{{ userStore.userInfo?.username }}</div>
             <div style="font-size: 14px;color: #363636;margin-top: 3px"
-                 v-if="userStore.userInfo?.registerType === 0">{{ userStore.userInfo?.email }}
+                v-if="userStore.userInfo?.registerType === 0">{{ userStore.userInfo?.email }}
             </div>
             <div style="font-size: 14px;color: #363636;margin-top: 3px" v-else>
               {{ userStore.userInfo?.registerType === 1 ? 'Gitee登录' : 'Github登录' }}
             </div>
           </div>
           <el-dropdown>
-            <el-avatar style="margin-right: 3rem"
-                       :src="userStore.userInfo?.avatar"></el-avatar>
+            <el-avatar style="margin-right: 3rem" :src="userStore.userInfo?.avatar"></el-avatar>
             <template #dropdown>
               <el-dropdown-item @click="router.push('/setting')">
                 <template #default>

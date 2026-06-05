@@ -1,4 +1,5 @@
 ## 升级v1.6.0导入[t_photo.sql](t_photo.sql)表
+
 **1、新建相册管理菜单：**
 ![img_1.png](img_1.png)
 

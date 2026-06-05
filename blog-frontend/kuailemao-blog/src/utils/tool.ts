@@ -251,7 +251,10 @@ export const returnTime = (time) => {
 /**
  * 图片压缩
  * @param {*} file 图片
- * @param {*} size 文件压缩至大小 实际上可能压缩不到 有可能会更小
+ * @param {*} size 文件压缩至大小 实际上可能压缩不到 有可能会更小，单位为kb
+ * @param {*} quality 压缩质量 0-1
+ * @param {*} maxTime 最大压缩次数
+ * @returns 压缩后的Blob对象
  */
 export const imageConversion = (file, size = 800, quality = 1, maxTime = 3) => {
     return new Promise((resolve) => {
